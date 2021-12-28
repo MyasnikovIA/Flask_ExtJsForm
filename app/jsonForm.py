@@ -31,6 +31,7 @@ TMP_PAGE_CAHE = {}
 # Шаблон JS файла для динамической загрузки ExtJS формы из JS функции  "openForm"
 TEMP_JS_FORM = """
   Ext.onReady(function() {
+       {%cmpDataset%}
        let {%frmObj%}_onclose = function(data){ }
        let {%frmObj%} = {%};
        if ( typeof(window.ExtObj["FormsObject"]) !=='undefined'){
@@ -46,19 +47,21 @@ TEMP_JS_FORM = """
                 let {%frmObj%}dataText = localStorage.getItem("ExtJsFormVars:"+{%frmObj%}['formName']);
                 if ({%frmObj%}dataText !== '{}') {
                     try {
-                       let {%frmObj%}_parentVars = JSON.parse({%frmObj%}dataText);
-                       if (typeof({%frmObj%}_parentVars['vars']) !== 'undefined') {
+                        let {%frmObj%}_parentVars = JSON.parse({%frmObj%}dataText);
+                     } catch {
+                       console.log("Error: Не удалось получить переменные из родительского окна")
+                     } 
+                     if (typeof({%frmObj%}_parentVars) !== 'undefined') {
+                        if (typeof({%frmObj%}_parentVars['vars']) !== 'undefined') {
                            for( let {%frmObj%}_key in {%frmObj%}_parentVars['vars']) {
                               {%frmObj%}['vars'][{%frmObj%}_key] = {%frmObj%}_parentVars['vars'][{%frmObj%}_key];
                            } 
                         }
-                       if (typeof({%frmObj%}_parentVars['parentFrom']) !== 'undefined') {
-                         {%frmObj%}['parentFrom'] = {%frmObj%}_parentVars['parentFrom'];
-                       }
-                       delete {%frmObj%}_parentVars;
-                    } catch {
-                       console.log("Error: Не удалось получить переменные из родительского окна")
-                    } 
+                        if (typeof({%frmObj%}_parentVars['parentFrom']) !== 'undefined') {
+                          {%frmObj%}['parentFrom'] = {%frmObj%}_parentVars['parentFrom'];
+                        }
+                     }
+                     delete {%frmObj%}_parentVars;
                 }
                 localStorage.removeItem("ExtJsFormVars:"+{%frmObj%}['formName']);      
                 delete {%frmObj%}dataText;
@@ -128,6 +131,8 @@ def getParsedForm(formName, data, session={}, isHtml=0):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
+    return getSrc(formName, data, session, isHtml)
+
     getTempCont = True
     if "debug" in data and int(data["debug"]) > 0:
         getTempCont = False
@@ -144,6 +149,8 @@ def replaceTempData(ext,txt, data):
     extListHtml = ["frm",'js',"html"] # список разрешений которые обрабатываются как текст
     if ext in extListHtml:
         if "vars" in data:
+            if str(type(txt)) == "<class 'bytes'>":
+                txt = txt.decode()
             txt = txt.replace("//=[[%DataVars%]]", f"={JSON_stringify(data['vars'], ensure_ascii=False)}")
             del data["vars"]
         if "isModal" in data:
@@ -349,8 +356,11 @@ def getXMLObject(formName):
     if rootForm.tag == "error":
         return rootForm
     rootForm = joinDfrm(formName, rootForm)
-    script = rootForm.findall(f"cmpScript")
-    if not blockName == "":  # получаем блок XML с именем blockName
+    if blockName == "":
+        script = rootForm.findall(f"cmpScript")
+        dataset = rootForm.findall(f"cmpDataSet")
+        return rootForm, script, dataset
+    else:  # получаем блок XML с именем blockName
         nodes = rootForm.findall(f"*[@name='{blockName}']")  # ишим фрагмент формы по атребуту имени
         if len(nodes) > 0:
             rootForm = nodes[0]
@@ -364,7 +374,7 @@ def getXMLObject(formName):
                     rootForm = nodes[0]
                 else:
                     rootForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{formName}" not found </error>')
-    return rootForm,script
+        return  rootForm, None, None
 
 
 def jsonFunFromString(html=""):
@@ -403,11 +413,14 @@ def getSrc(formName, data={}, session={}, isHtml=0):
             .replace("{%isMOdal%}",isModal)
         html = jsonFunFromString(html)
         return  html,  mimeType(ext)
-    rootForm, script = getXMLObject(formName)
+    rootForm, script,dataset = getXMLObject(formName)
     if rootForm.tag == "error":
         return f'{{"error":"{rootForm.text}"}}', "application/x-javascript"
+
     jsonFrm = parseXMLFrm(rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
+    jsonDataset = parseXMLDataset(dataset, formName, data, session) # парсим Script фрагменты
+
     jsonFrm['formName'] = formName
     jsonFrm['retuen_object'] = {}
     if not "listeners" in jsonFrm:
@@ -428,6 +441,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
         jsonFrmTxt = f" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} "
         html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
+            .replace("{%cmpDataset%}",jsonDataset)\
             .replace("{%frmObj%}",frmObj)\
             .replace("{%formName%}",formName)\
             .replace("{%cmpScript%}",jsonScript)\
@@ -450,6 +464,132 @@ def parseXMLScript(scriptXml, formName, data, session):
         scriptText.append(elem.text)
     return "\n".join(scriptText)
 
+
+def parseXMLDataset(datasetXml, formName, data, session):
+    """
+      Распарсить лист XML  объектов cmpScript 
+    """""
+    scriptText = []
+    for elem in datasetXml:
+        xmldict = dict(elem.attrib.copy())
+        if not "name" in xmldict:
+            continue
+        if not "activateoncreate" in xmldict:
+            xmldict["activateoncreate"] = "true"
+        extDataStore = {}
+        if len(datasetXml) > 0:
+            for subelem in elem:
+                subObject = dict(subelem.attrib.copy())
+                print("subObject",subObject)
+        scriptText.append(f"""DATA_SET_{{%frmObj%}}_{xmldict['name']}= new Ext.data.Store(""")
+        scriptText.append(JSON_stringify(extDataStore, ensure_ascii=False))
+        scriptText.append(");\r\n      ")
+        # scriptText.append(elem.text)
+    return " ".join(scriptText)
+
+def parseGridElement(xmldict,formName, data, session, root, info):
+    if "caption" in xmldict and not "title" in xmldict:
+        xmldict['title'] = xmldict['caption']
+        del xmldict['caption']
+    fieldsList = []
+    columnsList = []
+    columnsObj = []
+    storyObj = {}
+    if "store" in xmldict:
+        xmldict["store"] = f'(--##--){xmldict["store"]}(--##--)'
+    if "columns" in xmldict:
+        columnsList = [f"{val}" for val in xmldict['columns'].split(',')]
+    if "fields" in xmldict:
+        fieldsList = [f"{val}" for val in xmldict['fields'].split(',')]
+    if "dataset" in xmldict:
+        xmldict["store"] = f'''(--##--)DATA_SET_{{%frmObj%}}_{xmldict['dataset']}(--##--)'''
+    if "data" in xmldict:
+        storyObj["data"] = f'(--##--){xmldict["data"]}(--##--)'
+        del xmldict["data"]
+    elif not root.text == None:
+        txtTmp = root.text.strip().replace('"', "'").replace("\n", "").replace("\r", "")
+        if len(txtTmp) > 0:
+            storyObj["data"] = f'''(--##--){txtTmp}(--##--)'''
+    if len(root) > 0:
+        numSubEl = -1
+        for elem in root:
+            subObject = parseXMLFrm(elem, formName, data, session, root, info)
+            numSubEl+=1
+            if "mainForm" in subObject:
+                del subObject['mainForm']
+            if not "dataIndex" in subObject and "field" in subObject:
+                subObject['dataIndex'] = subObject["field"]
+                del subObject["field"]
+            if not "header" in subObject and "caption" in subObject:
+                subObject['header'] = subObject["caption"]
+                del subObject["caption"]
+            if "dataIndex" in subObject:
+                fieldsList.append(subObject['dataIndex'])
+            else:
+                if len(fieldsList) > numSubEl:
+                    subObject['dataIndex'] = fieldsList[numSubEl]
+            columnsObj.append(subObject)
+        xmldict["columns"] = columnsObj
+    elif len(columnsList) == len(fieldsList) and len(fieldsList)>0:
+        for ind in range(len(columnsList)):
+           subObject={}
+           subObject ["dataIndex"]=fieldsList[ind]
+           subObject ["header"]=columnsList[ind]
+           columnsObj.append(subObject)
+        xmldict["columns"] = columnsObj
+    storyObj["fields"] = fieldsList
+    if not "store" in xmldict:
+        txtArr = ["(--##--)"]
+        txtArr.append("new Ext.data.Store({")
+        if "url" in xmldict:
+            storyObj["data"] = f"(--##--)getJsonUrl('{xmldict['url']}')(--##--)"
+        if "dataset" in xmldict:
+            # txtArr.append(f"data:getJsonUrl('{xmldict['url']}'),")
+            pass
+        elif not root.text == None and not root.tail == None:
+            txtTmp = root.text.strip().replace('"', "'").replace("\n", "").replace("\r", "")
+            if len(txtTmp) > 0:
+                storyObj["data"] = f"(--##--){txtTmp}(--##--)"
+        xmldict["store"] = storyObj
+    return xmldict
+
+
+def parseComboBoxElement(xmldict,formName, data, session, root, info):
+    storeObj = {}
+    if "caption" in xmldict and not "fieldLabel" in xmldict:
+        xmldict['fieldLabel'] = xmldict['caption']
+        del xmldict['caption']
+    if "store" in xmldict:
+        xmldict["store"] = f'''{xmldict["store"].replace('"', "'")}'''
+        return xmldict
+    if "dataset" in xmldict:
+        xmldict["store"] = f'''(--##--)DATA_SET_{{%frmObj%}}_{xmldict['dataset']}(--##--)'''
+        return xmldict
+
+    storeObj = {}
+    dataItem = []
+    if "fields" in xmldict:
+        storeObj["fields"] = xmldict["fields"].split(",")
+        del xmldict["fields"]
+    if "data" in xmldict:
+        storeObj["data"] = f'''(--##--){xmldict["data"].replace('"', "'")}(--##--)'''
+        del xmldict["data"]
+    if len(root) == 0 and not root.text == None and not root.tail == None:
+        txtval = root.text.replace("\r", "").replace("\n", "").replace('"', "'")
+        if len(txtval) > 0:
+            storeObj["data"] = f'(--##--){txtval}(--##--)'
+    elif len(root) > 0:
+        for elem in root:
+            subObject = parseXMLFrm(elem, formName, data, session, root, info)
+            if "mainForm" in subObject:
+                del subObject['mainForm']
+            dataItem.append(subObject)
+        storeObj["data"] = dataItem
+    elif "url" in xmldict:
+        storeObj["data"] = f'''(--##--)getJsonUrl('{xmldict['url']}')(--##--)'''
+        del xmldict['url']
+    xmldict["store"] = storeObj
+    return xmldict
 
 itemsThiwObject = ["buttons"]
 itemsBlock = ['div','item']
@@ -485,6 +625,8 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
             xmldict[k] = f'(--##--){v}(--##--)'
         elif v.strip()[:4] == "Ext.":
             xmldict[k] = f'(--##--){v}(--##--)'
+        elif v.strip()[-1:] == "}" or v.strip()[:1] == "{" or v.strip()[-1:] == "]" or v.strip()[:1] == "[":
+            xmldict[k] = f'(--##--){v}(--##--)'
 
     if parentRoot==None:
         xmldict["vars_return"] = {}
@@ -506,6 +648,15 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
                 xmldict["handler"] = xmldict["onclick"]
                 del xmldict["onclick"]
 
+        # Создаем Store из локального контента
+        if root.tag[3:].lower() == 'combobox':
+            return parseComboBoxElement(xmldict, formName, data, session, root, info)
+        if root.tag[3:].lower() == 'combo':
+            return parseComboBoxElement(xmldict, formName, data, session, root, info)
+        if root.tag[3:].lower() == 'grid':
+            return parseGridElement(xmldict, formName, data, session, root, info)
+
+        # ======= HTML ==========
         htmlText = ""
         if not root.text == None:
             htmlText = f"{htmlText}{root.text}"
@@ -513,7 +664,7 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
             htmlText = f"{htmlText}{root.tail}"
         if len(htmlText) > 0 and len(htmlText.replace(" ","").replace("\n","").replace("\r",""))>0:
             xmldict['html'] = htmlText
-        # del htmlText
+
         # =========== Рекурсионый обход дерева ============================
         if hasattr(root, 'getchildren'):
             for elem in root.getchildren():
@@ -523,6 +674,8 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
                 blockName='items'
                 if root.tag[3:].lower() == 'button':
                     blockName = 'menu'
+                if xmldict['xtype'] == 'combo':
+                    blockName = 'store'
                 if not blockName in xmldict:
                     xmldict[blockName] = []
                 xmldict[blockName].append(subObject)
@@ -535,6 +688,8 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
                 blockName='items'
                 if root.tag[3:].lower() == 'button':
                     blockName = 'menu'
+                if root.tag[3:].lower() == 'combo':
+                    blockName = 'store'
                 if not blockName in xmldict:
                     xmldict[blockName] = []
                 xmldict[blockName].append(subObject)

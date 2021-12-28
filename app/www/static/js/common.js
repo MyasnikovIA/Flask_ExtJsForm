@@ -146,6 +146,18 @@ function objectPreprocessing(obj) {
 }
 
 
+function getJsonUrl(url) {
+    let xhr = new CreateRequest();
+    xhr.open('GET', url, false);
+    xhr.send();
+    if (xhr.status != 200) {
+      console.log( xhr.status + ': ' + xhr.statusText );
+      return {'error':xhr.status + ' : ' + xhr.statusText} ;
+    } else {
+      return JSON.parse(xhr.response);
+    }
+}
+
 function CreateRequest() {
     var Request = false;
 
@@ -202,8 +214,45 @@ function sendSrv(url, data, colbackFun) {
     //delete request;
 }
 
-window.ExtObj={};
+function ctrlDataSetExecute(_dom,datsetName) {
+   console.log("ctrlDataSetExecute,_dom",_dom)
+   let winObj = Ext.getCmp(_dom['mainForm'])
+   return new Ext.data.Store({
+        fields: [], // Поля, доступные в массиве данных
+        data: []
+    })
+}
 
+
+
+function refreshDataSet(_dom,datsetName,collbackFun){
+
+}
+function getExtDataStore(_dom,data) {
+
+    Ext.Ajax.request({
+        method: "POST",
+        url: url,
+        jsonData:  obj,
+        success: function (response) {
+            alert('success: ' + response.responseText);
+        },
+        failure: function (e, jqxhr) {
+            alert('failure!');
+            alert(e.status);
+        }
+    });
+
+   console.log("ctrlDataSetExecute,_dom",_dom)
+   let winObj = Ext.getCmp(_dom['mainForm'])
+   return new Ext.data.Store({
+        fields: [], // Поля, доступные в массиве данных
+        data: []
+    })
+}
+
+
+window.ExtObj={};
 function getVar(_dom,propName,value) {
    if (typeof(value) === 'undefined') {
       value = null;
