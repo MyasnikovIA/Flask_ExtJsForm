@@ -12,7 +12,6 @@ from flask import render_template
 from jinja2 import Template
 import jsonForm
 
-
 import requests as reqExt
 import urllib.parse
 
@@ -34,7 +33,6 @@ def before_request():
     """
     pass
 
-
 @app.after_request
 def after_request(response):
     # CORS in flask
@@ -43,6 +41,7 @@ def after_request(response):
     header['Access-Control-Allow-Headers'] = '*' # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
     header['Access-Control-Allow-Methods'] = '*' # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
     header['Server'] = 'D3apiServer'
+    header['Last-Modified'] =datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return response
 
 
@@ -69,16 +68,10 @@ def all_files(path):
     # Обработка запроса из JS функции  openWindow
     if "request.php" in path:
         queryJson = jsonForm.getAttrQuery(request)
-        formName = ""
-        if 'Form' in queryJson:
-            formName = queryJson['Form']
-            del queryJson['Form']
-        if len(formName) == 0:
-            return ""
-        if not "." in formName:
-            formName = f"{formName}.frm"
-        bin, mime = jsonForm.getParsedForm(formName, queryJson, jsonForm.SESSION_DICT[session["ID"]], 0)
-        return bin, 200, {'content-type': "application/json"}
+        print(queryJson)
+        return "{}", 200, {'content-type': "application/json"}
+        #bin, mime = jsonForm.getParsedForm(formName, queryJson, jsonForm.SESSION_DICT[session["ID"]], 0)
+        #return bin, 200, {'content-type': "application/json"}
 
     # Поиск запроса в каталоге static
     pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}{path}"

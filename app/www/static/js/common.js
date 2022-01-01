@@ -223,11 +223,6 @@ function ctrlDataSetExecute(_dom,datsetName) {
     })
 }
 
-
-
-function refreshDataSet(_dom,datsetName,collbackFun){
-
-}
 function getExtDataStore(_dom,data) {
 
     Ext.Ajax.request({
@@ -327,6 +322,53 @@ function close(_dom,mod) {
       ctrlObj.destroy()
    }
 }
+
+
+function refreshDataSet(){
+     if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
+     if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};
+     if (arguments.length === 0) return;
+     let datasetName = "";
+     let isModalWin = false;
+     let objectQuery = {};
+     let renderTo = Ext.getBody();
+     let arr = [].slice.call(arguments); // Перегружаем все аргументы в массив
+     let colbackFun = null;
+     let formName = "";
+     let _domParent = null;
+     if (typeof(arr[0]) === 'object') {
+        _domParent = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'string') {
+        datasetName = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'object') {
+        objectQuery = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'function') {
+        colbackFun = arr.splice(0, 1)[0];
+     }
+     if(datasetName.length === 0) return;
+     let parentFrom = null;
+     if (_domParent!=null) {
+        formName = _domParent["mainFormName"];
+        parentFrom = _domParent["mainForm"];
+     }
+     //Инициализировать переменные из объекта DataSet
+     // objectQuery[]
+
+     localStorage.setItem("ExtJsDataSetVars:"+formName, JSON.stringify(objectQuery)); // необходимо для проброса переменных между окнами
+     loadScript("request.php?Form="+formName+"&type=dataset&datasetName="+datasetName+"&parentFrom="+parentFrom+"&data="+JSON.stringify(objectQuery) ).then(function(script){
+         if (colbackFun !=null){
+             if (_domParent!=null)  colbackFun(_domParent)
+             else  colbackFun()
+         }
+     },function(error){
+           console.log(error);
+     })
+}
+
+
 
 // функция открытия формы через подгрузку JS файла (работает долго)
 function openForm() {

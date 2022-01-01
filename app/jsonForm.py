@@ -388,6 +388,7 @@ def jsonFunFromString(html=""):
     html = html.replace("getValue(", "getValue(this,",)
     html = html.replace("openForm(", "openForm(this,",)
     html = html.replace("getControl(", "getControl(this,",)
+    html = html.replace("refreshDataSet(", "refreshDataSet(this,",)
     html = html.replace("close(", "close(this,",)
     html = html.replace("openWindow(", "openWindow(this,",)
     html = html.replace('"Ext.getBody()"', "Ext.getBody()",)
@@ -517,6 +518,8 @@ def parseGridElement(xmldict,formName, data, session, root, info):
             numSubEl+=1
             if "mainForm" in subObject:
                 del subObject['mainForm']
+            if "mainFormName" in subObject:
+                del subObject['mainFormName']
             if not "dataIndex" in subObject and "field" in subObject:
                 subObject['dataIndex'] = subObject["field"]
                 del subObject["field"]
@@ -583,6 +586,8 @@ def parseComboBoxElement(xmldict,formName, data, session, root, info):
             subObject = parseXMLFrm(elem, formName, data, session, root, info)
             if "mainForm" in subObject:
                 del subObject['mainForm']
+            if "mainFormName" in subObject:
+                del subObject['mainFormName']
             dataItem.append(subObject)
         storeObj["data"] = dataItem
     elif "url" in xmldict:
@@ -634,9 +639,11 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
             xmldict["id"] = "win"+md5(f'{str(uuid1()).replace("-", "")}{info["numEl"]}{xmldict}{datetime.now().microsecond}'.encode()).hexdigest()
             root.attrib["mainForm"] = xmldict["id"]
             xmldict["mainForm"] = xmldict["id"]
+            xmldict["mainFormName"] = formName
     else:
         root.attrib["mainForm"] = parentRoot.attrib["mainForm"]
         xmldict["mainForm"] = parentRoot.attrib["mainForm"]
+        xmldict["mainFormName"] = formName
 
     if not "id" in xmldict and "name" in xmldict:
         xmldict["id"] = "ctrl"+md5(f'{str(uuid1()).replace("-", "")}{info["numEl"]}{xmldict}{datetime.now().microsecond}'.encode()).hexdigest()
