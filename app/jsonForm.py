@@ -269,14 +269,14 @@ def readFile(pathForm):
     ext = pathForm[pathForm.rfind('.') + 1:].lower()
     if ext == "html":
         # Добавляем CSS библиотеку, если её не указали на форме
-        if not "ext-6.2.0/classic/theme-classic/resources/theme-classic-all.css" in xmlContentSrc and "</head>" in xmlContentSrc:
+        if not "lib/ExtJS_6.0.0/theme-classic-all.css" in xmlContentSrc and "</head>" in xmlContentSrc:
             fragBegin, fragEnd = xmlContentSrc.split("</head>")
-            xmlContentSrc = f'{fragBegin}  <link href = "ext-6.2.0/classic/theme-classic/resources/theme-classic-all.css" rel = "stylesheet" />\r\n</head>{fragEnd}'
+            xmlContentSrc = f'{fragBegin}  <link href="lib/ExtJS_6.0.0/theme-classic-all.css" rel="stylesheet" />\r\n</head>{fragEnd}'
 
         # Добавляем CSS библиотеку, если её не указали на форме
-        if not "ext-6.2.0/ext-all.js" in xmlContentSrc and "</head>" in xmlContentSrc:
+        if not "lib/ExtJS_6.0.0/ext-all.js" in xmlContentSrc and "</head>" in xmlContentSrc:
             fragBegin, fragEnd = xmlContentSrc.split("</head>")
-            xmlContentSrc = f'{fragBegin} <script type="text/javascript" src="ext-6.2.0/ext-all.js"></script>\r\n</head>{fragEnd}'
+            xmlContentSrc = f'{fragBegin}  <script type="text/javascript" src="lib/ExtJS_6.0.0/ext-all.js"></script>\r\n</head>{fragEnd}'
 
         # Добавляем JS библиотеку, если её не указали на форме
         if not "js/common.js" in xmlContentSrc and "</head>" in xmlContentSrc:
