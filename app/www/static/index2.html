@@ -17,23 +17,23 @@
     <script type="text/javascript" src="js/common.js"></script>
     <script type="text/javascript">
         // https://metanit.com/web/extjs/6.7.php
-Ext.onReady(function() {
-
-     var store = Ext.create('Ext.data.Store', {
-         proxy: {type: 'ajax',url: 'request.php',reader: {type: 'json', root: 'data'}},
-         data : [{"company": "Alcoa Inc", "price": 71.72}, {"company": "Altria Group Inc", "price": 83.81},{"company": "American International Group, Inc.", "price": 81.82}],
-         autoLoad: true
-    });
-
-    var grid = Ext.create('Ext.grid.Panel', {
-        store: store,
-        columns: [ {text:'Company',dataIndex:'company'},{text:'Price',dataIndex:'price'} ],
-        height: 350,
-        width: 600,
-        title: 'Простейшая статическая таблица grid',
-        renderTo: Ext.getBody()
-    });
-});
+        Ext.onReady(function() {
+             openForm("main",false,{
+                     width: 800,
+                     height: 600,
+                     vars:{
+                        aaa:111,
+                        bbb:222,
+                        ccc:333
+                     }
+                     ,runFun:function(dd){
+                           a="1111"+dd;
+                     }
+                     ,onclose:function(mod){
+                        console.log("OK",mod);
+                     }
+             });
+        });
     </script>
 </head>
 <body></body>

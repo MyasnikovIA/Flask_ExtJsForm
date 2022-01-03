@@ -7,6 +7,11 @@ from uuid import uuid1
 from hashlib import md5
 from datetime import datetime
 from app import app
+import ast
+#from ast import parse as ParsePythonCode
+#from ast import Expression as ExpressionPythonCode
+
+import sys
 
 try:
     import xml.etree.cElementTree as ET
@@ -29,7 +34,52 @@ global TMP_PAGE_CAHE
 TMP_PAGE_CAHE = {}
 
 # Шаблон JS файла для динамической загрузки ExtJS формы из JS функции  "openForm"
+
 TEMP_JS_FORM = """
+  Ext.onReady(function() {
+       {%cmpAction%}
+       {%cmpDataset%}
+       let {%frmObj%}_onclose = function(data){ }
+       let {%frmObj%} = {%};
+       if ( typeof(window.ExtObj["FormsObject"]) !=='undefined'){
+           if (typeof(window.ExtObj["FormsObject"]['{%formName%}']) !== 'function') {
+              {%frmObj%}['parentEvent'] = window.ExtObj["FormsObject"]['{%formName%}'];
+              delete window.ExtObj["FormsObject"]['{%formName%}'];
+           }
+       }
+       if ( typeof({%frmObj%}['vars']) !=='undefined') {%frmObj%}['vars'] = {};
+       {%frmObj%}["vars"]//=[[%DataVars%]]
+       if ( typeof({%frmObj%}['formName']) !=='undefined') {
+            if (localStorage.getItem("ExtJsFormVars:"+{%frmObj%}['formName']) !== null) {
+                let {%frmObj%}dataText = localStorage.getItem("ExtJsFormVars:"+{%frmObj%}['formName']);
+                if ({%frmObj%}dataText !== '{}') {
+                    try {
+                        let {%frmObj%}_parentVars = JSON.parse({%frmObj%}dataText);
+                     } catch {
+                       console.log("Error: Не удалось получить переменные из родительского окна")
+                     } 
+                     if (typeof({%frmObj%}_parentVars) !== 'undefined') {
+                        if (typeof({%frmObj%}_parentVars['vars']) !== 'undefined') {
+                           for( let {%frmObj%}_key in {%frmObj%}_parentVars['vars']) {
+                              {%frmObj%}['vars'][{%frmObj%}_key] = {%frmObj%}_parentVars['vars'][{%frmObj%}_key];
+                           } 
+                        }
+                        if (typeof({%frmObj%}_parentVars['parentFrom']) !== 'undefined') {
+                          {%frmObj%}['parentFrom'] = {%frmObj%}_parentVars['parentFrom'];
+                        }
+                     }
+                     delete {%frmObj%}_parentVars;
+                }
+                localStorage.removeItem("ExtJsFormVars:"+{%frmObj%}['formName']);      
+                delete {%frmObj%}dataText;
+            }
+       }
+       {%cmpScript%}
+       let Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
+       Win_{%frmObj%}{%showWin%};
+  });
+"""
+TEMP_JS_FORM_OLD = """
   Ext.onReady(function() {
        {%cmpDataset%}
        let {%frmObj%}_onclose = function(data){ }
@@ -359,7 +409,8 @@ def getXMLObject(formName):
     if blockName == "":
         script = rootForm.findall(f"cmpScript")
         dataset = rootForm.findall(f"cmpDataSet")
-        return rootForm, script, dataset
+        action = rootForm.findall(f"cmpAction")
+        return rootForm, script, dataset, action
     else:  # получаем блок XML с именем blockName
         nodes = rootForm.findall(f"*[@name='{blockName}']")  # ишим фрагмент формы по атребуту имени
         if len(nodes) > 0:
@@ -389,6 +440,7 @@ def jsonFunFromString(html=""):
     html = html.replace("openForm(", "openForm(this,",)
     html = html.replace("getControl(", "getControl(this,",)
     html = html.replace("refreshDataSet(", "refreshDataSet(this,",)
+    html = html.replace("executeAction(", "executeAction(this,",)
     html = html.replace("close(", "close(this,",)
     html = html.replace("openWindow(", "openWindow(this,",)
     html = html.replace('"Ext.getBody()"', "Ext.getBody()",)
@@ -410,17 +462,18 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         if 'isModal' in data:
             isModal="true"
         html = TEMP_HTML_FORM.replace("{%}",formName) \
-            .replace("{%data%}",JSON_stringify(data, ensure_ascii=False)) \
+            .replace("{%data%}",JSON_stringify(data, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))) \
             .replace("{%isMOdal%}",isModal)
         html = jsonFunFromString(html)
         return  html,  mimeType(ext)
-    rootForm, script,dataset = getXMLObject(formName)
+    rootForm, script,dataset, action = getXMLObject(formName)
     if rootForm.tag == "error":
         return f'{{"error":"{rootForm.text}"}}', "application/x-javascript"
 
     jsonFrm = parseXMLFrm(rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
-    jsonDataset = parseXMLDataset(dataset, formName, data, session) # парсим Script фрагменты
+    jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим Script фрагменты
+    jsonAction, actionList = parseXMLAction(action, jsonFrm, data, session)  # парсим Script фрагменты
 
     jsonFrm['formName'] = formName
     jsonFrm['retuen_object'] = {}
@@ -428,6 +481,8 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         jsonFrm["listeners"] = {}
     if not "parentEvent" in jsonFrm:
         jsonFrm["parentEvent"] = {}
+    jsonFrm["dataSetList"] = dataSetList
+    jsonFrm["actionList"] = actionList
     # ---- получить JS файл с формой
     if isHtml == 2:
         extClass = "Ext.Viewport"
@@ -440,9 +495,10 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         if not 'renderTo' in jsonFrm:
             jsonFrm['renderTo'] = 'Ext.getBody()';
         jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
-        jsonFrmTxt = f" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} "
+        jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} """
         html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
             .replace("{%cmpDataset%}",jsonDataset)\
+            .replace("{%cmpAction%}",jsonAction)\
             .replace("{%frmObj%}",frmObj)\
             .replace("{%formName%}",formName)\
             .replace("{%cmpScript%}",jsonScript)\
@@ -466,27 +522,114 @@ def parseXMLScript(scriptXml, formName, data, session):
     return "\n".join(scriptText)
 
 
-def parseXMLDataset(datasetXml, formName, data, session):
+
+def parseXMLAction(datasetXml, jsonFrm, data, session):
     """
-      Распарсить лист XML  объектов cmpScript 
-    """""
+      Распарсить лист XML  объектов cmpAction
+    """
+    actionList= {}
     scriptText = []
     for elem in datasetXml:
         xmldict = dict(elem.attrib.copy())
+        print(xmldict)
         if not "name" in xmldict:
             continue
+        extActionStore = {}
         if not "activateoncreate" in xmldict:
-            xmldict["activateoncreate"] = "true"
-        extDataStore = {}
-        if len(datasetXml) > 0:
+            extActionStore["autoLoad"] = True
+        else:
+            extActionStore["autoLoad"] = (xmldict['activateoncreate'] =="true")
+        extActionStore['mainForm'] = jsonFrm["mainForm"]
+        extActionStore['mainFormName'] = jsonFrm["mainFormName"]
+        extActionStore['proxy'] = {"type":"ajax", "url":f"request.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
+        # JSON.stringify(objectQuery)
+        extActionStore["listeners"]={}
+        # https://coderedirect.com/questions/406619/how-to-get-extjs-4-stores-request-data-on-beforeload-event
+        paramVarList = []
+        if len(elem) > 0:
             for subelem in elem:
                 subObject = dict(subelem.attrib.copy())
+                if not "default" in subObject:
+                    subObject["default"]=""
+                if not "srctype" in subObject:
+                    subObject["srctype"] = "var"
+                if subObject["srctype"] == "session":
+                    continue
+                paramVarList.append(" this.getProxy().setExtraParam('")
+                paramVarList.append(subObject['name'])
+                paramVarList.append("',")
+                if subObject["srctype"] == "var" and "src" in subObject:
+                    paramVarList.append(f"getVar('{subObject['src']}','{subObject['default']}'));")
+                elif subObject["srctype"] == "var" and not "src" in subObject:
+                    paramVarList.append(f"getVar('{subObject['name']}','{subObject['default']}'));")
+                elif subObject["srctype"] == "ctrl" and "src" in subObject:
+                    paramVarList.append(f"getValue('{subObject['src']}','{subObject['default']}'));")
+                elif subObject["srctype"] == "ctrl" and not "src" in subObject:
+                    paramVarList.append(f"getValue('{subObject['name']}','{subObject['default']}'));")
                 print("subObject",subObject)
-        scriptText.append(f"""DATA_SET_{{%frmObj%}}_{xmldict['name']}= new Ext.data.Store(""")
-        scriptText.append(JSON_stringify(extDataStore, ensure_ascii=False))
+        #extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{  this.getProxy().setExtraParam('data', JSON.stringify({{'ind':1111}}) );  console.log( this.proxy );}} (--##--)"""
+        extActionStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{ {"".join(paramVarList)} }} (--##--)"""
+        actionList[xmldict['name']] = f"""(--##--)ACTION_{{%frmObj%}}_{xmldict['name']}(--##--)"""
+        scriptText.append(f"""ACTION_{{%frmObj%}}_{xmldict['name']}= new Ext.data.Store(""")
+        scriptText.append(JSON_stringify(extActionStore, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')))
         scriptText.append(");\r\n      ")
         # scriptText.append(elem.text)
-    return " ".join(scriptText)
+    return " ".join(scriptText),actionList
+
+
+def parseXMLDataset(datasetXml, jsonFrm, data, session):
+    """
+      Распарсить лист XML  объектов cmpAction
+    """
+    dataSetList= {}
+    scriptText = []
+    for elem in datasetXml:
+        xmldict = dict(elem.attrib.copy())
+        print(xmldict)
+        if not "name" in xmldict:
+            continue
+        extDataStore = {}
+        if not "activateoncreate" in xmldict:
+            extDataStore["autoLoad"] = True
+        else:
+            extDataStore["autoLoad"] = (xmldict['activateoncreate'] =="true")
+        extDataStore['mainForm'] = jsonFrm["mainForm"]
+        extDataStore['mainFormName'] = jsonFrm["mainFormName"]
+        extDataStore['proxy'] = {"type":"ajax", "url":f"request.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
+        # JSON.stringify(objectQuery)
+        extDataStore["listeners"]={}
+        extDataStore["records"]=[]
+        # https://coderedirect.com/questions/406619/how-to-get-extjs-4-stores-request-data-on-beforeload-event
+        paramVarList = []
+        if len(elem) > 0:
+            for subelem in elem:
+                subObject = dict(subelem.attrib.copy())
+                if not "default" in subObject:
+                    subObject["default"]=""
+                if not "srctype" in subObject:
+                    subObject["srctype"] = "var"
+                if subObject["srctype"] == "session":
+                    continue
+                paramVarList.append(" this.getProxy().setExtraParam('")
+                paramVarList.append(subObject['name'])
+                paramVarList.append("',")
+                if subObject["srctype"] == "var" and "src" in subObject:
+                    paramVarList.append(f"getVar('{subObject['src']}','{subObject['default']}'));")
+                elif subObject["srctype"] == "var" and not "src" in subObject:
+                    paramVarList.append(f"getVar('{subObject['name']}','{subObject['default']}'));")
+                elif subObject["srctype"] == "ctrl" and "src" in subObject:
+                    paramVarList.append(f"getValue('{subObject['src']}','{subObject['default']}'));")
+                elif subObject["srctype"] == "ctrl" and not "src" in subObject:
+                    paramVarList.append(f"getValue('{subObject['name']}','{subObject['default']}'));")
+                print("subObject",subObject)
+        #extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{  this.getProxy().setExtraParam('data', JSON.stringify({{'ind':1111}}) );  console.log( this.proxy );}} (--##--)"""
+        extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{ {"".join(paramVarList)} }} (--##--)"""
+        dataSetList[xmldict['name']] = f"""(--##--)DATA_SET_{{%frmObj%}}_{xmldict['name']}(--##--)"""
+        scriptText.append(f"""DATA_SET_{{%frmObj%}}_{xmldict['name']}= new Ext.data.Store(""")
+        scriptText.append(JSON_stringify(extDataStore, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')))
+        scriptText.append(");\r\n      ")
+        # scriptText.append(elem.text)
+    return " ".join(scriptText),dataSetList
 
 def parseGridElement(xmldict,formName, data, session, root, info):
     if "caption" in xmldict and not "title" in xmldict:
@@ -718,6 +861,99 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
                     subObject = parseXMLFrm(elem, formName, data, session, root)
                     xmldict[tag].append(subObject)
     return xmldict
+
+
+
+def stripCode(srcCode=""):
+    """
+    Функция очистки пробелов до первого символа (на  пробела), и выравневания остальных строк по этот символ
+    :param srcCode:
+    :return:
+    """
+    codeLines = srcCode.split("\n")
+    countlines = 0
+    startPosition = 0
+    codeRes = []
+    for line in codeLines:
+        oneText = line.lstrip()
+        if countlines == 0 and len(oneText) == 0:
+            continue
+        if countlines == 0 and len(oneText) != 0:
+            startPosition = line.find(oneText),
+        countlines += 1
+        codeRes.append(line[startPosition[0]:])
+    codeRes.append("locals()")
+    code = '\n'.join(codeRes)
+    return code
+
+def exec_then_eval(DB_DICT,vars, code, sessionId):
+    """
+    Запуск многострочного текста кода  с кэшированием
+    :param vars:  переменные для входных рагументов скрипта (инициализация) {"var1":111,"var2":333}
+    :param code: текст программы Python для выполнения
+    :return:
+    """
+    block = ast.parse(code, mode='exec')
+    last = ast.Expression(block.body.pop().value)
+    #for ind in globals():
+    #    if not ind[0:2] == '__' and not str(type(globals()[ind])) == "<class 'function'>" \
+    #            and not str(type(globals()[ind])) == "<class 'type'>" \
+    #            and not ind == "request":
+    #        # and not str(type(globals()[ind])) == "<class 'module'>"
+    #        vars[ind] = globals()[ind]
+    vars["session"] = SESSION_DICT[sessionId]
+    vars["SQL"] = DB_DICT
+    _globals, _locals = vars, {}
+    exec(compile(block, '<string>', mode='exec'), _globals, _locals)
+    res = eval(compile(last, '<string>', mode='eval'), _globals, _locals)
+    return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
+
+
+
+def dataSetQuery(queryJson, sessionId):
+    if not 'Form' in queryJson:
+        return '{"error":"Не определена форма на которой расположен запрос"}'
+    formName = queryJson['Form']
+    del queryJson['Form']
+    datasetName = queryJson['dataset']
+    del queryJson['dataset']
+    resObject={}
+    sessionVar = []
+    _DB_DICT = SESSION_DICT[sessionId].get("DB_DICT")
+    datSetXmlObj = getXMLObject(f"{formName}:{datasetName}")[0]
+    xmldict = dict(datSetXmlObj.attrib.copy())
+    code = stripCode(datSetXmlObj.text)
+    if "query_type" in xmldict:
+        query_type =xmldict.get("query_type")
+    else:
+        query_type = "sql"
+    for el in datSetXmlObj:
+        if not "name" in  el.attrib:continue
+        if el.attrib.get('srctype') == "session":
+            sessionVar.append(el.attrib.get('name'))
+            defaultValue = el.attrib.get('default')
+            if el.attrib.get('name') in SESSION_DICT[sessionId]:
+                queryJson[el.attrib.get('name')] = SESSION_DICT[sessionId][el.attrib.get('name')]
+            elif not defaultValue == None:
+                queryJson[el.attrib.get('name')] = defaultValue
+            else:
+                queryJson[el.attrib.get('name')] = ""
+    localVariableTemp = {}
+    try:
+        localVariableTemp = exec_then_eval(_DB_DICT, queryJson, code, sessionId)
+    except:
+        resObject["error"] = f"{formName} : {datasetName} :{sys.exc_info()}"
+    for param in localVariableTemp:
+       if param in sessionVar:
+           SESSION_DICT[sessionId][param] = localVariableTemp[param]
+       else:
+           resObject[param] = localVariableTemp[param]
+    if 'dataset' in queryJson and "data" in localVariableTemp:
+        resObject = resObject["data"]
+    else:
+        resObject = [resObject]
+    return JSON_stringify(resObject, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
+
 
 def existTempPage(name):
     """

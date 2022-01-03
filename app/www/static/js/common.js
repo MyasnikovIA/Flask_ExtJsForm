@@ -324,12 +324,93 @@ function close(_dom,mod) {
 }
 
 
+function getDataSet(){
+     // получить объект Dataset
+     if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
+     if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};
+     if (arguments.length === 0) return null;
+     let datasetName = "";
+     let arr = [].slice.call(arguments);
+     let _domParent = null;
+     if (typeof(arr[0]) === 'object') {
+        _domParent = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'string') {
+        datasetName = arr.splice(0, 1)[0];
+     }
+     if(datasetName.length === 0) return null;
+     if (_domParent == null)  return null;
+     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     return ctrlObj
+}
+
 function refreshDataSet(){
+     // Функция получения массива данных
+     // https://coderedirect.com/questions/406619/how-to-get-extjs-4-stores-request-data-on-beforeload-event
+     // this.getRPTGrid().getStore().load();
      if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
      if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};
      if (arguments.length === 0) return;
      let datasetName = "";
-     let isModalWin = false;
+     let objectQuery = {};
+     let renderTo = Ext.getBody();
+     let arr = [].slice.call(arguments); // Перегружаем все аргументы в массив
+     let colbackFun = null;
+     let formName = "";
+     let _domParent = null;
+     if (typeof(arr[0]) === 'object') {
+        _domParent = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'string') {
+        datasetName = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'object') {
+        objectQuery = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'function') {
+        colbackFun = arr.splice(0, 1)[0];
+     }
+     if(datasetName.length === 0) {
+        consople.log("error","Не указано имя dataset")
+        return;
+     }
+     if (_domParent == null)  {
+        consople.log("error","Не определен контекст вызова")
+        return;
+     }
+     let parentFrom = null;
+     formName = _domParent["mainFormName"];
+     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     if (typeof(ctrlObj['dataSetList']) === 'undefined')  {
+        consople.log("error","Не определен списко dataset на форме")
+        return;
+     } ;
+     if (typeof(ctrlObj['dataSetList'][datasetName]) === 'undefined') {
+        consople.log("error","dataset с именем "+datasetName+" отсутствует на форме")
+        return;
+     }
+     let storeObj = ctrlObj['dataSetList'][datasetName];
+     for(let key in objectQuery){
+        storeObj.getProxy().setExtraParam(key,objectQuery[key]);
+     }
+     storeObj.load({
+        callback: function(records, operation, success) {
+            if (typeof(colbackFun) !== 'undefined'){
+               colbackFun(records);
+            }
+            storeObj["records"] = records;
+            console.log("records",records)
+            console.log("storeObj",storeObj)
+        }
+    });
+}
+
+function executeAction(){
+      // https://www.mysamplecode.com/2012/01/extjs-controller-listen-store-events.html
+     if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
+     if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};
+     if (arguments.length === 0) return;
+     let datasetName = "";
      let objectQuery = {};
      let renderTo = Ext.getBody();
      let arr = [].slice.call(arguments); // Перегружаем все аргументы в массив
@@ -349,26 +430,39 @@ function refreshDataSet(){
         colbackFun = arr.splice(0, 1)[0];
      }
      if(datasetName.length === 0) return;
+     if (_domParent == null)  return;
      let parentFrom = null;
-     if (_domParent!=null) {
-        formName = _domParent["mainFormName"];
-        parentFrom = _domParent["mainForm"];
+     formName = _domParent["mainFormName"];
+     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     if (typeof(ctrlObj['actionList']) === 'undefined')  return;
+     if (typeof(ctrlObj['actionList'][datasetName]) === 'undefined') {
+        consople.log("error","dataset с именем "+datasetName+" отсутствует на форме")
+        return;
      }
-     //Инициализировать переменные из объекта DataSet
-     // objectQuery[]
-
-     localStorage.setItem("ExtJsDataSetVars:"+formName, JSON.stringify(objectQuery)); // необходимо для проброса переменных между окнами
-     loadScript("request.php?Form="+formName+"&type=dataset&datasetName="+datasetName+"&parentFrom="+parentFrom+"&data="+JSON.stringify(objectQuery) ).then(function(script){
-         if (colbackFun !=null){
-             if (_domParent!=null)  colbackFun(_domParent)
-             else  colbackFun()
-         }
-     },function(error){
-           console.log(error);
-     })
+     let storeObj = ctrlObj['actionList'][datasetName];
+     for(let key in objectQuery){
+        storeObj.getProxy().setExtraParam(key,objectQuery[key]);
+     }
+     storeObj.load({
+        callback: function(records, operation, success) {
+            if (records.length > 0) {
+               for (let key in records[0].data) {
+                  let ctrlObjFild = ctrlObj.query('[name='+key+']');
+                  if ((ctrlObjFild) && (ctrlObjFild.length>0)) {
+                      ctrlObjFild[0].setValue(records[0].data[key]);
+                  } else {
+                     setVar(_domParent,key,records[0].data[key])
+                  }
+               }
+               if (typeof(colbackFun) !== 'undefined') {
+                   colbackFun(records[0]);
+               }
+            } else {
+                console.log("error","Данные не найдены");
+            }
+        }
+    });
 }
-
-
 
 // функция открытия формы через подгрузку JS файла (работает долго)
 function openForm() {

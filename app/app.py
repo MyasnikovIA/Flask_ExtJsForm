@@ -33,17 +33,20 @@ def before_request():
     """
     pass
 
+
 @app.after_request
 def after_request(response):
     # CORS in flask
     header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'  # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
-    header['Access-Control-Allow-Headers'] = '*' # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
-    header['Access-Control-Allow-Methods'] = '*' # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
+    header[
+        'Access-Control-Allow-Origin'] = '*'  # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+    header[
+        'Access-Control-Allow-Headers'] = '*'  # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
+    header[
+        'Access-Control-Allow-Methods'] = '*'  # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
     header['Server'] = 'D3apiServer'
-    header['Last-Modified'] =datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    header['Last-Modified'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return response
-
 
 
 @app.route('/')
@@ -54,9 +57,12 @@ def example():
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
 
+
 ROOT_DIR = os.path.join(os.path.dirname(__file__))
 
 countQuery = 0
+
+
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def all_files(path):
     # инициализируем сессионный словарь
@@ -65,13 +71,12 @@ def all_files(path):
         countQuery += 1
         session["ID"] = f'{str(uuid.uuid1()).replace("-", "")}{countQuery}{datetime.datetime.now().microsecond}'
         jsonForm.SESSION_DICT[session["ID"]] = {}
-    # Обработка запроса из JS функции  openWindow
+
+
     if "request.php" in path:
         queryJson = jsonForm.getAttrQuery(request)
-        print(queryJson)
-        return "{}", 200, {'content-type': "application/json"}
-        #bin, mime = jsonForm.getParsedForm(formName, queryJson, jsonForm.SESSION_DICT[session["ID"]], 0)
-        #return bin, 200, {'content-type': "application/json"}
+        bin = jsonForm.dataSetQuery(queryJson, session["ID"])
+        return bin, 200, {'content-type': "application/json"}
 
     # Поиск запроса в каталоге static
     pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}{path}"
@@ -82,28 +87,28 @@ def all_files(path):
     queryJson = jsonForm.getAttrQuery(request)
     format = 1
     if "type" in queryJson and queryJson['type'] == "js":
-       format=2
+        format = 2
     # Поиск запроса в каталоге Forms и templates
-    isExist,pathHtmlFromForm = jsonForm.existContentExtJs(path, format)
+    isExist, pathHtmlFromForm = jsonForm.existContentExtJs(path, format)
     if isExist:
         if 'data' in queryJson:
-            queryJson  = json.loads(queryJson['data'])
+            queryJson = json.loads(queryJson['data'])
         bin, mime = jsonForm.getParsedForm(path, queryJson, jsonForm.SESSION_DICT[session["ID"]], format)
         return bin, 200, {'content-type': mime}
 
     # Поиск запроса в каталоге templates
-    pathHtmlFromForm = f"{app.template_folder.replace('/',os.sep)}{os.sep}{path}"
+    pathHtmlFromForm = f"{app.template_folder.replace('/', os.sep)}{os.sep}{path}"
     if os.path.isfile(pathHtmlFromForm):
         mime = jsonForm.mimeType(path)
         return render_template(path, data=jsonForm.getAttrQuery(request)), 200, {'content-type': mime}
-    return "",404
+    return "", 404
     # return render_template('404.html; charset=utf-8', **locals()), 404
     # return app.render_template(path)
     # return app.send_static_file(path)
 
-def to_pretty_json(value):
-    return json.dumps(value, sort_keys=True,indent=4, separators=(',', ': '))
 
+def to_pretty_json(value):
+    return json.dumps(value, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 if __name__ == '__main__':
