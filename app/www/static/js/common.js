@@ -160,30 +160,20 @@ function getJsonUrl(url) {
 
 function CreateRequest() {
     var Request = false;
-
-    if (window.XMLHttpRequest)
-    {
+    if (window.XMLHttpRequest) {
         //Gecko-совместимые браузеры, Safari, Konqueror
         Request = new XMLHttpRequest();
-    }
-    else if (window.ActiveXObject)
-    {
+    } else if (window.ActiveXObject) {
         //Internet explorer
-        try
-        {
+        try {
              Request = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        catch (CatchException)
-        {
+        } catch (CatchException) {
              Request = new ActiveXObject("Msxml2.XMLHTTP");
         }
     }
-
-    if (!Request)
-    {
+    if (!Request) {
         alert("Невозможно создать XMLHttpRequest");
     }
-
     return Request;
 }
 function sendSrv(url, data, colbackFun) {
@@ -211,7 +201,6 @@ function sendSrv(url, data, colbackFun) {
           return request.responseText;
         }
     }
-    //delete request;
 }
 
 function ctrlDataSetExecute(_dom,datsetName) {
@@ -346,8 +335,6 @@ function getDataSet(){
 
 function refreshDataSet(){
      // Функция получения массива данных
-     // https://coderedirect.com/questions/406619/how-to-get-extjs-4-stores-request-data-on-beforeload-event
-     // this.getRPTGrid().getStore().load();
      if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
      if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};
      if (arguments.length === 0) return;
@@ -406,7 +393,6 @@ function refreshDataSet(){
 }
 
 function executeAction(){
-      // https://www.mysamplecode.com/2012/01/extjs-controller-listen-store-events.html
      if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
      if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};
      if (arguments.length === 0) return;
