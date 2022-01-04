@@ -854,7 +854,12 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
             if not "listeners" in xmldict:
                 xmldict["listeners"] ={}
                 xmldict["listeners"] = {"close": "function(){objectOnEvent['onclose'](objectServ['vars_return'])}"}
-            xmldict["listeners"][k[2:]] = f"(--##--)function(view, index, element){{ {v} }}(--##--)"
+            if root.tag[3:].lower() == 'treepanel' \
+                    or root.tag[3:].lower() == 'grid' \
+                    or root.tag[3:].lower() == 'combobox':
+                xmldict["listeners"][k[2:]] = f"(--##--)function(view, index, element){{ {v} }}(--##--)"
+            else:
+                xmldict["listeners"][k[2:]] = f"(--##--)function(view){{ {v} }}(--##--)"
             del root.attrib[k]
         elif xmldict[k].strip()[:len("function(")] == "function(":
             xmldict[k] = f'(--##--){v}(--##--)'
