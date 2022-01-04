@@ -12,6 +12,9 @@ from flask import render_template
 from jinja2 import Template
 import jsonForm
 
+# https://docs.sencha.com/extjs/6.0.0/classic/Ext.tree.Panel.html
+# https://www.techferry.com/articles/ext-js/ext-js-ui-widgets.html
+
 import requests as reqExt
 import urllib.parse
 

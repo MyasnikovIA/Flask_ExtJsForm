@@ -128,9 +128,9 @@ TEMP_HTML_FORM = """<!DOCTYPE html>
 <html>
    <head>
         <meta charset="utf-8"/>
-        <link href="lib/ExtJS_6.0.0/theme-classic-all.css" rel="stylesheet" />
-        <script type="text/javascript" src="lib/ExtJS_6.0.0/ext-all.js"></script>
-        <script type="text/javascript" src="js/common.js"></script>
+        <link href="/lib/ExtJS_6.0.0/theme-classic-all.css" rel="stylesheet" />
+        <script type="text/javascript" src="/lib/ExtJS_6.0.0/ext-all.js"></script>
+        <script type="text/javascript" src="/js/common.js"></script>
         <script type = "text/javascript">
              Ext.onReady(function() {
                  openForm("{%}",{%isMOdal%},{%data%});
@@ -466,11 +466,11 @@ def getSrc(formName, data={}, session={}, isHtml=0):
             .replace("{%isMOdal%}",isModal)
         html = jsonFunFromString(html)
         return  html,  mimeType(ext)
-    rootForm, script,dataset, action = getXMLObject(formName)
+    rootForm, script, dataset, action = getXMLObject(formName)
     if rootForm.tag == "error":
         return f'{{"error":"{rootForm.text}"}}', "application/x-javascript"
 
-    jsonFrm = parseXMLFrm(rootForm, formName, data, session)  # парсим XML форму
+    jsonFrm = parseXMLFrm(rootForm,rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
     jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим Script фрагменты
     jsonAction, actionList = parseXMLAction(action, jsonFrm, data, session)  # парсим Script фрагменты
@@ -585,9 +585,12 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
     scriptText = []
     for elem in datasetXml:
         xmldict = dict(elem.attrib.copy())
-        print(xmldict)
         if not "name" in xmldict:
             continue
+        if "store_type" in xmldict and xmldict['store_type'] == "tree":
+            storeClass = "new Ext.data.TreeStore("
+        else:
+            storeClass = "new Ext.data.Store("
         extDataStore = {}
         if not "activateoncreate" in xmldict:
             extDataStore["autoLoad"] = True
@@ -625,13 +628,13 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
         #extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{  this.getProxy().setExtraParam('data', JSON.stringify({{'ind':1111}}) );  console.log( this.proxy );}} (--##--)"""
         extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{ {"".join(paramVarList)} }} (--##--)"""
         dataSetList[xmldict['name']] = f"""(--##--)DATA_SET_{{%frmObj%}}_{xmldict['name']}(--##--)"""
-        scriptText.append(f"""DATA_SET_{{%frmObj%}}_{xmldict['name']}= new Ext.data.Store(""")
+        scriptText.append(f"""DATA_SET_{{%frmObj%}}_{xmldict['name']}= {storeClass}""")
         scriptText.append(JSON_stringify(extDataStore, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')))
         scriptText.append(");\r\n      ")
         # scriptText.append(elem.text)
     return " ".join(scriptText),dataSetList
 
-def parseGridElement(xmldict,formName, data, session, root, info):
+def parseGridElement(rootForm,xmldict,formName, data, session, root, info):
     if "caption" in xmldict and not "title" in xmldict:
         xmldict['title'] = xmldict['caption']
         del xmldict['caption']
@@ -657,7 +660,7 @@ def parseGridElement(xmldict,formName, data, session, root, info):
     if len(root) > 0:
         numSubEl = -1
         for elem in root:
-            subObject = parseXMLFrm(elem, formName, data, session, root, info)
+            subObject = parseXMLFrm(rootForm,elem, formName, data, session, root, info)
             numSubEl+=1
             if "mainForm" in subObject:
                 del subObject['mainForm']
@@ -699,8 +702,98 @@ def parseGridElement(xmldict,formName, data, session, root, info):
         xmldict["store"] = storyObj
     return xmldict
 
+def rootToTree(root):
+    res=[]
+    for el in root:
+       obj =  dict(el.attrib.copy())
+       if "caption" in obj and not "text" in obj:
+           obj["text"] = obj["caption"]
+           del obj["caption"]
+       if len(el)>0:
+           obj['children']=[]
+           obj['children'].extend(rootToTree(el))
+       else:
+           obj['leaf'] = True
+       res.append(obj)
+    return res
 
-def parseComboBoxElement(xmldict,formName, data, session, root, info):
+def parseTreepanelElement(rootForm,xmldict,formName, data, session, root, info):
+    if "caption" in xmldict and not "title" in xmldict:
+        xmldict['title'] = xmldict['caption']
+        del xmldict['caption']
+    fieldsList = []
+    columnsList = []
+    columnsObj = []
+    storyObj = {}
+    rootTreeObj = {}
+    if "store" in xmldict:
+        xmldict["store"] = f'(--##--){xmldict["store"]}(--##--)'
+    if "columns" in xmldict:
+        columnsList = [f"{val}" for val in xmldict['columns'].split(',')]
+    if "fields" in xmldict:
+        fieldsList = [f"{val}" for val in xmldict['fields'].split(',')]
+    if "dataset" in xmldict:
+        datasetName = xmldict['dataset']
+        for dsEl in rootForm.findall(f"*[@name='{datasetName}']"):
+            dsEl.attrib['store_type'] = "tree"
+        xmldict["store"] = f'''(--##--)DATA_SET_{{%frmObj%}}_{xmldict['dataset']}(--##--)'''
+    if "data" in xmldict:
+        storyObj["data"] = f'(--##--){xmldict["data"]}(--##--)'
+        del xmldict["data"]
+    elif not root.text == None:
+        txtTmp = root.text.strip().replace('"', "'").replace("\n", "").replace("\r", "")
+        if len(txtTmp) > 0:
+            storyObj["data"] = f'''(--##--){txtTmp}(--##--)'''
+    if len(root) > 0 and "data" in storyObj and len(storyObj["data"]):
+        numSubEl = -1
+        for elem in root:
+            subObject = parseXMLFrm(rootForm,elem, formName, data, session, root, info)
+            numSubEl+=1
+            if "mainForm" in subObject:
+                del subObject['mainForm']
+            if "mainFormName" in subObject:
+                del subObject['mainFormName']
+            if not "dataIndex" in subObject and "field" in subObject:
+                subObject['dataIndex'] = subObject["field"]
+                del subObject["field"]
+            if not "header" in subObject and "caption" in subObject:
+                subObject['header'] = subObject["caption"]
+                del subObject["caption"]
+            if "dataIndex" in subObject:
+                fieldsList.append(subObject['dataIndex'])
+            else:
+                if len(fieldsList) > numSubEl:
+                    subObject['dataIndex'] = fieldsList[numSubEl]
+            columnsObj.append(subObject)
+        xmldict["columns"] = columnsObj
+    elif len(root) > 0:
+        storyObj["root"] = {'expanded': True, 'children': []}
+        storyObj["root"]['children'].extend(rootToTree(root))
+    elif len(columnsList) == len(fieldsList) and len(fieldsList)>0:
+        for ind in range(len(columnsList)):
+           subObject={}
+           subObject ["dataIndex"]=fieldsList[ind]
+           subObject ["header"]=columnsList[ind]
+           columnsObj.append(subObject)
+        xmldict["columns"] = columnsObj
+    storyObj["fields"] = fieldsList
+    if not "store" in xmldict:
+        txtArr = ["(--##--)"]
+        txtArr.append("new Ext.data.TreeStore({")
+        if "url" in xmldict:
+            storyObj["root"] = f"(--##--)getJsonUrl('{xmldict['url']}')(--##--)"
+        if "dataset" in xmldict:
+            # txtArr.append(f"data:getJsonUrl('{xmldict['url']}'),")
+            pass
+        elif not root.text == None and not root.tail == None:
+            txtTmp = root.text.strip().replace('"', "'").replace("\n", "").replace("\r", "")
+            if len(txtTmp) > 0:
+                storyObj["root"] = f"(--##--){txtTmp}(--##--)"
+        xmldict["store"] = storyObj
+    return xmldict
+
+
+def parseComboBoxElement(rootForm,xmldict,formName, data, session, root, info):
     storeObj = {}
     if "caption" in xmldict and not "fieldLabel" in xmldict:
         xmldict['fieldLabel'] = xmldict['caption']
@@ -741,7 +834,7 @@ def parseComboBoxElement(xmldict,formName, data, session, root, info):
 
 itemsThiwObject = ["buttons"]
 itemsBlock = ['div','item']
-def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0}):
+def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"numEl":0}):
     """
      Конвертировать XML объект формы в ExtJS объект
     """
@@ -761,7 +854,7 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
             if not "listeners" in xmldict:
                 xmldict["listeners"] ={}
                 xmldict["listeners"] = {"close": "function(){objectOnEvent['onclose'](objectServ['vars_return'])}"}
-            xmldict["listeners"][k[2:]] = f"(--##--)function(){{ {v} }}(--##--)"
+            xmldict["listeners"][k[2:]] = f"(--##--)function(view, index, element){{ {v} }}(--##--)"
             del root.attrib[k]
         elif xmldict[k].strip()[:len("function(")] == "function(":
             xmldict[k] = f'(--##--){v}(--##--)'
@@ -800,11 +893,13 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
 
         # Создаем Store из локального контента
         if root.tag[3:].lower() == 'combobox':
-            return parseComboBoxElement(xmldict, formName, data, session, root, info)
+            return parseComboBoxElement(rootForm,xmldict, formName, data, session, root, info)
         if root.tag[3:].lower() == 'combo':
-            return parseComboBoxElement(xmldict, formName, data, session, root, info)
+            return parseComboBoxElement(rootForm,xmldict, formName, data, session, root, info)
         if root.tag[3:].lower() == 'grid':
-            return parseGridElement(xmldict, formName, data, session, root, info)
+            return parseGridElement(rootForm,xmldict, formName, data, session, root, info)
+        if root.tag[3:].lower() == 'treepanel':
+            return parseTreepanelElement(rootForm,xmldict, formName, data, session, root, info)
 
         # ======= HTML ==========
         htmlText = ""
@@ -818,7 +913,7 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
         # =========== Рекурсионый обход дерева ============================
         if hasattr(root, 'getchildren'):
             for elem in root.getchildren():
-                subObject = parseXMLFrm(elem, formName, data, session, root, info)
+                subObject = parseXMLFrm(rootForm,elem, formName, data, session, root, info)
                 if subObject == None:
                     continue
                 blockName='items'
@@ -832,7 +927,7 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
         elif len(root) > 0:
             num_element = 0
             for elem in root:
-                subObject = parseXMLFrm(elem, formName, data, session, root, info)
+                subObject = parseXMLFrm(rootForm,elem, formName, data, session, root, info)
                 if subObject == None:
                     continue
                 blockName='items'
@@ -850,15 +945,15 @@ def parseXMLFrm(root, formName, data, session, parentRoot=None,info={"numEl":0})
         if hasattr(root, 'getchildren'):
             xmldict[tag] = []
             for elem in root.getchildren():
-                subObject = parseXMLFrm(elem, formName, data, session, root)
+                subObject = parseXMLFrm(rootForm, elem, formName, data, session, root)
                 xmldict[tag].append(subObject)
         elif len(root) > 0:
             if len(root)==1:
-                xmldict[tag] = parseXMLFrm(root[0], formName, data, session, root)
+                xmldict[tag] = parseXMLFrm(rootForm, root[0], formName, data, session, root)
             else:
                 xmldict[tag] = []
                 for elem in root:
-                    subObject = parseXMLFrm(elem, formName, data, session, root)
+                    subObject = parseXMLFrm(rootForm, elem, formName, data, session, root)
                     xmldict[tag].append(subObject)
     return xmldict
 
@@ -915,18 +1010,12 @@ def dataSetQuery(queryJson, sessionId):
         return '{"error":"Не определена форма на которой расположен запрос"}'
     formName = queryJson['Form']
     del queryJson['Form']
-    datasetName = queryJson['dataset']
+    datasetName = queryJson.get('dataset')
     del queryJson['dataset']
     resObject={}
     sessionVar = []
-    _DB_DICT = SESSION_DICT[sessionId].get("DB_DICT")
     datSetXmlObj = getXMLObject(f"{formName}:{datasetName}")[0]
     xmldict = dict(datSetXmlObj.attrib.copy())
-    code = stripCode(datSetXmlObj.text)
-    if "query_type" in xmldict:
-        query_type =xmldict.get("query_type")
-    else:
-        query_type = "sql"
     for el in datSetXmlObj:
         if not "name" in  el.attrib:continue
         if el.attrib.get('srctype') == "session":
@@ -939,20 +1028,39 @@ def dataSetQuery(queryJson, sessionId):
             else:
                 queryJson[el.attrib.get('name')] = ""
     localVariableTemp = {}
-    try:
-        localVariableTemp = exec_then_eval(_DB_DICT, queryJson, code, sessionId)
-    except:
-        resObject["error"] = f"{formName} : {datasetName} :{sys.exc_info()}"
+    if "DB" in xmldict:
+        # Если указано имя  базы данных, тогда выполняем SQL запрос
+        try:
+            localVariableTemp = execBdQuery(datSetXmlObj, xmldict.get("DB"),queryJson, sessionId)
+        except:
+            resObject["error"] = f"{formName} : {xmldict.get('DB')} :{sys.exc_info()}"
+        # Выполнить запрос
+    else:
+        # Если нет имени БД, тогда выполняем Python скрипт
+        try:
+            code = stripCode(datSetXmlObj.text)
+            _DB_DICT = SESSION_DICT[sessionId].get("DB_DICT")
+            localVariableTemp = exec_then_eval(_DB_DICT, queryJson, code, sessionId)
+        except:
+            resObject["error"] = f"{formName} : {datasetName} :{sys.exc_info()}"
     for param in localVariableTemp:
        if param in sessionVar:
            SESSION_DICT[sessionId][param] = localVariableTemp[param]
        else:
            resObject[param] = localVariableTemp[param]
-    if 'dataset' in queryJson and "data" in localVariableTemp:
+    if len(datasetName)>0 and "data" in localVariableTemp:
         resObject = resObject["data"]
     else:
         resObject = [resObject]
     return JSON_stringify(resObject, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
+
+def execBdQuery(datSetXmlObj, dbName, queryJson, sessionId):
+    # функция выполенние SQL запроса в Базе данных
+    _DB_DICT = SESSION_DICT[sessionId].get("DB_DICT")
+    if not dbName in _DB_DICT:
+        return {"error": f"Подключение к  базе данных отсутствует в списке"}
+    sqlText = datSetXmlObj.text
+    return {}
 
 
 def existTempPage(name):

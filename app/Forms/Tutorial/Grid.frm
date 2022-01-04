@@ -44,7 +44,7 @@
         </cmpDataSet>
 
 
-         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true">
+         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true" onitemclick=" console.log(view, index, element);  " >
               <![CDATA[
                    [ {id:1,name:"11111111"}
                      ,{id:2,name:"2222222222222"}

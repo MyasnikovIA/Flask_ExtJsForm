@@ -461,6 +461,15 @@ function openForm() {
      let renderTo = Ext.getBody();
      let arr = [].slice.call(arguments); // Перегружаем все аргументы в массив
      let _domParent = null;
+     let containerObject = null;
+     let containerObjectId = "";
+     if ((""+arr[0]) === '[object HTMLDivElement]') {
+        containerObject = arr.splice(0, 1)[0];
+        if (typeof(containerObject.id) === 'undefined') {
+           containerObject.id = "dom_"+makeid();
+           containerObjectId = "&containerObjectId="+containerObject.id;
+        }
+     }
      if (typeof(arr[0]) === 'object') {
         _domParent = arr.splice(0, 1)[0];
      }
@@ -496,7 +505,7 @@ function openForm() {
      if (formName.indexOf('.') === -1) {formName+=".frm"}
      window.ExtObj["FormsObject"][formName]=objectOnEvent; // пробрасываем события между модальными окнами внутри одного физического окна
      localStorage.setItem("ExtJsFormVars:"+formName, JSON.stringify(objectQuery)); // необходимо для проброса переменных между окнами
-     loadScript(formName+"?type=js&data="+JSON.stringify(objectQuery) ).then(function(script){
+     loadScript("/"+formName+"?type=js"+containerObjectId+"&data="+JSON.stringify(objectQuery) ).then(function(script){
          if ((!isModalWin) && (_domParent !== null ) && (typeof(_domParent["mainForm"]) !=='undefined')) {
              Ext.getCmp(_domParent["mainForm"]).destroy() // уничтожаем родителя
          }
@@ -506,3 +515,21 @@ function openForm() {
 }
 
 
+function getRandomString(length) {
+    var randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    for ( var i = 0; i < length; i++ ) {
+        result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+    }
+    return result;
+}
+
+function makeid() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}

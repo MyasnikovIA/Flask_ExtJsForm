@@ -16,28 +16,36 @@
     <!--script type="text/javascript" src="lib/system.js"></script-->
     <script type="text/javascript" src="js/common.js"></script>
     <script type="text/javascript">
-        // https://metanit.com/web/extjs/6.7.php
-        Ext.onReady(function() {
-             openForm(document.getElementById('test'),"main",false,{
-                     width: 800,
-                     height: 600,
-                     vars:{
-                        aaa:111,
-                        bbb:222,
-                        ccc:333
+       // https://www.tutorialspoint.com/extjs/container_tab.htm
+       Ext.onReady(function () {
+            Ext.create('Ext.Viewport', {
+               renderTo: Ext.getBody(),
+               height: 100,
+               width: 200,
+               items: [{
+                  xtype: 'tabpanel',
+                  title: 'Tab One',
+                  html: 'The first tab',
+                  listeners: {
+                     render: function() {
+                        Ext.MessageBox.alert('Tab one', 'Tab One was clicked.');
                      }
-                     ,runFun:function(dd){
-                           a="1111"+dd;
+                  }
+               },{
+                  xtype: 'tabpanel',
+                  title: 'Tab Two',
+                  html: 'The second tab',
+                  listeners: {
+                     render: function() {
+                        Ext.MessageBox.alert('Tab two', 'Tab Two was clicked.');
                      }
-                     ,onclose:function(mod){
-                        console.log("OK",mod);
-                     }
-             });
-        });
+                  }
+               }]
+            });
+         });
     </script>
 </head>
 <body>
-<div id="test"></div>
-
+<div id="tabPanel"></div>
 </body>
 </html>

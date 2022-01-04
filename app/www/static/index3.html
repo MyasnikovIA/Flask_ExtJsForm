@@ -17,25 +17,30 @@
     <script type="text/javascript" src="js/common.js"></script>
     <script type="text/javascript">
         // https://metanit.com/web/extjs/6.7.php
-Ext.onReady(function() {
+        Ext.onReady(function() {
 
-     var store = Ext.create('Ext.data.Store', {
-         proxy: {type: 'ajax',url: 'request.php',reader: {type: 'json', root: 'data'}},
-         data : [{"company": "Alcoa Inc", "price": 71.72}, {"company": "Altria Group Inc", "price": 83.81},{"company": "American International Group, Inc.", "price": 81.82}],
-         autoLoad: true
-    });
-
-    var grid = Ext.create('Ext.grid.Panel', {
-        store: store,
-        columns: [ {text:'Company',dataIndex:'company'},{text:'Price',dataIndex:'price'} ],
-        height: 350,
-        width: 600,
-        title: 'Простейшая статическая таблица grid',
-        // renderTo: Ext.getBody()
-    });
-    grid.render('tabPanel');
-});
+            var tabPanel= Ext.create('Ext.tab.Panel', {
+                width: 400,
+                height: 200,
+                activeTab: 0,
+                margin: '3 0 15 0',
+                items: [
+                    {
+                        title: 'Tab 1',
+                        bodyPadding: 10,
+                        html : 'A simple tab'
+                    },
+                    {
+                        title: 'Tab 2',
+                        html : 'Another one'
+                    }
+                ]
+            });
+            tabPanel.render('tabPanel');
+        });
     </script>
 </head>
-<body></body>
+<body>
+<div id="tabPanel"></div>
+</body>
 </html>
