@@ -392,6 +392,36 @@ function refreshDataSet(){
     });
 }
 
+function showPopupMenu(){
+     if (arguments.length === 0) return null;
+     let x=0;
+     let y=0;
+     let arr = [].slice.call(arguments);
+     let _domParent = null;
+     let menuName="";
+     if (typeof(arr[0]) === 'object') {
+        _domParent = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'string') {
+        menuName = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'number') {
+        x = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'number') {
+        y = arr.splice(0, 1)[0];
+     }
+     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     if (typeof(ctrlObj['mainList']) === 'undefined')  return;
+     if (typeof(ctrlObj['mainList'][menuName]) === 'undefined') {
+        consople.log("error","меню с именем "+menuName+" отсутствует на форме")
+        return;
+     }
+     let storeObj = ctrlObj['mainList'][menuName];
+     storeObj.showAt(x,y);
+     // Ext.getCmp('testCtrl').showAt(x,y);
+}
+
 function executeAction(){
      if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
      if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};

@@ -37,9 +37,17 @@
             Ext.getCmp('testCtrl').showAt(200,200);
        ]]>
     </cmpScript>
+    <!--
+    <cmpToolbar region="north" height="40" >
+          <items text="file" >
+                <items text="file"  onclick="alert(1)"/>
+          </items>
+          <items text="file3" >
+                <items text="file3"  onclick="alert(4)"/>
+          </items>
+    </cmpToolbar>
+    -->
     <cmpToolbar region="north" >
-        <cmpRight/>
-        <cmpTextField />
         <cmpButton>
              file
              <cmpButton onclick="showPopupMenu('myMain',200,200);">eeee</cmpButton>

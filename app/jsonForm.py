@@ -36,11 +36,13 @@ TMP_PAGE_CAHE = {}
 # Шаблон JS файла для динамической загрузки ExtJS формы из JS функции  "openForm"
 
 TEMP_JS_FORM = """
+  document.addEventListener('contextmenu', event => event.preventDefault());
   Ext.onReady(function() {
        {%cmpAction%}
        {%cmpDataset%}
-       let {%frmObj%}_onclose = function(data){ }
-       let {%frmObj%} = {%};
+       {%cmpPopupMenu%}
+       var {%frmObj%}_onclose = function(data){ }
+       var {%frmObj%} = {%};
        if ( typeof(window.ExtObj["FormsObject"]) !=='undefined'){
            if (typeof(window.ExtObj["FormsObject"]['{%formName%}']) !== 'function') {
               {%frmObj%}['parentEvent'] = window.ExtObj["FormsObject"]['{%formName%}'];
@@ -410,7 +412,8 @@ def getXMLObject(formName):
         script = rootForm.findall(f"cmpScript")
         dataset = rootForm.findall(f"cmpDataSet")
         action = rootForm.findall(f"cmpAction")
-        return rootForm, script, dataset, action
+        popupMenu = rootForm.findall(f"cmpPopupMenu")
+        return rootForm, script, dataset, action, popupMenu
     else:  # получаем блок XML с именем blockName
         nodes = rootForm.findall(f"*[@name='{blockName}']")  # ишим фрагмент формы по атребуту имени
         if len(nodes) > 0:
@@ -439,6 +442,7 @@ def jsonFunFromString(html=""):
     html = html.replace("getValue(", "getValue(this,",)
     html = html.replace("openForm(", "openForm(this,",)
     html = html.replace("getControl(", "getControl(this,",)
+    html = html.replace("showPopupMenu(", "showPopupMenu(this,",)
     html = html.replace("refreshDataSet(", "refreshDataSet(this,",)
     html = html.replace("executeAction(", "executeAction(this,",)
     html = html.replace("close(", "close(this,",)
@@ -466,14 +470,15 @@ def getSrc(formName, data={}, session={}, isHtml=0):
             .replace("{%isMOdal%}",isModal)
         html = jsonFunFromString(html)
         return  html,  mimeType(ext)
-    rootForm, script, dataset, action = getXMLObject(formName)
+    rootForm, script, dataset, action, popupMenu = getXMLObject(formName)
     if rootForm.tag == "error":
         return f'{{"error":"{rootForm.text}"}}', "application/x-javascript"
 
+    jsonPopupMenu, popupMenuList = parseXMLmain(popupMenu, rootForm, data, session)  # парсим main фрагменты
     jsonFrm = parseXMLFrm(rootForm,rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
-    jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим Script фрагменты
-    jsonAction, actionList = parseXMLAction(action, jsonFrm, data, session)  # парсим Script фрагменты
+    jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
+    jsonAction, actionList = parseXMLAction(action, jsonFrm, data, session)  # парсим Action фрагменты
 
     jsonFrm['formName'] = formName
     jsonFrm['retuen_object'] = {}
@@ -483,6 +488,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         jsonFrm["parentEvent"] = {}
     jsonFrm["dataSetList"] = dataSetList
     jsonFrm["actionList"] = actionList
+    jsonFrm["mainList"] = popupMenuList
     # ---- получить JS файл с формой
     if isHtml == 2:
         extClass = "Ext.Viewport"
@@ -498,6 +504,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} """
         html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
             .replace("{%cmpDataset%}",jsonDataset)\
+            .replace("{%cmpPopupMenu%}",jsonPopupMenu)\
             .replace("{%cmpAction%}",jsonAction)\
             .replace("{%frmObj%}",frmObj)\
             .replace("{%formName%}",formName)\
@@ -523,6 +530,55 @@ def parseXMLScript(scriptXml, formName, data, session):
 
 
 
+def mainToTree(root):
+    res=[]
+    for el in root:
+       obj =  dict(el.attrib.copy())
+       if "onclick" in obj:
+           obj["handler"]=f"""(--##--)function(){{ {obj['onclick']} }}(--##--)"""
+           del obj['onclick']
+       if "caption" in obj and not "text" in obj:
+           obj["text"] = obj["caption"]
+           del obj["caption"]
+       if len(el)>0:
+           obj['menu']=[]
+           obj['menu'].extend(mainToTree(el))
+       res.append(obj)
+    return res
+
+
+def parseXMLmain(mainXml, rootForm, data, session):
+    """
+             Ext.create('Ext.menu.Menu', {
+                items : [{
+                    iconCls : 'star',
+                    text : 'Favorite',
+                    handler : function() {
+                        console.log('menu clicked');
+                    }
+                }]
+            }).showAt(200,200);
+    """
+    menuList={}
+    scriptText = []
+    for elem in mainXml:
+        xmldict = dict(elem.attrib.copy())
+        onPopUpFun = ""
+        if "onpopup" in xmldict:
+            onPopUpFun = f"{xmldict['onpopup']};"
+            del xmldict['onpopup']
+        if "popupobject" in xmldict:
+            nodes = rootForm.findall(f'*[@name="{xmldict["popupobject"]}"]')
+            for node in nodes:
+                node.attrib["onitemcontextmenu"]= f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); {onPopUpFun} showPopupMenu('{xmldict['name']}',arr[4].getX(),arr[4].getY()); return false;"""
+        xmldict["items"]=mainToTree(elem)
+        menuList[xmldict['name']] = f"""(--##--)MENU_{{%frmObj%}}_{xmldict['name']}(--##--)"""
+        scriptText.append(f"""var MENU_{{%frmObj%}}_{xmldict['name']}= Ext.create('Ext.menu.Menu',""")
+        scriptText.append(JSON_stringify(xmldict))
+        scriptText.append(")")
+    return "".join(scriptText) ,menuList
+
+
 def parseXMLAction(datasetXml, jsonFrm, data, session):
     """
       Распарсить лист XML  объектов cmpAction
@@ -531,7 +587,6 @@ def parseXMLAction(datasetXml, jsonFrm, data, session):
     scriptText = []
     for elem in datasetXml:
         xmldict = dict(elem.attrib.copy())
-        print(xmldict)
         if not "name" in xmldict:
             continue
         extActionStore = {}
@@ -566,7 +621,6 @@ def parseXMLAction(datasetXml, jsonFrm, data, session):
                     paramVarList.append(f"getValue('{subObject['src']}','{subObject['default']}'));")
                 elif subObject["srctype"] == "ctrl" and not "src" in subObject:
                     paramVarList.append(f"getValue('{subObject['name']}','{subObject['default']}'));")
-                print("subObject",subObject)
         #extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{  this.getProxy().setExtraParam('data', JSON.stringify({{'ind':1111}}) );  console.log( this.proxy );}} (--##--)"""
         extActionStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{ {"".join(paramVarList)} }} (--##--)"""
         actionList[xmldict['name']] = f"""(--##--)ACTION_{{%frmObj%}}_{xmldict['name']}(--##--)"""
@@ -624,7 +678,6 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
                     paramVarList.append(f"getValue('{subObject['src']}','{subObject['default']}'));")
                 elif subObject["srctype"] == "ctrl" and not "src" in subObject:
                     paramVarList.append(f"getValue('{subObject['name']}','{subObject['default']}'));")
-                print("subObject",subObject)
         #extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{  this.getProxy().setExtraParam('data', JSON.stringify({{'ind':1111}}) );  console.log( this.proxy );}} (--##--)"""
         extDataStore["listeners"]['beforeload'] = f"""(--##--)function(store, operation, options){{ {"".join(paramVarList)} }} (--##--)"""
         dataSetList[xmldict['name']] = f"""(--##--)DATA_SET_{{%frmObj%}}_{xmldict['name']}(--##--)"""
@@ -653,6 +706,8 @@ def parseGridElement(rootForm,xmldict,formName, data, session, root, info):
     if "data" in xmldict:
         storyObj["data"] = f'(--##--){xmldict["data"]}(--##--)'
         del xmldict["data"]
+    if not "region" in xmldict:
+        xmldict["region"] = "center"
     elif not root.text == None:
         txtTmp = root.text.strip().replace('"', "'").replace("\n", "").replace("\r", "")
         if len(txtTmp) > 0:
@@ -702,7 +757,7 @@ def parseGridElement(rootForm,xmldict,formName, data, session, root, info):
         xmldict["store"] = storyObj
     return xmldict
 
-def rootToTree(root):
+def rootToTree(root,tagName='children'):
     res=[]
     for el in root:
        obj =  dict(el.attrib.copy())
@@ -710,12 +765,21 @@ def rootToTree(root):
            obj["text"] = obj["caption"]
            del obj["caption"]
        if len(el)>0:
-           obj['children']=[]
-           obj['children'].extend(rootToTree(el))
+           obj[tagName]=[]
+           obj[tagName].extend(rootToTree(el))
        else:
            obj['leaf'] = True
        res.append(obj)
     return res
+
+def parsePopupMenuElement(rootForm,xmldict,formName, data, session, root, info):
+    #obj = dict(root.attrib.copy())
+    #obj["items"]=[]
+    #for el in root:
+    #   subObject = parseXMLFrm(rootForm, el, formName, data, session, root, info)
+    #   obj["items"].append(subObject)
+    # print(obj)
+    return None
 
 def parseTreepanelElement(rootForm,xmldict,formName, data, session, root, info):
     if "caption" in xmldict and not "title" in xmldict:
@@ -744,6 +808,8 @@ def parseTreepanelElement(rootForm,xmldict,formName, data, session, root, info):
         txtTmp = root.text.strip().replace('"', "'").replace("\n", "").replace("\r", "")
         if len(txtTmp) > 0:
             storyObj["data"] = f'''(--##--){txtTmp}(--##--)'''
+    if not "region" in xmldict:
+        xmldict["region"] = "center"
     if len(root) > 0 and "data" in storyObj and len(storyObj["data"]):
         numSubEl = -1
         for elem in root:
@@ -832,6 +898,23 @@ def parseComboBoxElement(rootForm,xmldict,formName, data, session, root, info):
     xmldict["store"] = storeObj
     return xmldict
 
+def initListenerEvent(tagName, eventName, funBody):
+    return f"(--##--)function(){{ {funBody} }}(--##--)"
+    """
+    if tagName == 'combobox':
+        if eventName =="select":
+            return f"(--##--)function(view, record, index){{ {funBody} }}(--##--)"
+        if eventName =="change":
+            return f"(--##--)function(view, newValue, oldValue, eOpts){{ {funBody} }}(--##--)"
+        if eventName in ["afterrender" ,"render"]:
+            return f"(--##--)function(view){{ {funBody} }}(--##--)"
+
+    if tagName in ['treepanel', 'grid','combobox']:
+        return f"(--##--)function(view, index, element){{ {funBody} }}(--##--)"
+    return f"(--##--)function(view){{ {funBody} }}(--##--)"
+    """
+
+
 itemsThiwObject = ["buttons"]
 itemsBlock = ['div','item']
 def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"numEl":0}):
@@ -846,21 +929,27 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
             compName = root.tag[3:].lower()
     if compName == "script" or compName == "dataset" or compName == "action":
         return None
-    xmldict = dict(root.attrib.copy())
     info['numEl']+=1;
+    # обработка контекстного меню
+    if "popupmenu" in root.attrib:
+       root.attrib["onitemcontextmenu"] = f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); showPopupMenu('{root.attrib.get('popupmenu')}',arr[4].getX(),arr[4].getY()); return false;"""
+       del root.attrib["popupmenu"]
+    # если контекстное меню не установлено, тогда отключаем контекстное меню на компоненте
+    if not "onitemcontextmenu" in root.attrib:
+        root.attrib["onitemcontextmenu"] = f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); return false;"""
+
+    xmldict = dict(root.attrib.copy())
     # переносим события в блок "listeners"
     for k, v in xmldict.copy().items():
         if k[:2] == "on" and not xmldict[k][:len("function(")] == "function(" :
             if not "listeners" in xmldict:
                 xmldict["listeners"] ={}
                 xmldict["listeners"] = {"close": "function(){objectOnEvent['onclose'](objectServ['vars_return'])}"}
-            if root.tag[3:].lower() == 'treepanel' \
-                    or root.tag[3:].lower() == 'grid' \
-                    or root.tag[3:].lower() == 'combobox':
-                xmldict["listeners"][k[2:]] = f"(--##--)function(view, index, element){{ {v} }}(--##--)"
-            else:
-                xmldict["listeners"][k[2:]] = f"(--##--)function(view){{ {v} }}(--##--)"
+            eventName = k[2:]
+            tagName = root.tag[3:].lower()
+            xmldict["listeners"][eventName] = initListenerEvent(tagName, eventName, v)
             del root.attrib[k]
+            del xmldict[k]
         elif xmldict[k].strip()[:len("function(")] == "function(":
             xmldict[k] = f'(--##--){v}(--##--)'
         elif v.isdigit():
@@ -905,6 +994,10 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
             return parseGridElement(rootForm,xmldict, formName, data, session, root, info)
         if root.tag[3:].lower() == 'treepanel':
             return parseTreepanelElement(rootForm,xmldict, formName, data, session, root, info)
+        if root.tag[3:].lower() == 'popupmenu':
+            return parsePopupMenuElement(rootForm,xmldict, formName, data, session, root, info)
+        if root.tag[3:].lower() == 'right':
+            return "->"
 
         # ======= HTML ==========
         htmlText = ""
