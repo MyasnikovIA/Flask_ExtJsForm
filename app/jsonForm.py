@@ -183,8 +183,8 @@ def getParsedForm(formName, data, session={}, isHtml=0):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
-    return getSrc(formName, data, session, isHtml)
-
+    return getSrcSaveTemp(formName, data, session, isHtml)
+    # return getSrc(formName, data, session, isHtml)
     getTempCont = True
     if "debug" in data and int(data["debug"]) > 0:
         getTempCont = False
@@ -214,6 +214,36 @@ def replaceTempData(ext,txt, data):
         if len(jsonExtens)>0:
             txt = txt.replace("//[[%INPETDATA%]]",f",{jsonExtens}")
     return txt
+
+def getSrcSaveTemp(formName, data, session, isHtml=0):
+    """
+        Функция получения кэшированной формы (в папке темп HTML)
+    """
+    blockName = ""
+    if ":" in formName:
+        blockName, formName = formName.split(":")
+    cmpDirSrc = TEMP_DIR_PATH
+    ext = formName[formName.rfind('.') + 1:].lower()
+    if len(ext) == 0:
+        formNameBody = formName
+        ext = "frm"
+    else:
+        formNameBody = formName[:((len(ext)) * -1) - 1]
+    if isHtml == 2:
+        ext = "js"
+    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_')}{blockName}.{ext}").replace("/", sep)
+    mime = mimeType(ext)
+    if not path.exists(cmpDirSrc):
+        makedirs(cmpDirSrc)
+    if not path.exists(path.dirname(cmpFiletmp)):
+        makedirs(path.dirname(cmpFiletmp))
+    with open(cmpFiletmp, "wb") as d3_css:
+      txt, mime = getSrc(formName, data, session, isHtml)
+      d3_css.write(txt.encode())
+      setTempPage(cmpFiletmp, txt)
+      txt = replaceTempData(ext, txt, data)
+      return txt, mime
+
 
 def getTemp(formName, data, session, isHtml=0):
     """
@@ -764,6 +794,8 @@ def rootToTree(root,tagName='children'):
        if "caption" in obj and not "text" in obj:
            obj["text"] = obj["caption"]
            del obj["caption"]
+       if not "text" in obj and not el.text == None:
+           obj["text"] = el.text
        if len(el)>0:
            obj[tagName]=[]
            obj[tagName].extend(rootToTree(el))
@@ -932,11 +964,15 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
     info['numEl']+=1;
     # обработка контекстного меню
     if "popupmenu" in root.attrib:
-       root.attrib["onitemcontextmenu"] = f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); showPopupMenu('{root.attrib.get('popupmenu')}',arr[4].getX(),arr[4].getY()); return false;"""
+       onPopUpFun = ""
+       nodes = rootForm.findall(f'*[@name="{root.attrib.get("popupmenu")}"]')
+       if len(nodes)>0:
+           xmldicttmp = dict(nodes[0].attrib.copy())
+           print(xmldicttmp)
+           if "onpopup" in xmldicttmp:
+                onPopUpFun = f"{xmldicttmp['onpopup']};"
+       root.attrib["onitemcontextmenu"] = f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); {onPopUpFun} showPopupMenu('{root.attrib.get('popupmenu')}',arr[4].getX(),arr[4].getY()); return false;"""
        del root.attrib["popupmenu"]
-    # если контекстное меню не установлено, тогда отключаем контекстное меню на компоненте
-    if not "onitemcontextmenu" in root.attrib:
-        root.attrib["onitemcontextmenu"] = f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); return false;"""
 
     xmldict = dict(root.attrib.copy())
     # переносим события в блок "listeners"
@@ -944,7 +980,8 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
         if k[:2] == "on" and not xmldict[k][:len("function(")] == "function(" :
             if not "listeners" in xmldict:
                 xmldict["listeners"] ={}
-                xmldict["listeners"] = {"close": "function(){objectOnEvent['onclose'](objectServ['vars_return'])}"}
+                if parentRoot == None:
+                    xmldict["listeners"] = {"close": "(--##--)function(){objectOnEvent['onclose'](objectServ['vars_return'])}(--##--)"}
             eventName = k[2:]
             tagName = root.tag[3:].lower()
             xmldict["listeners"][eventName] = initListenerEvent(tagName, eventName, v)
@@ -977,6 +1014,10 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
 
     if not "id" in xmldict and "name" in xmldict:
         xmldict["id"] = "ctrl"+md5(f'{str(uuid1()).replace("-", "")}{info["numEl"]}{xmldict}{datetime.now().microsecond}'.encode()).hexdigest()
+
+    if root.tag.lower() == 'iframe':
+        xmldict["html"] = (ET.tostring(root)).decode('UTF-8')
+        return xmldict
 
     if len(compName)>0 or root.tag.lower() in itemsBlock:
         if len(compName)>0:

@@ -44,7 +44,7 @@
         </cmpDataSet>
 
 
-         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true" onitemclick=" console.log(view, index, element);  " >
+         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true" onitemclick=" console.log(arguments);  " >
               <![CDATA[
                    [ {id:1,name:"11111111"}
                      ,{id:2,name:"2222222222222"}
@@ -55,17 +55,17 @@
              <colum dataIndex='name' width="670" header='Name' />
          </cmpGrid>
 
-         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true"  url="json/tutorialdata.json">
+         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true"  url="/json/tutorialdata.json">
              <colum field='value'  caption='поле 1'  width="330"/>
              <colum field='text'   caption='поле 2'  width="670"/>
          </cmpGrid>
 
-         <cmpGrid title="Пользователи" height="150" width="500" fields="value,text" autoHeight="true"  url="json/tutorialdata.json">
+         <cmpGrid title="Пользователи" height="150" width="500" fields="value,text" autoHeight="true"  url="/json/tutorialdata.json">
              <colum  caption='поле 3'  width="330"/>
              <colum  caption='поле 4'  width="670"/>
          </cmpGrid>
 
-         <cmpGrid caption="Пользователи" height="150" width="500" fields="value,text" columns="поле 3,поле 4" autoHeight="true"  url="json/tutorialdata.json"/>
+         <cmpGrid caption="Пользователи" height="150" width="500" fields="value,text" columns="поле 3,поле 4" autoHeight="true"  url="/json/tutorialdata.json"/>
 
     </cmpPanel>
 </div>

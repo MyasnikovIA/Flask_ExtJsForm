@@ -283,7 +283,7 @@ function getValue(_dom,propName,value){
    let winObj = Ext.getCmp(_dom['mainForm'])
    let ctrlObj = winObj.query('[name='+propName+']');
    if (ctrlObj) {
-      return ctrlObj[0].getValue(value);
+      return ctrlObj[0].getValue();
    }
    console.log("error","контрол с именем "+propName+" нет на форме");
    return value
