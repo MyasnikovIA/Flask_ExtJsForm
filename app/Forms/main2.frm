@@ -16,9 +16,9 @@
        zdfvzxgvfzxdvzx
     </cmpPanel>
     <cmpPanel text="Expander component"  title='Правая панель' region="east" margin='5 5 5 5'>
-        <cmpButtons>
+        <cmpButton>
             <div text='New User Register' scale="medium" handler="alert(444);"/>
             <div text='Login' scale="medium" handler="alert(555);"/>
-        </cmpButtons>
+        </cmpButton>
     </cmpPanel>
 </div>

@@ -36,94 +36,26 @@ TMP_PAGE_CAHE = {}
 # Шаблон JS файла для динамической загрузки ExtJS формы из JS функции  "openForm"
 
 TEMP_JS_FORM = """
-  document.addEventListener('contextmenu', event => event.preventDefault());
-  Ext.onReady(function() {
-       {%cmpAction%}
-       {%cmpDataset%}
-       {%cmpPopupMenu%}
-       var {%frmObj%}_onclose = function(data){ }
-       var {%frmObj%} = {%};
-       if ( typeof(window.ExtObj["FormsObject"]) !=='undefined'){
-           if (typeof(window.ExtObj["FormsObject"]['{%formName%}']) !== 'function') {
-              {%frmObj%}['parentEvent'] = window.ExtObj["FormsObject"]['{%formName%}'];
-              delete window.ExtObj["FormsObject"]['{%formName%}'];
-           }
-       }
-       if ( typeof({%frmObj%}['vars']) !=='undefined') {%frmObj%}['vars'] = {};
-       {%frmObj%}["vars"]//=[[%DataVars%]]
-       if ( typeof({%frmObj%}['formName']) !=='undefined') {
-            if (localStorage.getItem("ExtJsFormVars:"+{%frmObj%}['formName']) !== null) {
-                let {%frmObj%}dataText = localStorage.getItem("ExtJsFormVars:"+{%frmObj%}['formName']);
-                if ({%frmObj%}dataText !== '{}') {
-                    try {
-                        let {%frmObj%}_parentVars = JSON.parse({%frmObj%}dataText);
-                     } catch {
-                       console.log("Error: Не удалось получить переменные из родительского окна")
-                     } 
-                     if (typeof({%frmObj%}_parentVars) !== 'undefined') {
-                        if (typeof({%frmObj%}_parentVars['vars']) !== 'undefined') {
-                           for( let {%frmObj%}_key in {%frmObj%}_parentVars['vars']) {
-                              {%frmObj%}['vars'][{%frmObj%}_key] = {%frmObj%}_parentVars['vars'][{%frmObj%}_key];
-                           } 
-                        }
-                        if (typeof({%frmObj%}_parentVars['parentFrom']) !== 'undefined') {
-                          {%frmObj%}['parentFrom'] = {%frmObj%}_parentVars['parentFrom'];
-                        }
-                     }
-                     delete {%frmObj%}_parentVars;
+           Ext.onReady(function() {
+                {%cmpAction%}
+                {%cmpDataset%}
+                {%cmpPopupMenu%}
+                var {%frmObj%}_onclose = function(data){ }
+                var {%frmObj%} = {%};
+                if ( typeof(window.ExtObj["FormsObject"]) !=='undefined'){
+                    if (typeof(window.ExtObj["FormsObject"]['{%formName%}']) !== 'function') {
+                       {%frmObj%}['parentEvent'] = window.ExtObj["FormsObject"]['{%formName%}'];
+                       delete window.ExtObj["FormsObject"]['{%formName%}'];
+                    }
                 }
-                localStorage.removeItem("ExtJsFormVars:"+{%frmObj%}['formName']);      
-                delete {%frmObj%}dataText;
-            }
-       }
-       {%cmpScript%}
-       let Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
-       Win_{%frmObj%}{%showWin%};
-  });
+                if ( typeof({%frmObj%}['vars']) !=='undefined') {%frmObj%}['vars'] = {};
+                {%frmObj%}["vars"]//=[[%DataVars%]]
+                {%cmpScript%}
+                let Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
+                Win_{%frmObj%}{%showWin%};
+           });
 """
-TEMP_JS_FORM_OLD = """
-  Ext.onReady(function() {
-       {%cmpDataset%}
-       let {%frmObj%}_onclose = function(data){ }
-       let {%frmObj%} = {%};
-       if ( typeof(window.ExtObj["FormsObject"]) !=='undefined'){
-           if (typeof(window.ExtObj["FormsObject"]['{%formName%}']) !== 'function') {
-              {%frmObj%}['parentEvent'] = window.ExtObj["FormsObject"]['{%formName%}'];
-              delete window.ExtObj["FormsObject"]['{%formName%}'];
-           }
-       }
-       if ( typeof({%frmObj%}['vars']) !=='undefined') {%frmObj%}['vars'] = {};
-       {%frmObj%}["vars"]//=[[%DataVars%]]
-       if ( typeof({%frmObj%}['formName']) !=='undefined') {
-            if (localStorage.getItem("ExtJsFormVars:"+{%frmObj%}['formName']) !== null) {
-                let {%frmObj%}dataText = localStorage.getItem("ExtJsFormVars:"+{%frmObj%}['formName']);
-                if ({%frmObj%}dataText !== '{}') {
-                    try {
-                        let {%frmObj%}_parentVars = JSON.parse({%frmObj%}dataText);
-                     } catch {
-                       console.log("Error: Не удалось получить переменные из родительского окна")
-                     } 
-                     if (typeof({%frmObj%}_parentVars) !== 'undefined') {
-                        if (typeof({%frmObj%}_parentVars['vars']) !== 'undefined') {
-                           for( let {%frmObj%}_key in {%frmObj%}_parentVars['vars']) {
-                              {%frmObj%}['vars'][{%frmObj%}_key] = {%frmObj%}_parentVars['vars'][{%frmObj%}_key];
-                           } 
-                        }
-                        if (typeof({%frmObj%}_parentVars['parentFrom']) !== 'undefined') {
-                          {%frmObj%}['parentFrom'] = {%frmObj%}_parentVars['parentFrom'];
-                        }
-                     }
-                     delete {%frmObj%}_parentVars;
-                }
-                localStorage.removeItem("ExtJsFormVars:"+{%frmObj%}['formName']);      
-                delete {%frmObj%}dataText;
-            }
-       }
-       {%cmpScript%}
-       let Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
-       Win_{%frmObj%}{%showWin%};
-  });
-"""
+
 
 # Шаблон HTML файла для визуализации форм *.frm
 TEMP_HTML_FORM = """<!DOCTYPE html>
@@ -134,9 +66,8 @@ TEMP_HTML_FORM = """<!DOCTYPE html>
         <script type="text/javascript" src="/lib/ExtJS_6.0.0/ext-all.js"></script>
         <script type="text/javascript" src="/js/common.js"></script>
         <script type = "text/javascript">
-             Ext.onReady(function() {
-                 openForm("{%}",{%isMOdal%},{%data%});
-             });
+             document.addEventListener('contextmenu', event => event.preventDefault());
+             {%}
         </script>
    </head>
    <body></body>
@@ -491,20 +422,14 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     ext = formName[formName.rfind('.') + 1:].lower()
     frmObj = formName.replace("/","_").replace(".","")
     # ---- получить HTML файл с перенаправлением на JS формой
-    if isHtml == 1:
-        isModal = "false"
-        if 'isModal' in data:
-            isModal="true"
-        html = TEMP_HTML_FORM.replace("{%}",formName) \
-            .replace("{%data%}",JSON_stringify(data, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))) \
-            .replace("{%isMOdal%}",isModal)
-        html = jsonFunFromString(html)
-        return  html,  mimeType(ext)
     rootForm, script, dataset, action, popupMenu = getXMLObject(formName)
     if rootForm.tag == "error":
-        return f'{{"error":"{rootForm.text}"}}', "application/x-javascript"
+        if isHtml == 1:
+            return f'<h1>error: {rootForm.text} </h1>', "text/html"
+        else:
+            return f'{{"error":"{rootForm.text}"}}', "application/x-javascript"
 
-    jsonPopupMenu, popupMenuList = parseXMLmain(popupMenu, rootForm, data, session)  # парсим main фрагменты
+    jsonPopupMenu, popupMenuList = parseXMLmain(popupMenu, rootForm, data, session)  # парсим PopupMenu фрагменты
     jsonFrm = parseXMLFrm(rootForm,rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
     jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
@@ -520,32 +445,34 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     jsonFrm["actionList"] = actionList
     jsonFrm["mainList"] = popupMenuList
     # ---- получить JS файл с формой
-    if isHtml == 2:
-        extClass = "Ext.Viewport"
-        showWin = ""
-        if "isModal" in data:
-            jsonFrm['modal'] = True
-            extClass = "Ext.window.Window"
-            showWin=".show()"
-        jsonFrm['layout'] = 'border'
-        if not 'renderTo' in jsonFrm:
-            jsonFrm['renderTo'] = 'Ext.getBody()';
-        jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
-        jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} """
-        html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
-            .replace("{%cmpDataset%}",jsonDataset)\
-            .replace("{%cmpPopupMenu%}",jsonPopupMenu)\
-            .replace("{%cmpAction%}",jsonAction)\
-            .replace("{%frmObj%}",frmObj)\
-            .replace("{%formName%}",formName)\
-            .replace("{%cmpScript%}",jsonScript)\
-            .replace("{%showWin%}",showWin)
-        html = jsonFunFromString(html).replace("Form.", f"{frmObj}.")
-        return html, mimeType(ext)
+    extClass = "Ext.Viewport"
+    showWin = ""
+    if "isModal" in data:
+        jsonFrm['modal'] = True
+        extClass = "Ext.window.Window"
+        showWin=".show()"
+    jsonFrm['layout'] = 'border'
+    if not 'renderTo' in jsonFrm:
+        jsonFrm['renderTo'] = 'Ext.getBody()';
     jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
-    jsonFrmTxt = f" {jsonFrmTxt[:-1]}\r\n,//[[%INPETDATA%]] \r\n }} "
-    jsonFrmTxt = jsonFunFromString(jsonFrmTxt).replace("Form.", f"{frmObj}.")
-    return jsonFrmTxt, "application/x-javascript"
+    jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} """
+    html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
+        .replace("{%cmpDataset%}",jsonDataset)\
+        .replace("{%cmpPopupMenu%}",jsonPopupMenu)\
+        .replace("{%cmpAction%}",jsonAction)\
+        .replace("{%frmObj%}",frmObj)\
+        .replace("{%formName%}",formName)\
+        .replace("{%cmpScript%}",jsonScript)\
+        .replace("{%showWin%}",showWin)
+    html = jsonFunFromString(html).replace("Form.", f"{frmObj}.")
+    if isHtml == 1:
+        html = TEMP_HTML_FORM.replace("{%}", html)
+        return  html,  mimeType(ext)
+    return html, mimeType(ext)
+    # jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
+    # jsonFrmTxt = f" {jsonFrmTxt[:-1]}\r\n,//[[%INPETDATA%]] \r\n }} "
+    # jsonFrmTxt = jsonFunFromString(jsonFrmTxt).replace("Form.", f"{frmObj}.")
+    # return jsonFrmTxt, "application/x-javascript"
 
 
 def parseXMLScript(scriptXml, formName, data, session):
@@ -949,6 +876,7 @@ def initListenerEvent(tagName, eventName, funBody):
 
 itemsThiwObject = ["buttons"]
 itemsBlock = ['div','item']
+htmlBlock = ['iframe']
 def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"numEl":0}):
     """
      Конвертировать XML объект формы в ExtJS объект
@@ -1015,7 +943,7 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
     if not "id" in xmldict and "name" in xmldict:
         xmldict["id"] = "ctrl"+md5(f'{str(uuid1()).replace("-", "")}{info["numEl"]}{xmldict}{datetime.now().microsecond}'.encode()).hexdigest()
 
-    if root.tag.lower() == 'iframe':
+    if root.tag.lower() in htmlBlock:
         xmldict["html"] = (ET.tostring(root)).decode('UTF-8')
         return xmldict
 
