@@ -550,7 +550,7 @@ def parseXMLAction(datasetXml, jsonFrm, data, session):
             extActionStore["autoLoad"] = (xmldict['activateoncreate'] =="true")
         extActionStore['mainForm'] = jsonFrm["mainForm"]
         extActionStore['mainFormName'] = jsonFrm["mainFormName"]
-        extActionStore['proxy'] = {"type":"ajax", "url":f"request.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
+        # extActionStore['proxy'] = {"type":"ajax", "url":f"request.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
         # JSON.stringify(objectQuery)
         extActionStore["listeners"]={}
         # https://coderedirect.com/questions/406619/how-to-get-extjs-4-stores-request-data-on-beforeload-event
@@ -608,7 +608,7 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
             extDataStore["autoLoad"] = (xmldict['activateoncreate'] =="true")
         extDataStore['mainForm'] = jsonFrm["mainForm"]
         extDataStore['mainFormName'] = jsonFrm["mainFormName"]
-        extDataStore['proxy'] = {"type":"ajax", "url":f"request.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
+        # extDataStore['proxy'] = {"type":"ajax", "url":f"request.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
         # JSON.stringify(objectQuery)
         extDataStore["listeners"]={}
         extDataStore["records"]=[]
