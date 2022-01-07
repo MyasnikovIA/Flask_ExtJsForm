@@ -440,7 +440,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     if not "parentEvent" in jsonFrm:
         jsonFrm["parentEvent"] = {}
     jsonFrm["dataSetList"] = dataSetList
-    # jsonFrm["actionList"] = actionList
+    jsonFrm["actionList"] = {}
     jsonFrm["mainList"] = popupMenuList
     # ---- получить JS файл с формой
     extClass = "Ext.Viewport"
@@ -1068,6 +1068,41 @@ def exec_then_eval(DB_DICT,vars, code, sessionId):
     exec(compile(block, '<string>', mode='exec'), _globals, _locals)
     res = eval(compile(last, '<string>', mode='eval'), _globals, _locals)
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
+
+
+def getDataSetQuery(queryJson, sessionId):
+    frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
+    datasetName = queryJson["dataset"]
+    bin = dataSetQuery(queryJson, sessionId)
+    txt = f""" window.Win_{frmObj}['dataSetList']['{datasetName}'].loadData({bin}); """
+    return txt
+
+def getActionQuery(queryJson, sessionId):
+    frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
+    datasetName = queryJson["dataset"]
+    colbackFun = ""
+    if "colbackFun" in queryJson:
+        colbackFun = f'{queryJson["colbackFun"]}'
+        if colbackFun.strip()[:len("function(")] == "function(":
+            colbackFun = f"var tmpcolbackFun = {colbackFun};\r\n        tmpcolbackFun();\r\n        delete tmpcolbackFun;"
+        else:
+            colbackFun = f"{colbackFun}();"
+        del queryJson["colbackFun"]
+    bin = dataSetQuery(queryJson, sessionId)
+    txt = f"""  
+    window.Win_{frmObj}['actionList']['{datasetName}'] = {bin[1:-1]}; 
+    for (let key in window.Win_{frmObj}['actionList']['{datasetName}']) {{
+        let ctrlObjFild = window.Win_{frmObj}.query('[name='+key+']');
+        if ((ctrlObjFild) && (ctrlObjFild.length>0)) {{
+           ctrlObjFild[0].setValue(window.Win_{frmObj}['actionList']['{datasetName}'][key]);
+           delete window.Win_{frmObj}['actionList']['{datasetName}'][key];
+        }} else {{
+           setVar(window.Win_{frmObj}, key, window.Win_{frmObj}['actionList']['{datasetName}'][key])
+        }}
+    }}
+    {colbackFun}
+    """.replace("this", f"window.Win_{frmObj}")
+    return txt
 
 
 LIST_OUTPUT_TYPE = ["<class 'str'>", "<class 'int'>", "<class 'list'>","<class 'dict'"]

@@ -13,10 +13,11 @@
                 
                 var mainfrm_onclose = function(data){ }
                 var mainfrm =  {
+    "actionList": {},
     "caption": "Примеры использования контролов",
     "dataSetList": {},
     "formName": "main.frm",
-    "id": "wina41f6bb758b992643cb50aca4db72575",
+    "id": "winc4d79780a3644c4a8fd5681706d8f94e",
     "items": [
         {
             "items": [
@@ -24,14 +25,14 @@
                     "listeners": {
                         "click": function(){ mainfrm.onClickBtn(arguments); }
                     },
-                    "mainForm": "wina41f6bb758b992643cb50aca4db72575",
+                    "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
                     "mainFormName": "main.frm",
                     "text": "test",
                     "xtype": "button"
                 },
                 {
-                    "id": "ctrlb3b526bd8d841999be70f7ca311bff67",
-                    "mainForm": "wina41f6bb758b992643cb50aca4db72575",
+                    "id": "ctrl5a139eb15a487c66ef04b44509af8ba9",
+                    "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
                     "mainFormName": "main.frm",
                     "name": "MyTime",
                     "value": "Все компоненты смещены вправо",
@@ -39,14 +40,14 @@
                     "xtype": "textfield"
                 }
             ],
-            "mainForm": "wina41f6bb758b992643cb50aca4db72575",
+            "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
             "mainFormName": "main.frm",
             "xtype": "panel"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "wina41f6bb758b992643cb50aca4db72575",
+    "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
     "mainFormName": "main.frm",
     "mainList": {},
     "parentEvent": {},
@@ -69,8 +70,8 @@
            mainfrm.onClickBtn = function(arguments) {
               let arr = [].slice.call(arguments);
               console.log("imput argument fun", arr);
-              executeAction(this,"myAction", function(rec) {
-                  console.log("rec",rec);
+              executeAction(this,"myAction", function() {
+                  console.log("OK",getVar(this,'arr'));
               })
            }
        

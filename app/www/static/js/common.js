@@ -377,36 +377,14 @@ function refreshDataSet(){
         return;
      }
      let storeObj = ctrlObj['dataSetList'][datasetName];
-     // let typ = "";
-     // if (typeof(storeObj['typ']) !== 'undefined'){
-     //    typ = storeObj['typ'];
-     // }
-     // Если в Store  указан тип обработки JS , тогда
-     //    <cmpDataSet name="myDataSet" typ="js"> // загрузка данных через подгрузку JS файлы
-     // if (typ == 'js') {
-         loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
-             if (typeof(colbackFun) ==='function') {
+     loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
+        if (typeof(colbackFun) ==='function') {
                  let records = storeObj.getData().items;
                  colbackFun(records);
-             }
-         },function(error){
-             console.log(error);
-         });
-        return;
-     // }
-     // Получение данных через прокси временно отключено, для определения скорости прямой инициализации данных через JS файл
-     // // Иначе запускаем загрузку через proxy
-     // for(let key in objectQuery){
-     //    storeObj.getProxy().setExtraParam(key,objectQuery[key]);
-     // }
-     // storeObj.load({
-     //    callback: function(records, operation, success) {
-     //        if (typeof(colbackFun) === 'function'){
-     //           colbackFun(records);
-     //        }
-     //        storeObj["records"] = records;
-     //    }
-     //});
+        }
+     },function(error){
+        console.log(error);
+     });
 }
 
 function setData() {
@@ -510,11 +488,8 @@ function executeAction(){
      if (_domParent == null)  return;
      let parentFrom = null;
      formName = _domParent["mainFormName"];
-     loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
-         if (typeof(colbackFun) ==='function') {
-            // let records = storeObj.getData().items;
-            // colbackFun(records);
-         }
+     loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+"&colbackFun="+colbackFun.toString()).then(function(script){
+
      },function(error){
          console.log(error);
      });

@@ -4,8 +4,8 @@
            Form.onClickBtn = function(arguments) {
               let arr = [].slice.call(arguments);
               console.log("imput argument fun", arr);
-              executeAction("myAction", function(rec) {
-                  console.log("rec",rec);
+              executeAction("myAction", function() {
+                  console.log("OK",getVar('arr'));
               })
            }
        ]]>
