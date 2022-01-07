@@ -37,6 +37,7 @@ TMP_PAGE_CAHE = {}
 
 TEMP_JS_FORM = """
            Ext.onReady(function() {
+                if (typeof(window.Win_mainfrm) === 'undefined') window.Win_mainfrm = "";
                 {%cmpDataset%}
                 {%cmpPopupMenu%}
                 var {%frmObj%}_onclose = function(data){ }
@@ -49,9 +50,9 @@ TEMP_JS_FORM = """
                 }
                 if ( typeof({%frmObj%}['vars']) !=='undefined') {%frmObj%}['vars'] = {};
                 {%frmObj%}["vars"]//=[[%DataVars%]]
-                {%cmpScript%}
                 window.Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
                 window.Win_{%frmObj%}{%showWin%};
+                {%cmpScript%}
            });
 """
 
@@ -391,23 +392,27 @@ def getXMLObject(formName):
         return  rootForm, None, None
 
 
-def jsonFunFromString(html=""):
+def jsonFunFromString(html="",frmObj=""):
     """
       1) Заменить текстовое значение JSON объекта в JS
       2) Добавить к глобальным функциям передачу контекста, для определения места вызова глобадьной функции
     """
-    html = html.replace("setVar(", "setVar(this,",)
-    html = html.replace("getVar(", "getVar(this,",)
-    html = html.replace("setValue(","setValue(this,",)
-    html = html.replace("getValue(", "getValue(this,",)
-    html = html.replace("openForm(", "openForm(this,",)
-    html = html.replace("getControl(", "getControl(this,",)
-    html = html.replace("showPopupMenu(", "showPopupMenu(this,",)
-    html = html.replace("refreshDataSet(", "refreshDataSet(this,",)
-    html = html.replace("executeAction(", "executeAction(this,",)
-    html = html.replace("close(", "close(this,",)
-    html = html.replace("openWindow(", "openWindow(this,",)
+    thisName = f"window.Win_{frmObj}"
+    html = html.replace("setVar(", f"setVar({thisName},",)
+    html = html.replace("getVar(", f"getVar({thisName},",)
+    html = html.replace("setValue(",f"setValue({thisName},",)
+    html = html.replace("getValue(", f"getValue({thisName},",)
+    html = html.replace("openForm(", f"openForm({thisName},",)
+    html = html.replace("getControl(", f"getControl({thisName},",)
+    html = html.replace("getDataSet(", f"getDataSet({thisName},",)
+    html = html.replace("showPopupMenu(", f"showPopupMenu({thisName},",)
+    html = html.replace("refreshDataSet(", f"refreshDataSet({thisName},",)
+    html = html.replace("executeAction(", f"executeAction({thisName},",)
+    html = html.replace("executeActionPost(", f"executeActionPost({thisName},",)
+    html = html.replace("close(", f"close({thisName},",)
+    html = html.replace("openWindow(", f"openWindow({thisName},",)
     html = html.replace('"Ext.getBody()"', "Ext.getBody()",)
+    html = html.replace("Form.", f"{frmObj}.")
     html = html.replace('(--##--)\"', '')
     html = html.replace('\"(--##--)', '')
     html = html.replace('\"(--##--)', '')
@@ -461,7 +466,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         .replace("{%formName%}",formName)\
         .replace("{%cmpScript%}",jsonScript)\
         .replace("{%showWin%}",showWin)
-    html = jsonFunFromString(html).replace("Form.", f"{frmObj}.")
+    html = jsonFunFromString(html,frmObj)
     if isHtml == 1:
         html = TEMP_HTML_FORM.replace("{%}", html)
         return  html,  mimeType(ext)
@@ -1070,14 +1075,14 @@ def exec_then_eval(DB_DICT,vars, code, sessionId):
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
 
 
-def getDataSetQuery(queryJson, sessionId):
+def getDataSetQuery(request,queryJson, sessionId):
     frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
     datasetName = queryJson["dataset"]
     bin = dataSetQuery(queryJson, sessionId)
     txt = f""" window.Win_{frmObj}['dataSetList']['{datasetName}'].loadData({bin}); """
     return txt
 
-def getActionQuery(queryJson, sessionId):
+def getActionQuery(request,queryJson, sessionId):
     frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
     datasetName = queryJson["dataset"]
     colbackFun = ""
@@ -1089,20 +1094,23 @@ def getActionQuery(queryJson, sessionId):
             colbackFun = f"{colbackFun}();"
         del queryJson["colbackFun"]
     bin = dataSetQuery(queryJson, sessionId)
-    txt = f"""  
-    window.Win_{frmObj}['actionList']['{datasetName}'] = {bin[1:-1]}; 
-    for (let key in window.Win_{frmObj}['actionList']['{datasetName}']) {{
-        let ctrlObjFild = window.Win_{frmObj}.query('[name='+key+']');
-        if ((ctrlObjFild) && (ctrlObjFild.length>0)) {{
-           ctrlObjFild[0].setValue(window.Win_{frmObj}['actionList']['{datasetName}'][key]);
-           delete window.Win_{frmObj}['actionList']['{datasetName}'][key];
-        }} else {{
-           setVar(window.Win_{frmObj}, key, window.Win_{frmObj}['actionList']['{datasetName}'][key])
+    if request.method == 'GET':
+        txt = f"""
+        window.Win_{frmObj}['actionList']['{datasetName}'] = {bin[1:-1]}; 
+        for (let key in window.Win_{frmObj}['actionList']['{datasetName}']) {{
+            let ctrlObjFild = window.Win_{frmObj}.query('[name='+key+']');
+            if ((ctrlObjFild) && (ctrlObjFild.length>0)) {{
+               ctrlObjFild[0].setValue(window.Win_{frmObj}['actionList']['{datasetName}'][key]);
+               delete window.Win_{frmObj}['actionList']['{datasetName}'][key];
+            }} else {{
+               setVar(window.Win_{frmObj}, key, window.Win_{frmObj}['actionList']['{datasetName}'][key])
+            }}
         }}
-    }}
-    {colbackFun}
-    """.replace("this", f"window.Win_{frmObj}")
-    return txt
+        {colbackFun}
+        """.replace("this", f"window.Win_{frmObj}")
+        return txt
+    else:
+        return bin[1:-1]
 
 
 LIST_OUTPUT_TYPE = ["<class 'str'>", "<class 'int'>", "<class 'list'>","<class 'dict'"]

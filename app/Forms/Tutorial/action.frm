@@ -1,17 +1,26 @@
 <div caption="Примеры использования контролов" >
     <cmpScript>
        <![CDATA[
-           Form.onClickBtn = function(arguments) {
+           Form.onClickBtnGet = function(arguments) {
               let arr = [].slice.call(arguments);
-              console.log("imput argument fun", arr);
-              executeAction("myAction", function(rec) {
-                  console.log("rec",rec);
+              console.log("GET imput argument fun", arr);
+              executeAction("myAction", function() {
+                  console.log("OK",getVar('arr'));
               })
+           }
+           Form.onClickBtnPost = function(arguments) {
+              let arr = [].slice.call(arguments);
+              console.log("POST imput argument fun", arr);
+              executeAction("myAction", function(obj) {
+                  console.log("obj",obj);
+                  console.log("OK",getVar('arr'));
+              },true); // <== признак отправки сообщения POST запросом
            }
        ]]>
     </cmpScript>
     <cmpPanel>
-        <cmpButton text="test" onclick="Form.onClickBtn(arguments);"/>
+        <cmpButton text="executeAction GET Query" onclick="Form.onClickBtnGet(arguments);"/>
+        <cmpButton text="executeAction POST Query" onclick="Form.onClickBtnPost(arguments);"/>
         <cmpTextField  name="MyTime" value="Все компоненты смещены вправо"  width="250"/>
     </cmpPanel>
 

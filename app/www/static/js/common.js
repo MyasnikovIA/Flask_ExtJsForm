@@ -241,7 +241,10 @@ function getVar(_dom,propName,value) {
    if (typeof(value) === 'undefined') {
       value = null;
    }
-   let winObj = Ext.getCmp(_dom['mainForm'])
+   let winObj = Ext.getCmp(_dom['mainForm']);
+   if (typeof(winObj) === 'undefined') {
+       return value;
+   }
    if (typeof(winObj['vars']) === 'undefined') {
        winObj['vars'] = {};
        return value;
@@ -313,6 +316,9 @@ function close(_dom,mod) {
 }
 
 
+function getStore(){
+    return getDataSet(arguments);
+}
 function getDataSet(){
      // получить объект Dataset
      if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
@@ -329,8 +335,12 @@ function getDataSet(){
      }
      if(datasetName.length === 0) return null;
      if (_domParent == null)  return null;
-     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
-     return ctrlObj
+     // let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     let ctrlObj = _domParent;
+     if (typeof(ctrlObj)==='undefined') return null;
+     if (typeof(ctrlObj['dataSetList'])==='undefined') return null;
+     if (typeof(ctrlObj['dataSetList'][datasetName])==='undefined') return null;
+     return ctrlObj['dataSetList'][datasetName]
 }
 
 function refreshDataSet(){
@@ -358,7 +368,7 @@ function refreshDataSet(){
         colbackFun = arr.splice(0, 1)[0];
      }
      if(datasetName.length === 0) {
-        consople.log("error","Не указано имя dataset")
+        console.log("error","Не указано имя dataset")
         return;
      }
      if (_domParent == null)  {
@@ -409,7 +419,7 @@ function setData() {
         objectQuery = arr.splice(0, 1)[0];
      }
      if(datasetName.length === 0) {
-        consople.log("error","Не указано имя dataset")
+        console.log("error","Не указано имя dataset")
         return;
      }
      if (_domParent == null)  {
@@ -450,7 +460,8 @@ function showPopupMenu(){
      if (typeof(arr[0]) === 'number') {
         y = arr.splice(0, 1)[0];
      }
-     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     // let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     let ctrlObj = _domParent;
      if (typeof(ctrlObj['mainList']) === 'undefined')  return;
      if (typeof(ctrlObj['mainList'][menuName]) === 'undefined') {
         consople.log("error","меню с именем "+menuName+" отсутствует на форме")
@@ -472,6 +483,7 @@ function executeAction(){
      let colbackFun = null;
      let formName = "";
      let _domParent = null;
+     let isPostQuery = false;
      if (typeof(arr[0]) === 'object') {
         _domParent = arr.splice(0, 1)[0];
      }
@@ -484,15 +496,50 @@ function executeAction(){
      if (typeof(arr[0]) === 'function') {
         colbackFun = arr.splice(0, 1)[0];
      }
+     if (typeof(arr[0]) === 'boolean') {
+        isPostQuery = arr.splice(0, 1)[0];
+     }
      if(datasetName.length === 0) return;
      if (_domParent == null)  return;
      let parentFrom = null;
      formName = _domParent["mainFormName"];
-     loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+"&colbackFun="+colbackFun.toString()).then(function(script){
-
-     },function(error){
-         console.log(error);
-     });
+     if (!isPostQuery) {
+         loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+"&colbackFun="+colbackFun.toString()).then(function(script){
+         },function(error){
+             console.log(error);
+         });
+     }else{
+         // let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+         let ctrlObj = _domParent;
+         let url = "action.php?Form="+formName+"&dataset="+datasetName;
+         var request = new XMLHttpRequest(); // CreateRequest();
+         //request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
+         request.open('POST', url, true);  // `false` makes the request synchronous
+         request.setRequestHeader('Content-type', 'application/json');
+         var countQuery = 0; // необходимо уточнить почему производится 3 запроса, вмнсто одного
+         request.onreadystatechange = function() {
+           if (request.status === 200) {
+                countQuery++;
+                if (countQuery == 2) {
+                    ctrlObj['actionList'][datasetName] = JSON.parse(request.responseText);
+                    console.log("ctrlObj",ctrlObj)
+                    for (let key in ctrlObj['actionList'][datasetName]) {
+                        let ctrlObjFild = ctrlObj.query('[name='+key+']');
+                        if ((ctrlObjFild) && (ctrlObjFild.length>0)) {
+                           ctrlObjFild[0].setValue(ctrlObj['actionList'][datasetName][key]);
+                           delete ctrlObj['actionList'][datasetName][key];
+                        } else {
+                           if (typeof(ctrlObj['vars']) == "undefined") ctrlObj['vars'] = {};
+                           ctrlObj['vars'][key]=ctrlObj['actionList'][datasetName][key]
+                        }
+                    }
+                    colbackFun(ctrlObj['actionList'][datasetName]);
+                }
+           }
+         };
+         request.send(JSON.stringify(objectQuery));
+         return request;
+     }
 }
 
 // функция открытия формы через подгрузку JS файла (работает долго)

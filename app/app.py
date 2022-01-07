@@ -77,12 +77,12 @@ def all_files(path):
 
     if "dataset.php" in path:
         queryJson = jsonForm.getAttrQuery(request)
-        txt =jsonForm.getDataSetQuery(queryJson,session["ID"])
+        txt =jsonForm.getDataSetQuery(request,queryJson,session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
     if "action.php" in path:
         queryJson = jsonForm.getAttrQuery(request)
-        txt = jsonForm.getActionQuery(queryJson,session["ID"])
+        txt = jsonForm.getActionQuery(request,queryJson,session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
     # Поиск запроса в каталоге static

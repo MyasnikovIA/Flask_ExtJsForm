@@ -9,6 +9,7 @@
              document.addEventListener('contextmenu', event => event.preventDefault());
              
            Ext.onReady(function() {
+                if (typeof(window.Win_mainfrm) === 'undefined') window.Win_mainfrm = "";
                 
                 
                 var mainfrm_onclose = function(data){ }
@@ -17,22 +18,31 @@
     "caption": "Примеры использования контролов",
     "dataSetList": {},
     "formName": "main.frm",
-    "id": "winc4d79780a3644c4a8fd5681706d8f94e",
+    "id": "win949533ef4792186b8a204622fe853f45",
     "items": [
         {
             "items": [
                 {
                     "listeners": {
-                        "click": function(){ mainfrm.onClickBtn(arguments); }
+                        "click": function(){ mainfrm.onClickBtnGet(arguments); }
                     },
-                    "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
+                    "mainForm": "win949533ef4792186b8a204622fe853f45",
                     "mainFormName": "main.frm",
-                    "text": "test",
+                    "text": "executeAction GET Query",
                     "xtype": "button"
                 },
                 {
-                    "id": "ctrl5a139eb15a487c66ef04b44509af8ba9",
-                    "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
+                    "listeners": {
+                        "click": function(){ mainfrm.onClickBtnPost(arguments); }
+                    },
+                    "mainForm": "win949533ef4792186b8a204622fe853f45",
+                    "mainFormName": "main.frm",
+                    "text": "executeAction POST Query",
+                    "xtype": "button"
+                },
+                {
+                    "id": "ctrl371800d9c159dd6f7dca188717579ed0",
+                    "mainForm": "win949533ef4792186b8a204622fe853f45",
                     "mainFormName": "main.frm",
                     "name": "MyTime",
                     "value": "Все компоненты смещены вправо",
@@ -40,14 +50,14 @@
                     "xtype": "textfield"
                 }
             ],
-            "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
+            "mainForm": "win949533ef4792186b8a204622fe853f45",
             "mainFormName": "main.frm",
             "xtype": "panel"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "winc4d79780a3644c4a8fd5681706d8f94e",
+    "mainForm": "win949533ef4792186b8a204622fe853f45",
     "mainFormName": "main.frm",
     "mainList": {},
     "parentEvent": {},
@@ -65,19 +75,29 @@
                 }
                 if ( typeof(mainfrm['vars']) !=='undefined') mainfrm['vars'] = {};
                 mainfrm["vars"]//=[[%DataVars%]]
+                window.Win_mainfrm = Ext.create('Ext.Viewport',mainfrm);
+                window.Win_mainfrm;
                 
        
-           mainfrm.onClickBtn = function(arguments) {
+           mainfrm.onClickBtnGet = function(arguments) {
               let arr = [].slice.call(arguments);
-              console.log("imput argument fun", arr);
-              executeAction(this,"myAction", function() {
-                  console.log("OK",getVar(this,'arr'));
+              console.log("GET imput argument fun", arr);
+              setVar(window.Win_mainfrm,'method','GET');
+              executeAction(window.Win_mainfrm,"myAction", function() {
+                  console.log("OK",getVar(window.Win_mainfrm,'arr'));
               })
+           }
+           mainfrm.onClickBtnPost = function(arguments) {
+              let arr = [].slice.call(arguments);
+              console.log("POST imput argument fun", arr);
+              setVar(window.Win_mainfrm,'method','POST');
+              executeAction(window.Win_mainfrm,"myAction", function(obj) {
+                  console.log("obj",obj);
+                  console.log("OK",getVar(window.Win_mainfrm,'arr'));
+              },true); // <== признак отправки сообщения POST запросом
            }
        
     
-                window.Win_mainfrm = Ext.create('Ext.Viewport',mainfrm);
-                window.Win_mainfrm;
            });
 
         </script>

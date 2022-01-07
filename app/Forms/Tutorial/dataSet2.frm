@@ -4,10 +4,14 @@
            Form.onClickBtn = function(arguments) {
               let arr = [].slice.call(arguments);
               console.log("imput argument fun", arr);
+              console.log( getDataSet("myDataSet") );
               refreshDataSet("myDataSet", function(rec) {
                   console.log("rec",rec);
               })
            }
+           refreshDataSet("myDataSet", function(rec) {
+                console.log("rec",rec);
+           })
        ]]>
     </cmpScript>
     <cmpPanel>
