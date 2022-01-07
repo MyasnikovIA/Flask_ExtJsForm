@@ -37,7 +37,6 @@ TMP_PAGE_CAHE = {}
 
 TEMP_JS_FORM = """
            Ext.onReady(function() {
-                {%cmpAction%}
                 {%cmpDataset%}
                 {%cmpPopupMenu%}
                 var {%frmObj%}_onclose = function(data){ }
@@ -51,8 +50,8 @@ TEMP_JS_FORM = """
                 if ( typeof({%frmObj%}['vars']) !=='undefined') {%frmObj%}['vars'] = {};
                 {%frmObj%}["vars"]//=[[%DataVars%]]
                 {%cmpScript%}
-                let Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
-                Win_{%frmObj%}{%showWin%};
+                window.Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
+                window.Win_{%frmObj%}{%showWin%};
            });
 """
 
@@ -433,8 +432,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     jsonFrm = parseXMLFrm(rootForm,rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
     jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
-    jsonAction, actionList = parseXMLAction(action, jsonFrm, data, session)  # парсим Action фрагменты
-
+    # jsonAction, actionList = parseXMLAction(action, jsonFrm, data, session)  # парсим Action фрагменты
     jsonFrm['formName'] = formName
     jsonFrm['retuen_object'] = {}
     if not "listeners" in jsonFrm:
@@ -442,7 +440,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     if not "parentEvent" in jsonFrm:
         jsonFrm["parentEvent"] = {}
     jsonFrm["dataSetList"] = dataSetList
-    jsonFrm["actionList"] = actionList
+    # jsonFrm["actionList"] = actionList
     jsonFrm["mainList"] = popupMenuList
     # ---- получить JS файл с формой
     extClass = "Ext.Viewport"
@@ -459,7 +457,6 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
         .replace("{%cmpDataset%}",jsonDataset)\
         .replace("{%cmpPopupMenu%}",jsonPopupMenu)\
-        .replace("{%cmpAction%}",jsonAction)\
         .replace("{%frmObj%}",frmObj)\
         .replace("{%formName%}",formName)\
         .replace("{%cmpScript%}",jsonScript)\
@@ -603,6 +600,8 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
         else:
             storeClass = "new Ext.data.Store("
         extDataStore = {}
+        if "typ" in xmldict:
+            extDataStore['typ'] = xmldict["typ"]
         if not "activateoncreate" in xmldict:
             extDataStore["autoLoad"] = True
         else:
@@ -1071,7 +1070,7 @@ def exec_then_eval(DB_DICT,vars, code, sessionId):
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
 
 
-
+LIST_OUTPUT_TYPE = ["<class 'str'>", "<class 'int'>", "<class 'list'>","<class 'dict'"]
 def dataSetQuery(queryJson, sessionId):
     if not 'Form' in queryJson:
         return '{"error":"Не определена форма на которой расположен запрос"}'
@@ -1114,7 +1113,8 @@ def dataSetQuery(queryJson, sessionId):
        if param in sessionVar:
            SESSION_DICT[sessionId][param] = localVariableTemp[param]
        else:
-           resObject[param] = localVariableTemp[param]
+           if f"{str(type(localVariableTemp[param]))}" in LIST_OUTPUT_TYPE:
+               resObject[param] = localVariableTemp[param]
     if len(datasetName)>0 and "data" in localVariableTemp:
         resObject = resObject["data"]
     else:

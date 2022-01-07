@@ -76,10 +76,37 @@ def all_files(path):
         jsonForm.SESSION_DICT[session["ID"]] = {}
 
 
-    if "request.php" in path:
+    # if "request.php" in path:
+    #     queryJson = jsonForm.getAttrQuery(request)
+    #     bin = jsonForm.dataSetQuery(queryJson, session["ID"])
+    #     return bin, 200, {'content-type': "application/json"}
+
+    if "dataset.php" in path:
         queryJson = jsonForm.getAttrQuery(request)
+        frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
+        print(queryJson)
+        datasetName = queryJson["dataset"]
         bin = jsonForm.dataSetQuery(queryJson, session["ID"])
-        return bin, 200, {'content-type': "application/json"}
+        txt =f""" window.Win_{frmObj}['dataSetList']['{datasetName}'].loadData({bin}); """
+        return txt, 200, {'content-type': "application/x-javascript"}
+
+    if "action.php" in path:
+        queryJson = jsonForm.getAttrQuery(request)
+        frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
+        bin = jsonForm.dataSetQuery(queryJson, session["ID"])
+        txt =f"""  
+        var actionResultObject = {bin[1:-1]}; 
+        for (let key in actionResultObject) {{
+            let ctrlObjFild = window.Win_{frmObj}.query('[name='+key+']');
+            if ((ctrlObjFild) && (ctrlObjFild.length>0)) {{
+               ctrlObjFild[0].setValue(actionResultObject[key]);
+            }} else {{
+               setVar(window.Win_{frmObj}, key, actionResultObject[key])
+            }}
+        }}
+        """
+        return txt, 200, {'content-type': "application/x-javascript"}
+
 
     # Поиск запроса в каталоге static
     pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}{path}"

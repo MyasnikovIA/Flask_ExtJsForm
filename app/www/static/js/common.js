@@ -373,23 +373,84 @@ function refreshDataSet(){
         return;
      } ;
      if (typeof(ctrlObj['dataSetList'][datasetName]) === 'undefined') {
+        console.log("error","dataset с именем "+datasetName+" отсутствует на форме")
+        return;
+     }
+     let storeObj = ctrlObj['dataSetList'][datasetName];
+     // let typ = "";
+     // if (typeof(storeObj['typ']) !== 'undefined'){
+     //    typ = storeObj['typ'];
+     // }
+     // Если в Store  указан тип обработки JS , тогда
+     //    <cmpDataSet name="myDataSet" typ="js"> // загрузка данных через подгрузку JS файлы
+     // if (typ == 'js') {
+         loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
+             if (typeof(colbackFun) ==='function') {
+                 let records = storeObj.getData().items;
+                 colbackFun(records);
+             }
+         },function(error){
+             console.log(error);
+         });
+        return;
+     // }
+     // Получение данных через прокси временно отключено, для определения скорости прямой инициализации данных через JS файл
+     // // Иначе запускаем загрузку через proxy
+     // for(let key in objectQuery){
+     //    storeObj.getProxy().setExtraParam(key,objectQuery[key]);
+     // }
+     // storeObj.load({
+     //    callback: function(records, operation, success) {
+     //        if (typeof(colbackFun) === 'function'){
+     //           colbackFun(records);
+     //        }
+     //        storeObj["records"] = records;
+     //    }
+     //});
+}
+
+function setData() {
+     // Функция загрузки store данных в JS коде
+     if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
+     if (typeof(window.ExtObj["FormsObject"])==='undefined') window.ExtObj["FormsObject"] = {};
+     if (arguments.length === 0) return;
+     let datasetName = "";
+     let objectQuery = [];
+     let renderTo = Ext.getBody();
+     let arr = [].slice.call(arguments); // Перегружаем все аргументы в массив
+     let colbackFun = null;
+     let formName = "";
+     let _domParent = null;
+     if (typeof(arr[0]) === 'object') {
+        _domParent = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'string') {
+        datasetName = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'object') {
+        objectQuery = arr.splice(0, 1)[0];
+     }
+     if(datasetName.length === 0) {
+        consople.log("error","Не указано имя dataset")
+        return;
+     }
+     if (_domParent == null)  {
+        consople.log("error","Не определен контекст вызова")
+        return;
+     }
+     let parentFrom = null;
+     formName = _domParent["mainFormName"];
+     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+     if (typeof(ctrlObj['dataSetList']) === 'undefined')  {
+        consople.log("error","Не определен списко dataset на форме")
+        return;
+     } ;
+     if (typeof(ctrlObj['dataSetList'][datasetName]) === 'undefined') {
         consople.log("error","dataset с именем "+datasetName+" отсутствует на форме")
         return;
      }
      let storeObj = ctrlObj['dataSetList'][datasetName];
-     for(let key in objectQuery){
-        storeObj.getProxy().setExtraParam(key,objectQuery[key]);
-     }
-     storeObj.load({
-        callback: function(records, operation, success) {
-            if (typeof(colbackFun) !== 'undefined'){
-               colbackFun(records);
-            }
-            storeObj["records"] = records;
-            console.log("records",records)
-            console.log("storeObj",storeObj)
-        }
-    });
+     storeObj.loadData(objectQuery);
 }
 
 function showPopupMenu(){
@@ -449,35 +510,14 @@ function executeAction(){
      if (_domParent == null)  return;
      let parentFrom = null;
      formName = _domParent["mainFormName"];
-     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
-     if (typeof(ctrlObj['actionList']) === 'undefined')  return;
-     if (typeof(ctrlObj['actionList'][datasetName]) === 'undefined') {
-        consople.log("error","dataset с именем "+datasetName+" отсутствует на форме")
-        return;
-     }
-     let storeObj = ctrlObj['actionList'][datasetName];
-     for(let key in objectQuery){
-        storeObj.getProxy().setExtraParam(key,objectQuery[key]);
-     }
-     storeObj.load({
-        callback: function(records, operation, success) {
-            if (records.length > 0) {
-               for (let key in records[0].data) {
-                  let ctrlObjFild = ctrlObj.query('[name='+key+']');
-                  if ((ctrlObjFild) && (ctrlObjFild.length>0)) {
-                      ctrlObjFild[0].setValue(records[0].data[key]);
-                  } else {
-                     setVar(_domParent,key,records[0].data[key])
-                  }
-               }
-               if (typeof(colbackFun) !== 'undefined') {
-                   colbackFun(records[0]);
-               }
-            } else {
-                console.log("error","Данные не найдены");
-            }
-        }
-    });
+     loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
+         if (typeof(colbackFun) ==='function') {
+            // let records = storeObj.getData().items;
+            // colbackFun(records);
+         }
+     },function(error){
+         console.log(error);
+     });
 }
 
 // функция открытия формы через подгрузку JS файла (работает долго)
@@ -534,14 +574,14 @@ function openForm() {
      objectToStr(objectQuery); // конвертируем JS функции в строку
      if (formName.indexOf('.') === -1) {formName+=".frm"}
      window.ExtObj["FormsObject"][formName]=objectOnEvent; // пробрасываем события между модальными окнами внутри одного физического окна
-     localStorage.setItem("ExtJsFormVars:"+formName, JSON.stringify(objectQuery)); // необходимо для проброса переменных между окнами
+     // localStorage.setItem("ExtJsFormVars:"+formName, JSON.stringify(objectQuery)); // необходимо для проброса переменных между окнами
      loadScript("/"+formName+"?type=js"+containerObjectId+"&data="+JSON.stringify(objectQuery) ).then(function(script){
          if ((!isModalWin) && (_domParent !== null ) && (typeof(_domParent["mainForm"]) !=='undefined')) {
              Ext.getCmp(_domParent["mainForm"]).destroy() // уничтожаем родителя
          }
      },function(error){
            console.log(error);
-     })
+     });
 }
 
 
