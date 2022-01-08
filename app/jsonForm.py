@@ -437,7 +437,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     jsonFrm = parseXMLFrm(rootForm,rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
     jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
-    # jsonAction, actionList = parseXMLAction(action, jsonFrm, data, session)  # парсим Action фрагменты
+    actionList = parseXMLAction(rootForm,action, jsonFrm, data, session)  # парсим Action фрагменты
     jsonFrm['formName'] = formName
     jsonFrm['retuen_object'] = {}
     if not "listeners" in jsonFrm:
@@ -445,6 +445,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     if not "parentEvent" in jsonFrm:
         jsonFrm["parentEvent"] = {}
     jsonFrm["dataSetList"] = dataSetList
+    jsonFrm["actionVarList"] = actionList
     jsonFrm["actionList"] = {}
     jsonFrm["mainList"] = popupMenuList
     # ---- получить JS файл с формой
@@ -538,7 +539,7 @@ def parseXMLmain(mainXml, rootForm, data, session):
     return "".join(scriptText) ,menuList
 
 
-def parseXMLAction(datasetXml, jsonFrm, data, session):
+def parseXMLActionOld(datasetXml, jsonFrm, data, session):
     """
       Распарсить лист XML  объектов cmpAction
     """
@@ -588,6 +589,34 @@ def parseXMLAction(datasetXml, jsonFrm, data, session):
         scriptText.append(");\r\n      ")
         # scriptText.append(elem.text)
     return " ".join(scriptText),actionList
+def parseXMLAction(rootForm,datasetXml, jsonFrm, data, session):
+    """
+      Распарсить лист XML  объектов cmpAction
+    """
+    actionList= {}
+    for elem in datasetXml:
+        xmldict = dict(elem.attrib.copy())
+        if not "name" in xmldict:
+            continue
+        dataset = xmldict['name']
+        actionList[dataset]={}
+        if len(elem) > 0:
+            for subelem in elem:
+                subObject = dict(subelem.attrib.copy())
+                if not "name" in subObject:
+                    continue
+                actionList[dataset][subObject['name']] = {}
+                actionList[dataset][subObject['name']]["default"] = ""
+                actionList[dataset][subObject['name']]["srctype"] = "var"
+                if not "src" in subObject:
+                    actionList[dataset][subObject['name']]["src"] = subObject['name']
+                else:
+                    actionList[dataset][subObject['name']]["src"] = subObject['src']
+                if "default" in subObject:
+                   actionList[dataset][subObject['name']]["default"] = subObject['default']
+                if "srctype" in subObject:
+                    actionList[dataset][subObject['name']]["srctype"] = subObject['srctype']
+    return actionList
 
 
 def parseXMLDataset(datasetXml, jsonFrm, data, session):
@@ -1121,6 +1150,9 @@ def dataSetQuery(queryJson, sessionId):
     del queryJson['Form']
     datasetName = queryJson.get('dataset')
     del queryJson['dataset']
+    data = {}
+    if "data" in queryJson:
+        data = queryJson["data"]
     resObject={}
     sessionVar = []
     datSetXmlObj = getXMLObject(f"{formName}:{datasetName}")[0]
@@ -1131,16 +1163,16 @@ def dataSetQuery(queryJson, sessionId):
             sessionVar.append(el.attrib.get('name'))
             defaultValue = el.attrib.get('default')
             if el.attrib.get('name') in SESSION_DICT[sessionId]:
-                queryJson[el.attrib.get('name')] = SESSION_DICT[sessionId][el.attrib.get('name')]
+                data[el.attrib.get('name')] = SESSION_DICT[sessionId][el.attrib.get('name')]
             elif not defaultValue == None:
-                queryJson[el.attrib.get('name')] = defaultValue
+                data[el.attrib.get('name')] = defaultValue
             else:
-                queryJson[el.attrib.get('name')] = ""
+                data[el.attrib.get('name')] = ""
     localVariableTemp = {}
     if "DB" in xmldict:
         # Если указано имя  базы данных, тогда выполняем SQL запрос
         try:
-            localVariableTemp = execBdQuery(datSetXmlObj, xmldict.get("DB"),queryJson, sessionId)
+            localVariableTemp = execBdQuery(datSetXmlObj, xmldict.get("DB"),data, sessionId)
         except:
             resObject["error"] = f"{formName} : {xmldict.get('DB')} :{sys.exc_info()}"
         # Выполнить запрос
@@ -1149,7 +1181,7 @@ def dataSetQuery(queryJson, sessionId):
         try:
             code = stripCode(datSetXmlObj.text)
             _DB_DICT = SESSION_DICT[sessionId].get("DB_DICT")
-            localVariableTemp = exec_then_eval(_DB_DICT, queryJson, code, sessionId)
+            localVariableTemp = exec_then_eval(_DB_DICT, data, code, sessionId)
         except:
             resObject["error"] = f"{formName} : {datasetName} :{sys.exc_info()}"
     for param in localVariableTemp:

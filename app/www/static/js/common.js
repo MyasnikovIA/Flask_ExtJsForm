@@ -315,10 +315,6 @@ function close(_dom,mod) {
    }
 }
 
-
-function getStore(){
-    return getDataSet(arguments);
-}
 function getDataSet(){
      // получить объект Dataset
      if (typeof(window.ExtObj)==='undefined') window.ExtObj = {};
@@ -503,6 +499,18 @@ function executeAction(){
      if (_domParent == null)  return;
      let parentFrom = null;
      formName = _domParent["mainFormName"];
+     if ((typeof(_domParent['actionVarList'])!=="undefined") && (typeof(_domParent['actionVarList'][datasetName])!=="undefined") ) {
+        for (let key in _domParent['actionVarList'][datasetName]) {
+            let srcName = _domParent['actionVarList'][datasetName][key]['src']
+            let defaultValue = _domParent['actionVarList'][datasetName][key]['default']
+            if (_domParent['actionVarList'][datasetName][key]['srctype'] == "ctrl") {
+                objectQuery[key] = getValue(_domParent,srcName,defaultValue)
+            }
+            if (_domParent['actionVarList'][datasetName][key]['srctype'] == "var") {
+                objectQuery[key] = getVar(_domParent,srcName,defaultValue)
+            }
+        }
+     }
      if (!isPostQuery) {
          loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+"&colbackFun="+colbackFun.toString()).then(function(script){
          },function(error){
@@ -511,7 +519,7 @@ function executeAction(){
      }else{
          // let ctrlObj = Ext.getCmp(_domParent['mainForm'])
          let ctrlObj = _domParent;
-         let url = "action.php?Form="+formName+"&dataset="+datasetName;
+         let url = "action.php";
          var request = new XMLHttpRequest(); // CreateRequest();
          //request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
          request.open('POST', url, true);  // `false` makes the request synchronous
@@ -537,7 +545,7 @@ function executeAction(){
                 }
            }
          };
-         request.send(JSON.stringify(objectQuery));
+         request.send(JSON.stringify({'Form':formName,'dataset':datasetName, 'data':objectQuery}));
          return request;
      }
 }

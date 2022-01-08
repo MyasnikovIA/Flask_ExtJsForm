@@ -15,7 +15,7 @@
     "listeners": {
         "beforeload": function(store, operation, options){  } 
     },
-    "mainForm": "win5593dde3df14671350e0d42b822e1812",
+    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
     "mainFormName": "Tutorial/dataSet2.frm",
     "records": [],
     "typ": "js"
@@ -30,7 +30,7 @@
         "myDataSet": DATA_SET_Tutorial_dataSet2frm_myDataSet
     },
     "formName": "Tutorial/dataSet2.frm",
-    "id": "win5593dde3df14671350e0d42b822e1812",
+    "id": "winb0441eb5d613a62eb60f80eb54151cc0",
     "items": [
         {
             "items": [
@@ -38,7 +38,7 @@
                     "listeners": {
                         "click": function(){ Tutorial_dataSet2frm.onClickBtn(arguments); }
                     },
-                    "mainForm": "win5593dde3df14671350e0d42b822e1812",
+                    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
                     "mainFormName": "Tutorial/dataSet2.frm",
                     "text": "test",
                     "xtype": "button"
@@ -58,21 +58,21 @@
                     ],
                     "dataset": "myDataSet",
                     "height": 250,
-                    "mainForm": "win5593dde3df14671350e0d42b822e1812",
+                    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
                     "mainFormName": "Tutorial/dataSet2.frm",
                     "region": "center",
                     "store": DATA_SET_Tutorial_dataSet2frm_myDataSet,
                     "xtype": "grid"
                 }
             ],
-            "mainForm": "win5593dde3df14671350e0d42b822e1812",
+            "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
             "mainFormName": "Tutorial/dataSet2.frm",
             "xtype": "panel"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win5593dde3df14671350e0d42b822e1812",
+    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
     "mainFormName": "Tutorial/dataSet2.frm",
     "mainList": {},
     "parentEvent": {},
@@ -101,13 +101,6 @@
               refreshDataSet(window.Win_Tutorial_dataSet2frm,"myDataSet", function(rec) {
                   console.log("rec",rec);
               })
-           }
-           Tutorial_dataSet2frm.listeners["afterrender"] = function() {
-              console.log("------- box---",window.Win_Tutorial_dataSet2frm );
-             // console.log(window.Win_Tutorial_dataSet2frm);
-             // refreshDataSet(window.Win_Tutorial_dataSet2frm,"myDataSet", function(rec) {
-             //     console.log("rec",rec);
-             // })
            }
            refreshDataSet(window.Win_Tutorial_dataSet2frm,"myDataSet", function(rec) {
                 console.log("rec",rec);

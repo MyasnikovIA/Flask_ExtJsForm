@@ -15,10 +15,24 @@
                 var mainfrm_onclose = function(data){ }
                 var mainfrm =  {
     "actionList": {},
+    "actionVarList": {
+        "myAction": {
+            "MyTime": {
+                "default": "0",
+                "src": "MyTime",
+                "srctype": "ctrl"
+            },
+            "method": {
+                "default": "0",
+                "src": "method",
+                "srctype": "var"
+            }
+        }
+    },
     "caption": "Примеры использования контролов",
     "dataSetList": {},
     "formName": "main.frm",
-    "id": "win949533ef4792186b8a204622fe853f45",
+    "id": "win665706ecc6f6f1488f3ede7935dac2ca",
     "items": [
         {
             "items": [
@@ -26,7 +40,7 @@
                     "listeners": {
                         "click": function(){ mainfrm.onClickBtnGet(arguments); }
                     },
-                    "mainForm": "win949533ef4792186b8a204622fe853f45",
+                    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
                     "mainFormName": "main.frm",
                     "text": "executeAction GET Query",
                     "xtype": "button"
@@ -35,14 +49,14 @@
                     "listeners": {
                         "click": function(){ mainfrm.onClickBtnPost(arguments); }
                     },
-                    "mainForm": "win949533ef4792186b8a204622fe853f45",
+                    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
                     "mainFormName": "main.frm",
                     "text": "executeAction POST Query",
                     "xtype": "button"
                 },
                 {
-                    "id": "ctrl371800d9c159dd6f7dca188717579ed0",
-                    "mainForm": "win949533ef4792186b8a204622fe853f45",
+                    "id": "ctrle67f076e73e81af15867cf5925fc4e73",
+                    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
                     "mainFormName": "main.frm",
                     "name": "MyTime",
                     "value": "Все компоненты смещены вправо",
@@ -50,14 +64,14 @@
                     "xtype": "textfield"
                 }
             ],
-            "mainForm": "win949533ef4792186b8a204622fe853f45",
+            "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
             "mainFormName": "main.frm",
             "xtype": "panel"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win949533ef4792186b8a204622fe853f45",
+    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
     "mainFormName": "main.frm",
     "mainList": {},
     "parentEvent": {},
