@@ -45,7 +45,6 @@
                } else {
                    script.onreadystatechange = onload;
                }
-
                timer=setTimeout(script.onerror,_timeout||30000);
                script.setAttribute("type", "text/javascript");
                script.setAttribute("src", src);
@@ -351,6 +350,8 @@ function refreshDataSet(){
      let colbackFun = null;
      let formName = "";
      let _domParent = null;
+     let isPostQuery = false;
+     console.log("arr",arr)
      if (typeof(arr[0]) === 'object') {
         _domParent = arr.splice(0, 1)[0];
      }
@@ -362,6 +363,9 @@ function refreshDataSet(){
      }
      if (typeof(arr[0]) === 'function') {
         colbackFun = arr.splice(0, 1)[0];
+     }
+     if (typeof(arr[0]) === 'boolean') {
+        isPostQuery = arr.splice(0, 1)[0];
      }
      if(datasetName.length === 0) {
         console.log("error","Не указано имя dataset")
@@ -382,15 +386,68 @@ function refreshDataSet(){
         console.log("error","dataset с именем "+datasetName+" отсутствует на форме")
         return;
      }
-     let storeObj = ctrlObj['dataSetList'][datasetName];
-     loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
-        if (typeof(colbackFun) ==='function') {
-                 let records = storeObj.getData().items;
-                 colbackFun(records);
+     if ((typeof(_domParent['dataSetVarList'])!=="undefined") && (typeof(_domParent['dataSetVarList'][datasetName])!=="undefined") ) {
+        for (let key in _domParent['dataSetVarList'][datasetName]) {
+            let srcName = _domParent['dataSetVarList'][datasetName][key]['src']
+            let defaultValue = _domParent['dataSetVarList'][datasetName][key]['default']
+            if (_domParent['dataSetVarList'][datasetName][key]['srctype'] == "ctrl") {
+                objectQuery[key] = getValue(_domParent,srcName,defaultValue)
+            }
+            if (_domParent['dataSetVarList'][datasetName][key]['srctype'] == "var") {
+                objectQuery[key] = getVar(_domParent,srcName,defaultValue)
+            }
         }
-     },function(error){
-        console.log(error);
-     });
+     }
+     console.log("isPostQuery",isPostQuery)
+     let storeObj = ctrlObj['dataSetList'][datasetName];
+     if (!isPostQuery) {
+         loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
+            if (typeof(colbackFun) ==='function') {
+                     let records = storeObj.getData().items;
+                     colbackFun(records);
+            }
+         },function(error){
+            console.log(error);
+         });
+     } else {
+         /*
+         // получение данных через Proxy (GET) запрос
+         storeObj.getProxy()['url'] = "dataset.php?Form="+formName+"&dataset="+datasetName;
+         for(let key in objectQuery){
+            storeObj.getProxy().setExtraParam(key,objectQuery[key]);
+         }
+         storeObj.load({
+            callback: function(records, operation, success) {
+                if (typeof(colbackFun) === 'function'){
+                   colbackFun(records);
+                }
+                storeObj["records"] = records;
+            }
+        });
+        */
+         // let ctrlObj = Ext.getCmp(_domParent['mainForm'])
+         let ctrlObj = _domParent;
+         let url = "dataset.php";
+         var request = new XMLHttpRequest(); // CreateRequest();
+         //request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
+         request.open('POST', url, true);  // `false` makes the request synchronous
+         request.setRequestHeader('Content-type', 'application/json');
+         var countQuery = 0; // необходимо уточнить почему производится 3 запроса, вмнсто одного
+         request.onreadystatechange = function() {
+           if (request.status === 200) {
+                countQuery++;
+                if (countQuery == 2) {
+                    let bin = JSON.parse(request.responseText);
+                    storeObj.loadData(bin);
+                    if (typeof(colbackFun) === "function") {
+                        colbackFun(bin);
+                    }
+                }
+           }
+         };
+         request.send(JSON.stringify({'Form':formName,'dataset':datasetName, 'data':objectQuery}));
+         return request;
+     }
 }
 
 function setData() {

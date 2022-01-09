@@ -436,7 +436,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     jsonPopupMenu, popupMenuList = parseXMLmain(popupMenu, rootForm, data, session)  # парсим PopupMenu фрагменты
     jsonFrm = parseXMLFrm(rootForm,rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
-    jsonDataset,dataSetList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
+    jsonDataset,dataSetList, dataSetVarList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
     actionList = parseXMLAction(rootForm,action, jsonFrm, data, session)  # парсим Action фрагменты
     jsonFrm['formName'] = formName
     jsonFrm['retuen_object'] = {}
@@ -446,6 +446,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         jsonFrm["parentEvent"] = {}
     jsonFrm["dataSetList"] = dataSetList
     jsonFrm["actionVarList"] = actionList
+    jsonFrm["dataSetVarList"] = dataSetVarList
     jsonFrm["actionList"] = {}
     jsonFrm["mainList"] = popupMenuList
     # ---- получить JS файл с формой
@@ -472,10 +473,6 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         html = TEMP_HTML_FORM.replace("{%}", html)
         return  html,  mimeType(ext)
     return html, mimeType(ext)
-    # jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
-    # jsonFrmTxt = f" {jsonFrmTxt[:-1]}\r\n,//[[%INPETDATA%]] \r\n }} "
-    # jsonFrmTxt = jsonFunFromString(jsonFrmTxt).replace("Form.", f"{frmObj}.")
-    # return jsonFrmTxt, "application/x-javascript"
 
 
 def parseXMLScript(scriptXml, formName, data, session):
@@ -625,10 +622,13 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
     """
     dataSetList= {}
     scriptText = []
+    dataSetVarList = {}
     for elem in datasetXml:
         xmldict = dict(elem.attrib.copy())
         if not "name" in xmldict:
             continue
+        dataset = xmldict['name']
+        dataSetVarList[dataset]={}
         if "store_type" in xmldict and xmldict['store_type'] == "tree":
             storeClass = "new Ext.data.TreeStore("
         else:
@@ -642,7 +642,8 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
             extDataStore["autoLoad"] = (xmldict['activateoncreate'] =="true")
         extDataStore['mainForm'] = jsonFrm["mainForm"]
         extDataStore['mainFormName'] = jsonFrm["mainFormName"]
-        # extDataStore['proxy'] = {"type":"ajax", "url":f"request.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
+        # extDataStore['proxy'] = {"type":"ajax", "url":f"dataset.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
+        extDataStore['proxy'] = {"type":"ajax","reader":{'type': 'json', 'root': 'data'}}
         # JSON.stringify(objectQuery)
         extDataStore["listeners"]={}
         extDataStore["records"]=[]
@@ -651,12 +652,25 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
         if len(elem) > 0:
             for subelem in elem:
                 subObject = dict(subelem.attrib.copy())
+                if not "name" in subObject:
+                    continue
                 if not "default" in subObject:
                     subObject["default"]=""
                 if not "srctype" in subObject:
                     subObject["srctype"] = "var"
                 if subObject["srctype"] == "session":
                     continue
+                dataSetVarList[dataset][subObject['name']] = {}
+                dataSetVarList[dataset][subObject['name']]["default"] = ""
+                dataSetVarList[dataset][subObject['name']]["srctype"] = "var"
+                if not "src" in subObject:
+                    dataSetVarList[dataset][subObject['name']]["src"] = subObject['name']
+                else:
+                    dataSetVarList[dataset][subObject['name']]["src"] = subObject['src']
+                if "default" in subObject:
+                   dataSetVarList[dataset][subObject['name']]["default"] = subObject['default']
+                if "srctype" in subObject:
+                    dataSetVarList[dataset][subObject['name']]["srctype"] = subObject['srctype']
                 paramVarList.append(" this.getProxy().setExtraParam('")
                 paramVarList.append(subObject['name'])
                 paramVarList.append("',")
@@ -675,7 +689,7 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
         scriptText.append(JSON_stringify(extDataStore, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')))
         scriptText.append(");\r\n      ")
         # scriptText.append(elem.text)
-    return " ".join(scriptText),dataSetList
+    return " ".join(scriptText),dataSetList,dataSetVarList
 
 def parseGridElement(rootForm,xmldict,formName, data, session, root, info):
     if "caption" in xmldict and not "title" in xmldict:
@@ -1108,7 +1122,10 @@ def getDataSetQuery(request,queryJson, sessionId):
     frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
     datasetName = queryJson["dataset"]
     bin = dataSetQuery(queryJson, sessionId)
-    txt = f""" window.Win_{frmObj}['dataSetList']['{datasetName}'].loadData({bin}); """
+    if request.method == 'GET':
+        txt = f""" window.Win_{frmObj}['dataSetList']['{datasetName}'].loadData({bin}); """
+    else:
+        txt = bin
     return txt
 
 def getActionQuery(request,queryJson, sessionId):
@@ -1150,9 +1167,12 @@ def dataSetQuery(queryJson, sessionId):
     del queryJson['Form']
     datasetName = queryJson.get('dataset')
     del queryJson['dataset']
-    data = {}
+    dataObj = {}
     if "data" in queryJson:
-        data = queryJson["data"]
+        if type(queryJson["data"]) == str:
+            dataObj = JSON_parse(queryJson["data"])
+        else:
+            dataObj = queryJson["data"]
     resObject={}
     sessionVar = []
     datSetXmlObj = getXMLObject(f"{formName}:{datasetName}")[0]
@@ -1160,19 +1180,22 @@ def dataSetQuery(queryJson, sessionId):
     for el in datSetXmlObj:
         if not "name" in  el.attrib:continue
         if el.attrib.get('srctype') == "session":
-            sessionVar.append(el.attrib.get('name'))
-            defaultValue = el.attrib.get('default')
-            if el.attrib.get('name') in SESSION_DICT[sessionId]:
-                data[el.attrib.get('name')] = SESSION_DICT[sessionId][el.attrib.get('name')]
+            xmldictSub = dict(el.attrib.copy())
+            nameVar = xmldictSub['name']
+            sessionVar.append(nameVar)
+            defaultValue = xmldictSub['default']
+            dataObj[nameVar] = defaultValue
+            if nameVar in SESSION_DICT[sessionId]:
+                dataObj[nameVar] = SESSION_DICT[sessionId][nameVar]
             elif not defaultValue == None:
-                data[el.attrib.get('name')] = defaultValue
+                dataObj[nameVar] = defaultValue
             else:
-                data[el.attrib.get('name')] = ""
+                dataObj[nameVar] = ""
     localVariableTemp = {}
     if "DB" in xmldict:
         # Если указано имя  базы данных, тогда выполняем SQL запрос
         try:
-            localVariableTemp = execBdQuery(datSetXmlObj, xmldict.get("DB"),data, sessionId)
+            localVariableTemp = execBdQuery(datSetXmlObj, xmldict.get("DB"),dataObj, sessionId)
         except:
             resObject["error"] = f"{formName} : {xmldict.get('DB')} :{sys.exc_info()}"
         # Выполнить запрос
@@ -1181,7 +1204,7 @@ def dataSetQuery(queryJson, sessionId):
         try:
             code = stripCode(datSetXmlObj.text)
             _DB_DICT = SESSION_DICT[sessionId].get("DB_DICT")
-            localVariableTemp = exec_then_eval(_DB_DICT, data, code, sessionId)
+            localVariableTemp = exec_then_eval(_DB_DICT, dataObj, code, sessionId)
         except:
             resObject["error"] = f"{formName} : {datasetName} :{sys.exc_info()}"
     for param in localVariableTemp:

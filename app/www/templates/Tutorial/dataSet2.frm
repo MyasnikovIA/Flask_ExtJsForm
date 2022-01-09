@@ -15,8 +15,15 @@
     "listeners": {
         "beforeload": function(store, operation, options){  } 
     },
-    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
+    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
     "mainFormName": "Tutorial/dataSet2.frm",
+    "proxy": {
+        "reader": {
+            "root": "data",
+            "type": "json"
+        },
+        "type": "ajax"
+    },
     "records": [],
     "typ": "js"
 } );
@@ -25,22 +32,35 @@
                 var Tutorial_dataSet2frm_onclose = function(data){ }
                 var Tutorial_dataSet2frm =  {
     "actionList": {},
+    "actionVarList": {},
     "caption": "Примеры использования контролов",
     "dataSetList": {
         "myDataSet": DATA_SET_Tutorial_dataSet2frm_myDataSet
     },
+    "dataSetVarList": {
+        "myDataSet": {}
+    },
     "formName": "Tutorial/dataSet2.frm",
-    "id": "winb0441eb5d613a62eb60f80eb54151cc0",
+    "id": "win4e0316eca0bb2974a7a7067a53254679",
     "items": [
         {
             "items": [
                 {
                     "listeners": {
-                        "click": function(){ Tutorial_dataSet2frm.onClickBtn(arguments); }
+                        "click": function(){ Tutorial_dataSet2frm.onClickBtnGET(arguments); }
                     },
-                    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
+                    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
                     "mainFormName": "Tutorial/dataSet2.frm",
-                    "text": "test",
+                    "text": "onClickBtnGET",
+                    "xtype": "button"
+                },
+                {
+                    "listeners": {
+                        "click": function(){ Tutorial_dataSet2frm.onClickBtnPOST(arguments); }
+                    },
+                    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
+                    "mainFormName": "Tutorial/dataSet2.frm",
+                    "text": "onClickBtnPOST",
                     "xtype": "button"
                 },
                 {
@@ -58,21 +78,21 @@
                     ],
                     "dataset": "myDataSet",
                     "height": 250,
-                    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
+                    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
                     "mainFormName": "Tutorial/dataSet2.frm",
                     "region": "center",
                     "store": DATA_SET_Tutorial_dataSet2frm_myDataSet,
                     "xtype": "grid"
                 }
             ],
-            "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
+            "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
             "mainFormName": "Tutorial/dataSet2.frm",
             "xtype": "panel"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "winb0441eb5d613a62eb60f80eb54151cc0",
+    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
     "mainFormName": "Tutorial/dataSet2.frm",
     "mainList": {},
     "parentEvent": {},
@@ -94,7 +114,7 @@
                 window.Win_Tutorial_dataSet2frm;
                 
        
-           Tutorial_dataSet2frm.onClickBtn = function(arguments) {
+           Tutorial_dataSet2frm.onClickBtnGET = function(arguments) {
               let arr = [].slice.call(arguments);
               console.log("imput argument fun", arr);
               console.log( getDataSet(window.Win_Tutorial_dataSet2frm,"myDataSet") );
@@ -102,6 +122,17 @@
                   console.log("rec",rec);
               })
            }
+
+           Tutorial_dataSet2frm.onClickBtnPOST = function(arguments) {
+              let arr = [].slice.call(arguments);
+              console.log("imput argument fun", arr);
+              console.log( getDataSet(window.Win_Tutorial_dataSet2frm,"myDataSet") );
+              refreshDataSet(window.Win_Tutorial_dataSet2frm,"myDataSet", function(rec) {
+                  console.log("rec",rec);
+              },true);
+           }
+
+
            refreshDataSet(window.Win_Tutorial_dataSet2frm,"myDataSet", function(rec) {
                 console.log("rec",rec);
            })
