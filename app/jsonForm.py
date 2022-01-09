@@ -1245,7 +1245,9 @@ def dataSetQuery(queryJson, sessionId):
     if resObject == {}:
         return "[]"
     if len(datasetName)>0 and "data" in localVariableTemp:
-        resObject = resObject["data"]
+        resObject = localVariableTemp["data"]
+        if resObject == {} or resObject == []:
+            return "[]"
     else:
         resObject = [resObject]
     return JSON_stringify(resObject, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
