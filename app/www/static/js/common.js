@@ -351,7 +351,6 @@ function refreshDataSet(){
      let formName = "";
      let _domParent = null;
      let isPostQuery = false;
-     console.log("arr",arr)
      if (typeof(arr[0]) === 'object') {
         _domParent = arr.splice(0, 1)[0];
      }

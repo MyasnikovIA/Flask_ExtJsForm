@@ -1242,6 +1242,8 @@ def dataSetQuery(queryJson, sessionId):
        else:
            if f"{str(type(localVariableTemp[param]))}" in LIST_OUTPUT_TYPE:
                resObject[param] = localVariableTemp[param]
+    if resObject == {}:
+        return "[]"
     if len(datasetName)>0 and "data" in localVariableTemp:
         resObject = resObject["data"]
     else:
