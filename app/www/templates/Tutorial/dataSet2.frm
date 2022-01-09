@@ -15,7 +15,7 @@
     "listeners": {
         "beforeload": function(store, operation, options){  } 
     },
-    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
+    "mainForm": "win2d5c7bd13b317f1b727d21ba0070232b",
     "mainFormName": "Tutorial/dataSet2.frm",
     "proxy": {
         "reader": {
@@ -41,7 +41,7 @@
         "myDataSet": {}
     },
     "formName": "Tutorial/dataSet2.frm",
-    "id": "win4e0316eca0bb2974a7a7067a53254679",
+    "id": "win2d5c7bd13b317f1b727d21ba0070232b",
     "items": [
         {
             "items": [
@@ -49,7 +49,7 @@
                     "listeners": {
                         "click": function(){ Tutorial_dataSet2frm.onClickBtnGET(arguments); }
                     },
-                    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
+                    "mainForm": "win2d5c7bd13b317f1b727d21ba0070232b",
                     "mainFormName": "Tutorial/dataSet2.frm",
                     "text": "onClickBtnGET",
                     "xtype": "button"
@@ -58,7 +58,7 @@
                     "listeners": {
                         "click": function(){ Tutorial_dataSet2frm.onClickBtnPOST(arguments); }
                     },
-                    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
+                    "mainForm": "win2d5c7bd13b317f1b727d21ba0070232b",
                     "mainFormName": "Tutorial/dataSet2.frm",
                     "text": "onClickBtnPOST",
                     "xtype": "button"
@@ -78,21 +78,21 @@
                     ],
                     "dataset": "myDataSet",
                     "height": 250,
-                    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
+                    "mainForm": "win2d5c7bd13b317f1b727d21ba0070232b",
                     "mainFormName": "Tutorial/dataSet2.frm",
                     "region": "center",
                     "store": DATA_SET_Tutorial_dataSet2frm_myDataSet,
                     "xtype": "grid"
                 }
             ],
-            "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
+            "mainForm": "win2d5c7bd13b317f1b727d21ba0070232b",
             "mainFormName": "Tutorial/dataSet2.frm",
             "xtype": "panel"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win4e0316eca0bb2974a7a7067a53254679",
+    "mainForm": "win2d5c7bd13b317f1b727d21ba0070232b",
     "mainFormName": "Tutorial/dataSet2.frm",
     "mainList": {},
     "parentEvent": {},

@@ -398,7 +398,6 @@ function refreshDataSet(){
             }
         }
      }
-     console.log("isPostQuery",isPostQuery)
      let storeObj = ctrlObj['dataSetList'][datasetName];
      if (!isPostQuery) {
          loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
