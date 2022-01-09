@@ -31,47 +31,367 @@
     },
     "caption": "Примеры использования контролов",
     "dataSetList": {},
+    "dataSetVarList": {},
     "formName": "main.frm",
-    "id": "win665706ecc6f6f1488f3ede7935dac2ca",
+    "id": "winfcc4ff3c31be4ada9df87991316e1ad4",
     "items": [
+        {
+            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+            "mainFormName": "main.frm"
+        },
+        {
+            "bodyStyle": "background: url(https://bipbap.ru/wp-content/uploads/2017/11/best-new-year-wallpaper6-1-640x360.jpg) no-repeat;-moz-background-size: 100%;-webkit-background-size: 100%;-o-background-size: 100%; background-size: 100%; ",
+            "html": "\n        http://libs.gisi.ru/ext-5.0.1/build/examples/\n    \n    ",
+            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+            "mainFormName": "main.frm",
+            "region": "center"
+        },
         {
             "items": [
                 {
-                    "listeners": {
-                        "click": function(){ mainfrm.onClickBtnGet(arguments); }
-                    },
-                    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
+                    "html": "\n             Пуск\n             \n        ",
+                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
                     "mainFormName": "main.frm",
-                    "text": "executeAction GET Query",
+                    "menu": [
+                        {
+                            "html": "\n                 еуые\n                 \n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "menu": [
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "Load form\n                 ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "xtype": "button"
+                                },
+                                {
+                                    "html": "\n                         еуые\n                         \n             ",
+                                    "listeners": {
+                                        "click": function(){  }
+                                    },
+                                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                    "mainFormName": "main.frm",
+                                    "menu": [
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                         ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        },
+                                        {
+                                            "html": "Load form\n                 ",
+                                            "listeners": {
+                                                "click": function(){  }
+                                            },
+                                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                                            "mainFormName": "main.frm",
+                                            "xtype": "button"
+                                        }
+                                    ],
+                                    "xtype": "button"
+                                }
+                            ],
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n             ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        },
+                        {
+                            "html": "Load form\n        ",
+                            "listeners": {
+                                "click": function(){  }
+                            },
+                            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
+                            "mainFormName": "main.frm",
+                            "xtype": "button"
+                        }
+                    ],
                     "xtype": "button"
                 },
+                "->",
                 {
-                    "listeners": {
-                        "click": function(){ mainfrm.onClickBtnPost(arguments); }
-                    },
-                    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
+                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
                     "mainFormName": "main.frm",
-                    "text": "executeAction POST Query",
-                    "xtype": "button"
+                    "text": "|",
+                    "xtype": "label"
                 },
                 {
-                    "id": "ctrle67f076e73e81af15867cf5925fc4e73",
-                    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
+                    "id": "p",
+                    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
                     "mainFormName": "main.frm",
-                    "name": "MyTime",
-                    "value": "Все компоненты смещены вправо",
-                    "width": 250,
-                    "xtype": "textfield"
+                    "name": "dateTimeLabel",
+                    "text": "dddddddd",
+                    "width": 60,
+                    "xtype": "label"
                 }
             ],
-            "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
+            "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
             "mainFormName": "main.frm",
-            "xtype": "panel"
+            "region": "south",
+            "xtype": "toolbar"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win665706ecc6f6f1488f3ede7935dac2ca",
+    "mainForm": "winfcc4ff3c31be4ada9df87991316e1ad4",
     "mainFormName": "main.frm",
     "mainList": {},
     "parentEvent": {},
@@ -109,8 +429,36 @@
                   console.log("obj",obj);
                   console.log("OK",getVar(window.Win_mainfrm,'arr'));
               },true); // <== признак отправки сообщения POST запросом
-           }
+            }
+            function startClock(){
+               var currentDate = new Date();
+               time = currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds();
+               document.getElementById("p").innerHTML = time;
+               setTimeout(startClock, 1000);
+            }
+            startClock();
+
        
+    
+                
+    var css = `
+   body {
+    background: url(https://bipbap.ru/wp-content/uploads/2017/11/best-new-year-wallpaper6-1-640x360.jpg) no-repeat;
+    -moz-background-size: 100%; /* Firefox 3.6+ */
+    -webkit-background-size: 100%; /* Safari 3.1+ и Chrome 4.0+ */
+    -o-background-size: 100%; /* Opera 9.6+ */
+    background-size: 100%; /* Современные браузеры */
+   }
+  `,
+    head = document.head || document.getElementsByTagName('head')[0],
+    style = document.createElement('style');
+    head.appendChild(style);
+    style.type = 'text/css';
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
     
            });
 

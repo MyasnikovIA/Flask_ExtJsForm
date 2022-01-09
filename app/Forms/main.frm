@@ -1,4 +1,14 @@
 <div caption="Примеры использования контролов" >
+
+  <style>
+   body {
+    background: url(https://bipbap.ru/wp-content/uploads/2017/11/best-new-year-wallpaper6-1-640x360.jpg) no-repeat;
+    -moz-background-size: 100%; /* Firefox 3.6+ */
+    -webkit-background-size: 100%; /* Safari 3.1+ и Chrome 4.0+ */
+    -o-background-size: 100%; /* Opera 9.6+ */
+    background-size: 100%; /* Современные браузеры */
+   }
+  </style>
     <cmpScript>
        <![CDATA[
            Form.onClickBtnGet = function(arguments) {
@@ -17,15 +27,17 @@
                   console.log("obj",obj);
                   console.log("OK",getVar('arr'));
               },true); // <== признак отправки сообщения POST запросом
-           }
+            }
+            function startClock(){
+               var currentDate = new Date();
+               time = currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds();
+               document.getElementById("p").innerHTML = time;
+               setTimeout(startClock, 1000);
+            }
+            startClock();
+
        ]]>
     </cmpScript>
-    <cmpPanel>
-        <cmpButton text="executeAction GET Query" onclick="Form.onClickBtnGet(arguments);"/>
-        <cmpButton text="executeAction POST Query" onclick="Form.onClickBtnPost(arguments);"/>
-        <cmpTextField  name="MyTime" value="Все компоненты смещены вправо"  width="250"/>
-    </cmpPanel>
-
     <cmpAction name="myAction" >
         <![CDATA[
            from datetime import datetime
@@ -39,4 +51,54 @@
         <items name="method" src="method" srctype="var"  default="0"/>
         <items name="MyTime" src="MyTime" srctype="ctrl"  default="0"/>
     </cmpAction>
+    <item region="center"  bodyStyle="background: url(https://bipbap.ru/wp-content/uploads/2017/11/best-new-year-wallpaper6-1-640x360.jpg) no-repeat;-moz-background-size: 100%;-webkit-background-size: 100%;-o-background-size: 100%; background-size: 100%; " >
+        http://libs.gisi.ru/ext-5.0.1/build/examples/
+    </item>
+    <cmpToolbar region="south" >
+        <cmpButton>
+             Пуск
+             <cmpButton onclick="">
+                 еуые
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">Load form</cmpButton>
+                 <cmpButton onclick="">
+                         еуые
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                         <cmpButton onclick="">Load form</cmpButton>
+                 </cmpButton>
+             </cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+             <cmpButton onclick="">Load form</cmpButton>
+        </cmpButton>
+        <cmpRight/>
+        <cmplabel text="|"/>
+        <cmplabel name="dateTimeLabel" text="dddddddd" id="p"  width="60" />
+    </cmpToolbar>
+
 </div>

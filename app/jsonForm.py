@@ -53,6 +53,7 @@ TEMP_JS_FORM = """
                 window.Win_{%frmObj%} = Ext.create('{%ExtClass%}',{%frmObj%});
                 window.Win_{%frmObj%}{%showWin%};
                 {%cmpScript%}
+                {%style%}
            });
 """
 
@@ -374,7 +375,8 @@ def getXMLObject(formName):
         dataset = rootForm.findall(f"cmpDataSet")
         action = rootForm.findall(f"cmpAction")
         popupMenu = rootForm.findall(f"cmpPopupMenu")
-        return rootForm, script, dataset, action, popupMenu
+        styleBlock= rootForm.findall(f"style")
+        return rootForm, script, dataset, action, popupMenu, styleBlock
     else:  # получаем блок XML с именем blockName
         nodes = rootForm.findall(f"*[@name='{blockName}']")  # ишим фрагмент формы по атребуту имени
         if len(nodes) > 0:
@@ -426,7 +428,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     ext = formName[formName.rfind('.') + 1:].lower()
     frmObj = formName.replace("/","_").replace(".","")
     # ---- получить HTML файл с перенаправлением на JS формой
-    rootForm, script, dataset, action, popupMenu = getXMLObject(formName)
+    rootForm, script, dataset, action, popupMenu, styleBlock = getXMLObject(formName)
     if rootForm.tag == "error":
         if isHtml == 1:
             return f'<h1>error: {rootForm.text} </h1>', "text/html"
@@ -436,6 +438,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     jsonPopupMenu, popupMenuList = parseXMLmain(popupMenu, rootForm, data, session)  # парсим PopupMenu фрагменты
     jsonFrm = parseXMLFrm(rootForm,rootForm, formName, data, session)  # парсим XML форму
     jsonScript = parseXMLScript(script, formName, data, session) # парсим Script фрагменты
+    jsonStyle = parseXMLStyle(styleBlock, formName, data, session) # парсим Script фрагменты
     jsonDataset,dataSetList, dataSetVarList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
     actionList = parseXMLAction(rootForm,action, jsonFrm, data, session)  # парсим Action фрагменты
     jsonFrm['formName'] = formName
@@ -467,6 +470,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
         .replace("{%frmObj%}",frmObj)\
         .replace("{%formName%}",formName)\
         .replace("{%cmpScript%}",jsonScript)\
+        .replace("{%style%}",jsonStyle)\
         .replace("{%showWin%}",showWin)
     html = jsonFunFromString(html,frmObj)
     if isHtml == 1:
@@ -484,6 +488,29 @@ def parseXMLScript(scriptXml, formName, data, session):
         xmldict = dict(elem.attrib.copy())
         scriptText.append(elem.text)
     return "\n".join(scriptText)
+
+
+def parseXMLStyle(scriptXml, formName, data, session):
+    """
+      Распарсить лист XML объектов Style 
+    """""
+    scriptText = []
+    for elem in scriptXml:
+        xmldict = dict(elem.attrib.copy())
+        scriptText.append(elem.text)
+    cssBody = "\n".join(scriptText)
+    return f"""
+    var css = `{cssBody}`,
+    head = document.head || document.getElementsByTagName('head')[0],
+    style = document.createElement('style');
+    head.appendChild(style);
+    style.type = 'text/css';
+    if (style.styleSheet) {{
+      style.styleSheet.cssText = css;
+    }} else {{
+      style.appendChild(document.createTextNode(css));
+    }}
+    """
 
 
 
@@ -1014,6 +1041,8 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
             return parsePopupMenuElement(rootForm,xmldict, formName, data, session, root, info)
         if root.tag[3:].lower() == 'right':
             return "->"
+        if root.tag.lower() == 'style':
+            return ""
 
         # ======= HTML ==========
         htmlText = ""

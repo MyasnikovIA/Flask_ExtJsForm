@@ -18,8 +18,6 @@
                   console.log("rec",rec);
               },true);
            }
-
-
            refreshDataSet("myDataSet", function(rec) {
                 console.log("rec",rec);
            })
