@@ -240,7 +240,7 @@ function getVar(_dom,propName,value) {
    if (typeof(value) === 'undefined') {
       value = null;
    }
-   let winObj = Ext.getCmp(_dom['mainForm']);
+   let winObj = _dom;
    if (typeof(winObj) === 'undefined') {
        return value;
    }
@@ -255,7 +255,7 @@ function getVar(_dom,propName,value) {
 }
 
 function setVar(_dom,propName,value) {
-   let winObj = Ext.getCmp(_dom['mainForm'])
+   let winObj = _dom
    if (typeof(winObj['vars']) === 'undefined') {
        winObj['vars'] = {};
    }
@@ -269,10 +269,23 @@ function setValue(_dom,propName,value){
     if (typeof(value) === 'undefined') {
       value = null;
     }
-    let winObj = Ext.getCmp(_dom['mainForm'])
-    let ctrlObj = winObj.query('[name='+propName+']');
+    let ctrlObj = _dom.query('[name='+propName+']');
     if (ctrlObj) {
        ctrlObj[0].setValue(value);
+       return
+    }
+    console.log("error","контрол с именем "+propName+" нет на форме");
+}
+
+
+function setCaption(_dom,propName,value){
+    if (typeof(value) === 'undefined') {
+      value = null;
+    }
+    // let winObj = Ext.getCmp(_dom['mainForm'])
+    let ctrlObj = _dom.query('[name='+propName+']');
+    if (ctrlObj.length > 0) {
+       ctrlObj[0].setText(value);
        return
     }
     console.log("error","контрол с именем "+propName+" нет на форме");
@@ -282,8 +295,7 @@ function getValue(_dom,propName,value){
    if (typeof(value) === 'undefined') {
       value = null;
    }
-   let winObj = Ext.getCmp(_dom['mainForm'])
-   let ctrlObj = winObj.query('[name='+propName+']');
+   let ctrlObj = _dom.query('[name='+propName+']');
    if (ctrlObj) {
       return ctrlObj[0].getValue();
    }
@@ -292,8 +304,7 @@ function getValue(_dom,propName,value){
 }
 
 function getControl(_dom, propName) {
-   let winObj = Ext.getCmp(_dom['mainForm'])
-   let ctrlObj =winObj.query('[name='+propName+']')
+   let ctrlObj = _dom.query('[name='+propName+']');
    if (ctrlObj.length > 0) {
       return ctrlObj[0];
    }
@@ -301,7 +312,7 @@ function getControl(_dom, propName) {
 }
 
 function close(_dom,mod) {
-   let ctrlObj = Ext.getCmp(_dom['mainForm'])
+   let ctrlObj = _dom.query('[name='+propName+']');
    if (typeof(ctrlObj['parentEvent']) === 'object' ){
        if (typeof(ctrlObj['parentEvent'].onclose) === 'function' ){
           ctrlObj['parentEvent'].onclose(mod);

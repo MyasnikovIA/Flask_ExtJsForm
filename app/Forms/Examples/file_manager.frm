@@ -5,6 +5,12 @@
 
     <cmpScript>
        <![CDATA[
+           // absPath
+           Form.getAbsPath = function(arguments) {
+              let arr = [].slice.call(arguments);
+              setCaption("absPath",arr[1].data['abspath']);
+           }
+
            Form.getPropertyList = function(arguments) {
               let arr = [].slice.call(arguments);
               setVar("selectFile",arr[1].data);
@@ -74,8 +80,9 @@
     <cmpPanel region="west" height="40%" split="true" width="50%" minSize="100" autoScroll="true" layout="border">
         <cmpfieldset region="north" title="Search">
            <cmpTextField name="searchItem" value="" onspecialkey="Form.onSearchTreeItem(arguments);"  height="25" width="100%"/>
+           <cmpLabel text="111" name="absPath"/>
         </cmpfieldset>
-        <cmpTreePanel name="domTree"  rootVisible="false" onitemdblclick=" Form.getPropertyList(arguments);  " height="80%"  popupmenu="popupMenuDomTree" dataset="DS_TREE" >
+        <cmpTreePanel name="domTree"  rootVisible="false" onitemdblclick=" Form.getPropertyList(arguments);"  onitemclick=" Form.getAbsPath(arguments);"   height="80%"  popupmenu="popupMenuDomTree" dataset="DS_TREE" >
             <colum field='text' caption='Name' />
         </cmpTreePanel>
     </cmpPanel>

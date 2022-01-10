@@ -404,6 +404,7 @@ def jsonFunFromString(html="",frmObj=""):
     html = html.replace("getVar(", f"getVar({thisName},",)
     html = html.replace("setValue(",f"setValue({thisName},",)
     html = html.replace("getValue(", f"getValue({thisName},",)
+    html = html.replace("setCaption(", f"setCaption({thisName},",)
     html = html.replace("openForm(", f"openForm({thisName},",)
     html = html.replace("getControl(", f"getControl({thisName},",)
     html = html.replace("getDataSet(", f"getDataSet({thisName},",)
