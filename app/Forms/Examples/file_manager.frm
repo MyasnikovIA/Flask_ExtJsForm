@@ -81,6 +81,5 @@
     </cmpPanel>
     <!--item region="east" collapsible="true" width="10" title="Details"  split="true"></item-->
     <cmpPanel region="center" name="demoBody">
-
     </cmpPanel>
 </div>

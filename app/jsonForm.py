@@ -1062,7 +1062,7 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
                 blockName='items'
                 if root.tag[3:].lower() == 'button':
                     blockName = 'menu'
-                if xmldict['xtype'] == 'combo':
+                if 'xtype' in xmldict and xmldict['xtype'] == 'combo':
                     blockName = 'store'
                 if not blockName in xmldict:
                     xmldict[blockName] = []
