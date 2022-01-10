@@ -593,7 +593,11 @@ function executeAction(){
         }
      }
      if (!isPostQuery) {
-         loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+"&colbackFun="+colbackFun.toString()).then(function(script){
+         let colbackFunText = "";
+         if (typeof(colbackFun) === 'function') {
+             colbackFunText = +"&colbackFun="+colbackFun.toString();
+         }
+         loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+colbackFunText).then(function(script){
          },function(error){
              console.log(error);
          });

@@ -5,10 +5,14 @@
 
     <cmpScript>
        <![CDATA[
-           // absPath
+
            Form.getAbsPathLeft = function(arguments) {
               let arr = [].slice.call(arguments);
               setCaption("absPathLeft",arr[1].data['abspath']);
+              if (arr[1].data['isFile'] === true) {
+                 setVar("selectFileLeft",arr[1].data['abspath']);
+                 executeAction("GET_FILE_INFO")
+              }
            }
 
            Form.getAbsPath = function(arguments) {
@@ -102,6 +106,22 @@
        <items name="selectFileLeft" src="selectFileLeft" srctype="var" default=""/>
     </cmpDataSet>
 
+    <cmpAction name="GET_FILE_INFO">
+        <![CDATA[
+                info = {}
+                import os
+                import datetime
+                filename = selectFileLeft
+                stats = os.stat(filename)
+                info['size'] = stats.st_size
+                info['datetime_change'] = f"{datetime.datetime.fromtimestamp(stats.st_mtime)}"
+                info['datetime_create'] = f"{datetime.datetime.fromtimestamp(stats.st_ctime)}"
+                info['datetime_open'] = f"{datetime.datetime.fromtimestamp(stats.st_atime)}"
+        ]]>
+        <items name="selectFileLeft" src="selectFileLeft" srctype="var" default=""/>
+        <items name="info" srctype="var" />
+    </cmpAction>
+
     <cmpDataSet name="DS_TREE" activateoncreate="false">
        <![CDATA[
            import os
@@ -163,8 +183,6 @@
         </cmpTreePanel>
     </cmpPanel>
     <!--item region="east" collapsible="true" width="10" title="Details"  split="true"></item-->
-
-
     <cmpPanel region="center" height="40%" split="true" width="50%" minSize="100" autoScroll="true" layout="border"  name="demoBody">
         <cmpfieldset region="north" title="Search">
            <cmpTextField name="searchItem" value="" onspecialkey="Form.onSearchTreeItem(arguments);"  height="25" width="100%"/>

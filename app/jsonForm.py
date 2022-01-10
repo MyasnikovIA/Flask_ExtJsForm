@@ -411,7 +411,6 @@ def jsonFunFromString(html="",frmObj=""):
     html = html.replace("showPopupMenu(", f"showPopupMenu({thisName},",)
     html = html.replace("refreshDataSet(", f"refreshDataSet({thisName},",)
     html = html.replace("executeAction(", f"executeAction({thisName},",)
-    html = html.replace("executeActionPost(", f"executeActionPost({thisName},",)
     html = html.replace("close(", f"close({thisName},",)
     html = html.replace("openWindow(", f"openWindow({thisName},",)
     html = html.replace('"Ext.getBody()"', "Ext.getBody()",)
@@ -1170,9 +1169,11 @@ def getActionQuery(request,queryJson, sessionId):
             colbackFun = f"{colbackFun}(); "
         del queryJson["colbackFun"]
     bin = dataSetQuery(queryJson, sessionId)
+    if bin=="[]":
+        bin = "[{}]"
     if request.method == 'GET':
         txt = f"""
-        window.Win_{frmObj}['actionList']['{datasetName}'] = {bin[1:-1]}; 
+        window.Win_{frmObj}['actionList']['{datasetName}'] = {bin[1:-1]}; /**/
         for (let key in window.Win_{frmObj}['actionList']['{datasetName}']) {{
             let ctrlObjFild = window.Win_{frmObj}.query('[name='+key+']');
             if ((ctrlObjFild) && (ctrlObjFild.length>0)) {{
@@ -1190,7 +1191,7 @@ def getActionQuery(request,queryJson, sessionId):
         return bin[1:-1]
 
 
-LIST_OUTPUT_TYPE = ["<class 'str'>", "<class 'int'>", "<class 'list'>","<class 'dict'"]
+LIST_OUTPUT_TYPE = ["<class 'str'>", "<class 'int'>", "<class 'list'>","<class 'dict'>"]
 def dataSetQuery(queryJson, sessionId):
     if not 'Form' in queryJson:
         return '{"error":"Не определена форма на которой расположен запрос"}'
