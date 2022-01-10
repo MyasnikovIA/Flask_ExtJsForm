@@ -56,7 +56,10 @@
            dirname = LPUleft
            if 'leaf' in selectFileLeft:
                 if selectFileLeft['leaf'] == False:
-                    dirname = selectFileLeft['abspath']
+                    if 'abspath' in selectFileLeft:
+                        dirname = selectFileLeft['abspath']
+                    else:
+                        dirname = "."
            LPUleft = dirname
            data=[]
            if len(searchItemLeft) == 0:
@@ -105,7 +108,10 @@
            dirname = LPU
            if 'leaf' in selectFile:
                 if selectFile['leaf'] == False:
-                    dirname = selectFile['abspath']
+                    if 'abspath' in selectFile:
+                        dirname = selectFile['abspath']
+                    else:
+                        dirname = "."
            LPU = dirname
            data=[]
            if len(searchItem) == 0:
@@ -150,7 +156,7 @@
     <cmpPanel region="west" height="40%" split="true" width="50%" minSize="100" autoScroll="true" layout="border">
         <cmpfieldset region="north" title="Search">
            <cmpTextField name="searchItemLeft" value="" onspecialkey="Form.onSearchTreeItemLeft(arguments);"  height="25" width="100%"/>
-           <cmpLabel text="" name="absPathLeft"/>
+           <cmpLabel text="_" name="absPathLeft"/>
         </cmpfieldset>
         <cmpTreePanel name="fileTreeLeft"  rootVisible="false" onitemdblclick=" Form.getPropertyListLeft(arguments);"  onitemclick=" Form.getAbsPathLeft(arguments);"   height="80%"  popupmenu="popupMenuDomTree" dataset="DS_TREE_LEFT" >
             <colum field='text' caption='Name' />
@@ -162,7 +168,7 @@
     <cmpPanel region="center" height="40%" split="true" width="50%" minSize="100" autoScroll="true" layout="border"  name="demoBody">
         <cmpfieldset region="north" title="Search">
            <cmpTextField name="searchItem" value="" onspecialkey="Form.onSearchTreeItem(arguments);"  height="25" width="100%"/>
-           <cmpLabel text="" name="absPath"/>
+           <cmpLabel text="_" name="absPath"/>
         </cmpfieldset>
         <cmpTreePanel name="domTree"  rootVisible="false" onitemdblclick=" Form.getPropertyList(arguments);"  onitemclick=" Form.getAbsPath(arguments);"   height="80%"  popupmenu="popupMenuDomTree" dataset="DS_TREE" >
             <colum field='text' caption='Name' />
