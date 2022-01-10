@@ -15,7 +15,7 @@
     "listeners": {
         "beforeload": function(store, operation, options){  this.getProxy().setExtraParam('DATE_FROM',getVar(window.Win_Examples_file_managerfrm,'DATE_FROM','111')); this.getProxy().setExtraParam('searchItem',getValue(window.Win_Examples_file_managerfrm,'searchItem','')); this.getProxy().setExtraParam('selectFile',getVar(window.Win_Examples_file_managerfrm,'selectFile','')); } 
     },
-    "mainForm": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+    "mainForm": "win517ca83734905831a145d98fee41b4dd",
     "mainFormName": "Examples/file_manager.frm",
     "proxy": {
         "reader": {
@@ -57,8 +57,12 @@
     },
     "formName": "Examples/file_manager.frm",
     "fullscreen": true,
-    "id": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+    "id": "win517ca83734905831a145d98fee41b4dd",
     "items": [
+        {
+            "mainForm": "win517ca83734905831a145d98fee41b4dd",
+            "mainFormName": "Examples/file_manager.frm"
+        },
         {
             "autoScroll": true,
             "height": "40%",
@@ -67,11 +71,11 @@
                     "items": [
                         {
                             "height": 25,
-                            "id": "ctrlf960ce1273c46101233fdc5894bff2a6",
+                            "id": "ctrl2717410ab2d6425ffce89064e9b28442",
                             "listeners": {
                                 "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItem(arguments); }
                             },
-                            "mainForm": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+                            "mainForm": "win517ca83734905831a145d98fee41b4dd",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "searchItem",
                             "value": "",
@@ -79,7 +83,7 @@
                             "xtype": "textfield"
                         }
                     ],
-                    "mainForm": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+                    "mainForm": "win517ca83734905831a145d98fee41b4dd",
                     "mainFormName": "Examples/file_manager.frm",
                     "region": "north",
                     "title": "Search",
@@ -88,12 +92,12 @@
                 {
                     "dataset": "DS_TREE",
                     "height": "80%",
-                    "id": "ctrl4ff0052fb951bbcce7f1132373c3935c",
+                    "id": "ctrl06768e7395c7978da4aa92b2b5980c5f",
                     "listeners": {
-                        "itemclick": function(){  Examples_file_managerfrm.getPropertyList(arguments);   },
-                        "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent();  showPopupMenu(window.Win_Examples_file_managerfrm,'popupMenuDomTree',arr[4].getX(),arr[4].getY()); return false; }
+                        "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent();  showPopupMenu(window.Win_Examples_file_managerfrm,'popupMenuDomTree',arr[4].getX(),arr[4].getY()); return false; },
+                        "itemdblclick": function(){  Examples_file_managerfrm.getPropertyList(arguments);   }
                     },
-                    "mainForm": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+                    "mainForm": "win517ca83734905831a145d98fee41b4dd",
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "domTree",
                     "region": "center",
@@ -103,17 +107,17 @@
                 }
             ],
             "layout": "border",
-            "mainForm": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+            "mainForm": "win517ca83734905831a145d98fee41b4dd",
             "mainFormName": "Examples/file_manager.frm",
             "minSize": 100,
             "region": "west",
             "split": true,
-            "width": "20%",
+            "width": "50%",
             "xtype": "panel"
         },
         {
-            "id": "ctrl8d9c950bec17be436e3fa3ab145d4d14",
-            "mainForm": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+            "id": "ctrl0701c3b2c3d91a7bc0aed6193afcfadc",
+            "mainForm": "win517ca83734905831a145d98fee41b4dd",
             "mainFormName": "Examples/file_manager.frm",
             "name": "demoBody",
             "region": "center",
@@ -122,7 +126,7 @@
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win4c3c8c4ddc66c86baf679ce1600bea6a",
+    "mainForm": "win517ca83734905831a145d98fee41b4dd",
     "mainFormName": "Examples/file_manager.frm",
     "mainList": {},
     "parentEvent": {},
@@ -146,21 +150,24 @@
        
            Examples_file_managerfrm.getPropertyList = function(arguments) {
               let arr = [].slice.call(arguments);
-              console.log("GET imput argument fun", arr);
               setVar(window.Win_Examples_file_managerfrm,"selectFile",arr[1].data);
-              refreshDataSet(window.Win_Examples_file_managerfrm,"DS_TREE")
+              refreshDataSet(window.Win_Examples_file_managerfrm,"DS_TREE");
            }
            Examples_file_managerfrm.onSearchTreeItem = function(arguments) {
               let arr = [].slice.call(arguments);
               if (arr[1].getKey() == arr[1].ENTER) {
-                  refreshDataSet(window.Win_Examples_file_managerfrm,"DS_TREE")
+                  refreshDataSet(window.Win_Examples_file_managerfrm,"DS_TREE",function(rec){
+                        console.log("rec",rec)
+                  })
               }
            }
            refreshDataSet(window.Win_Examples_file_managerfrm,"DS_TREE")
        
     
                 
-    var css = ``,
+    var css = `
+      .ico-test { background-color:#352788; width:15px; height:15px; background-image:none !important; }
+    `,
     head = document.head || document.getElementsByTagName('head')[0],
     style = document.createElement('style');
     head.appendChild(style);

@@ -735,7 +735,7 @@ def parseGridElement(rootForm,xmldict,formName, data, session, root, info):
     if "dataset" in xmldict:
         xmldict["store"] = f'''(--##--)DATA_SET_{{%frmObj%}}_{xmldict['dataset']}(--##--)'''
     if "data" in xmldict:
-        storyObj["data"] = f'(--##--){xmldict["data"]}(--##--)'
+        storyObj["data"] =xmldict["data"]
         del xmldict["data"]
     if not "region" in xmldict:
         xmldict["region"] = "center"
@@ -835,7 +835,7 @@ def parseTreepanelElement(rootForm,xmldict,formName, data, session, root, info):
             dsEl.attrib['store_type'] = "tree"
         xmldict["store"] = f'''(--##--)DATA_SET_{{%frmObj%}}_{xmldict['dataset']}(--##--)'''
     if "data" in xmldict:
-        storyObj["data"] = f'(--##--){xmldict["data"]}(--##--)'
+        storyObj["data"] = xmldict["data"]
         del xmldict["data"]
     elif not root.text == None:
         txtTmp = root.text.strip().replace('"', "'").replace("\n", "").replace("\r", "")
@@ -1152,7 +1152,7 @@ def getDataSetQuery(request,queryJson, sessionId):
     datasetName = queryJson["dataset"]
     bin = dataSetQuery(queryJson, sessionId)
     if request.method == 'GET':
-        txt = f""" window.Win_{frmObj}['dataSetList']['{datasetName}'].loadData({bin}); """
+        txt = f""" window.Win_{frmObj}['dataSetList']['{datasetName}'].loadData({bin}); \n stopProgress();"""
     else:
         txt = bin
     return txt
@@ -1164,9 +1164,9 @@ def getActionQuery(request,queryJson, sessionId):
     if "colbackFun" in queryJson:
         colbackFun = f'{queryJson["colbackFun"]}'
         if colbackFun.strip()[:len("function(")] == "function(":
-            colbackFun = f"var tmpcolbackFun = {colbackFun};\r\n        tmpcolbackFun();\r\n        delete tmpcolbackFun;"
+            colbackFun = f"var tmpcolbackFun = {colbackFun};\r\n      tmpcolbackFun();\r\n        delete tmpcolbackFun;  "
         else:
-            colbackFun = f"{colbackFun}();"
+            colbackFun = f"{colbackFun}(); "
         del queryJson["colbackFun"]
     bin = dataSetQuery(queryJson, sessionId)
     if request.method == 'GET':
@@ -1182,6 +1182,7 @@ def getActionQuery(request,queryJson, sessionId):
             }}
         }}
         {colbackFun}
+        stopProgress();  
         """.replace("this", f"window.Win_{frmObj}")
         return txt
     else:

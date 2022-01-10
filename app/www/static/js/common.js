@@ -293,8 +293,8 @@ function getValue(_dom,propName,value){
 
 function getControl(_dom, propName) {
    let winObj = Ext.getCmp(_dom['mainForm'])
-   let ctrlObj = winObj.ComponentQuery.query('[name='+propName+']');
-   if (ctrlObj) {
+   let ctrlObj =winObj.query('[name='+propName+']')
+   if (ctrlObj.length > 0) {
       return ctrlObj[0];
    }
    console.log("error","контрол с именем "+propName+" нет на форме");
@@ -336,6 +336,17 @@ function getDataSet(){
      if (typeof(ctrlObj['dataSetList'])==='undefined') return null;
      if (typeof(ctrlObj['dataSetList'][datasetName])==='undefined') return null;
      return ctrlObj['dataSetList'][datasetName]
+}
+function startProgress(){
+    Ext.MessageBox.show({
+                    msg : 'Load...',
+                    progressText : 'Load...',
+                    width : 300,
+                    wait : true,
+                  });
+}
+function stopProgress(){
+    Ext.MessageBox.hide();
 }
 
 function refreshDataSet(){
@@ -399,9 +410,11 @@ function refreshDataSet(){
      }
      let storeObj = ctrlObj['dataSetList'][datasetName];
      if (!isPostQuery) {
+         startProgress();
          loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
             if (typeof(colbackFun) ==='function') {
                      let records = storeObj.getData().items;
+                     stopProgress();
                      colbackFun(records);
             }
          },function(error){
@@ -431,7 +444,9 @@ function refreshDataSet(){
          request.open('POST', url, true);  // `false` makes the request synchronous
          request.setRequestHeader('Content-type', 'application/json');
          var countQuery = 0; // необходимо уточнить почему производится 3 запроса, вмнсто одного
+         startProgress();
          request.onreadystatechange = function() {
+            stopProgress();
            if (request.status === 200) {
                 countQuery++;
                 if (countQuery == 2) {
