@@ -341,12 +341,18 @@ function getControl(_dom, propName) {
       if (key === propName ){
           return _dom['mainList'][key];
       }
+      let ctrlSubObj = _dom['mainList'][key].query('[name='+propName+']');
+      if (ctrlSubObj.length > 0) {
+          return ctrlSubObj[0];
+      }
    }
    for (let key in _dom['dataSetList']) {
       if (key === propName ){
           return _dom['dataSetList'][key];
       }
    }
+
+
    console.log("error","контрол с именем "+propName+" нет на форме");
    return null;
 }

@@ -47,12 +47,12 @@
     "dataSetVarList": {},
     "formName": "Examples/editFile.frm",
     "fullscreen": true,
-    "id": "win3c5d4784fde6c84998575da457b43a2d",
+    "id": "win5adab2d1938da8ab1abcca6b8053f96f",
     "items": [
         {
             "height": "100%",
-            "id": "ctrl104b4e41d011d22e980a930260b3e5b1",
-            "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+            "id": "ctrl7092d3c0c7bfa59dfca10189a280707b",
+            "mainForm": "win5adab2d1938da8ab1abcca6b8053f96f",
             "mainFormName": "Examples/editFile.frm",
             "name": "bodyText",
             "region": "center",
@@ -63,11 +63,11 @@
             "height": 25,
             "items": [
                 {
-                    "id": "ctrl7de0f6b88177d49eedbff9d77c3a6539",
+                    "id": "ctrl6b4a78ae182ef5f215d03b594873903f",
                     "listeners": {
                         "click": function(){ Examples_editFilefrm.clsForm() }
                     },
-                    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+                    "mainForm": "win5adab2d1938da8ab1abcca6b8053f96f",
                     "mainFormName": "Examples/editFile.frm",
                     "name": "fileinfo",
                     "region": "west",
@@ -75,11 +75,11 @@
                     "xtype": "button"
                 },
                 {
-                    "id": "ctrl51753eec8558769181d7c6011d197934",
+                    "id": "ctrld09c30640cb6375bd280779dbf2c5d4d",
                     "listeners": {
                         "click": function(){ Examples_editFilefrm.SaveForm() }
                     },
-                    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+                    "mainForm": "win5adab2d1938da8ab1abcca6b8053f96f",
                     "mainFormName": "Examples/editFile.frm",
                     "name": "fileinfo",
                     "region": "east",
@@ -87,11 +87,11 @@
                     "xtype": "button"
                 },
                 {
-                    "id": "ctrl90858ea0a0170a67e3aef25cd912eff4",
+                    "id": "ctrld565167e571440a4fa0de3383037f2ea",
                     "listeners": {
                         "click": function(){ Examples_editFilefrm.SaveAndCloseForm() }
                     },
-                    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+                    "mainForm": "win5adab2d1938da8ab1abcca6b8053f96f",
                     "mainFormName": "Examples/editFile.frm",
                     "name": "fileinfo",
                     "region": "east",
@@ -100,7 +100,7 @@
                 }
             ],
             "layout": "border",
-            "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+            "mainForm": "win5adab2d1938da8ab1abcca6b8053f96f",
             "mainFormName": "Examples/editFile.frm",
             "region": "south",
             "xtype": "panel"
@@ -108,7 +108,7 @@
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+    "mainForm": "win5adab2d1938da8ab1abcca6b8053f96f",
     "mainFormName": "Examples/editFile.frm",
     "mainList": {},
     "modal": true,

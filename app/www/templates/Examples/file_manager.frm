@@ -15,7 +15,7 @@
     "listeners": {
         "beforeload": function(store, operation, options){  this.getProxy().setExtraParam('searchItemLeft',getValue(window.Win_Examples_file_managerfrm,'searchItemLeft','')); this.getProxy().setExtraParam('selectFileLeft',getVar(window.Win_Examples_file_managerfrm,'selectFileLeft','')); } 
     },
-    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
     "mainFormName": "Examples/file_manager.frm",
     "proxy": {
         "reader": {
@@ -31,7 +31,7 @@
     "listeners": {
         "beforeload": function(store, operation, options){  this.getProxy().setExtraParam('searchItem',getValue(window.Win_Examples_file_managerfrm,'searchItem','')); this.getProxy().setExtraParam('selectFile',getVar(window.Win_Examples_file_managerfrm,'selectFile','')); } 
     },
-    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
     "mainFormName": "Examples/file_manager.frm",
     "proxy": {
         "reader": {
@@ -45,8 +45,14 @@
       
                 var MENU_Examples_file_managerfrm_popUpFile= Ext.create('Ext.menu.Menu',{"name": "popUpFile"
 , "popupobject": "GridMain"
-, "items": [{"text": "\u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c"
-, "handler": function(){ Examples_file_managerfrm.editFile(arguments); }}, {"text": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c"
+, "items": [{"name": "popNewFile"
+, "text": "\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439 \u0444\u0430\u0439\u043b"
+, "handler": function(){ Examples_file_managerfrm.CreateNewTextFile(); }}, {"name": "popNewDir"
+, "text": "\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439 \u043a\u0430\u0442\u0430\u043b\u043e\u0433"
+, "handler": function(){ Examples_file_managerfrm.CreateNewDir(); }}, {"name": "popEditFile"
+, "text": "\u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c"
+, "handler": function(){ Examples_file_managerfrm.editFile(arguments); }}, {"name": "popDelFile"
+, "text": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c"
 , "handler": function(){ Examples_file_managerfrm.editFile(arguments); }}]})
                 var Examples_file_managerfrm_onclose = function(data){ }
                 var Examples_file_managerfrm =  {
@@ -98,10 +104,10 @@
     },
     "formName": "Examples/file_manager.frm",
     "fullscreen": true,
-    "id": "win722e12b5e9416987d9cbb212e2cee0ff",
+    "id": "win48d9d159f0831445d3d4889e4248dc0d",
     "items": [
         {
-            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
             "mainFormName": "Examples/file_manager.frm"
         },
         {
@@ -112,11 +118,11 @@
                     "items": [
                         {
                             "height": 25,
-                            "id": "ctrl4850bf677593b852b12c4b25fc19534b",
+                            "id": "ctrl1bccca434f02b173f458cb8731c58c8c",
                             "listeners": {
                                 "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItemLeft(arguments); }
                             },
-                            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "searchItemLeft",
                             "value": "",
@@ -124,15 +130,15 @@
                             "xtype": "textfield"
                         },
                         {
-                            "id": "ctrlef30dfbcac4277b8e659a315fc73ae38",
-                            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                            "id": "ctrlf793c0b857422436c89ba113acdf4f99",
+                            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "absPathLeft",
                             "text": "_",
                             "xtype": "label"
                         }
                     ],
-                    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                     "mainFormName": "Examples/file_manager.frm",
                     "region": "north",
                     "title": "Search",
@@ -141,13 +147,13 @@
                 {
                     "dataset": "DS_TREE_LEFT",
                     "height": "80%",
-                    "id": "ctrld48e47350fb6fd31dbe36c45ca11a4e3",
+                    "id": "ctrldf1cfc8d693df2d12607bd92a595320a",
                     "listeners": {
                         "itemclick": function(){  Examples_file_managerfrm.getAbsPathLeft(arguments); },
                         "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent(); Examples_file_managerfrm.onPOP(arguments); showPopupMenu(window.Win_Examples_file_managerfrm,'popUpFile',arr[4].getX(),arr[4].getY()); return false; },
                         "itemdblclick": function(){  Examples_file_managerfrm.getPropertyListLeft(arguments); }
                     },
-                    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "fileTreeLeft",
                     "region": "center",
@@ -157,7 +163,7 @@
                 }
             ],
             "layout": "border",
-            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
             "mainFormName": "Examples/file_manager.frm",
             "minSize": 100,
             "region": "west",
@@ -168,17 +174,17 @@
         {
             "autoScroll": true,
             "height": "40%",
-            "id": "ctrl21eda6751d7dfa38d7adfb130657dbce",
+            "id": "ctrlb0e2f0fd3500e7b9b7ac7cdef85671db",
             "items": [
                 {
                     "items": [
                         {
                             "height": 25,
-                            "id": "ctrl6f22177f5980827318958108c550be36",
+                            "id": "ctrlaa5634aab4fdc27283583fb210cdc3be",
                             "listeners": {
                                 "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItem(arguments); }
                             },
-                            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "searchItem",
                             "value": "",
@@ -186,15 +192,15 @@
                             "xtype": "textfield"
                         },
                         {
-                            "id": "ctrl543bbdb04a8ad01f4c70fc87dd853f1e",
-                            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                            "id": "ctrl68177208b8fdffa4a8aeb44ed52c597b",
+                            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "absPath",
                             "text": "_",
                             "xtype": "label"
                         }
                     ],
-                    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                     "mainFormName": "Examples/file_manager.frm",
                     "region": "north",
                     "title": "Search",
@@ -203,13 +209,13 @@
                 {
                     "dataset": "DS_TREE",
                     "height": "80%",
-                    "id": "ctrlc5239706161c86aa18966f375ddbb517",
+                    "id": "ctrl13f0673e0590b67234c28a9332fac167",
                     "listeners": {
                         "itemclick": function(){  Examples_file_managerfrm.getAbsPath(arguments); },
                         "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent(); Examples_file_managerfrm.onPOP(arguments); showPopupMenu(window.Win_Examples_file_managerfrm,'popUpFile',arr[4].getX(),arr[4].getY()); return false; },
                         "itemdblclick": function(){  Examples_file_managerfrm.getPropertyList(arguments); }
                     },
-                    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "domTree",
                     "region": "center",
@@ -219,7 +225,7 @@
                 }
             ],
             "layout": "border",
-            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
             "mainFormName": "Examples/file_manager.frm",
             "minSize": 100,
             "name": "demoBody",
@@ -233,15 +239,16 @@
             "height": "10%",
             "items": [
                 {
-                    "id": "ctrl33a6df10b4e00ccb1b2146b75b859bb5",
-                    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+                    "id": "ctrle711ae909e1977f0432f9494df72fe2a",
+                    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "fileinfo",
+                    "region": "south",
                     "text": "",
                     "xtype": "label"
                 }
             ],
-            "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+            "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
             "mainFormName": "Examples/file_manager.frm",
             "region": "south",
             "split": true,
@@ -251,7 +258,7 @@
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win722e12b5e9416987d9cbb212e2cee0ff",
+    "mainForm": "win48d9d159f0831445d3d4889e4248dc0d",
     "mainFormName": "Examples/file_manager.frm",
     "mainList": {
         "popUpFile": MENU_Examples_file_managerfrm_popUpFile
@@ -281,15 +288,21 @@
            Examples_file_managerfrm.onPOP = function(arguments) {
               let arr = [].slice.call(arguments);
               let pop = getControl(window.Win_Examples_file_managerfrm,"popUpFile");
-              setVisible(window.Win_Examples_file_managerfrm,pop.items.items[1], false);
-              setDisable(window.Win_Examples_file_managerfrm,pop.items.items[1], true);
+              // setVisible(window.Win_Examples_file_managerfrm,pop.items.items[3], false);
+              // setDisable(window.Win_Examples_file_managerfrm,pop.items.items[3], true);
+              setVisible(window.Win_Examples_file_managerfrm,getControl(window.Win_Examples_file_managerfrm,"popDelFile"), false);
               let data = arr[1].data;
               Examples_file_managerfrm.SelectFileObject = data;
               if (data['isFile'] === true) {
-                  setVisible(window.Win_Examples_file_managerfrm,pop.items.items[0], true);
+                  setVisible(window.Win_Examples_file_managerfrm,getControl(window.Win_Examples_file_managerfrm,"popEditFile"), true);
+                  setVisible(window.Win_Examples_file_managerfrm,getControl(window.Win_Examples_file_managerfrm,"popNewDir"), false);
+                  setVisible(window.Win_Examples_file_managerfrm,getControl(window.Win_Examples_file_managerfrm,"popNewFile"), false);
               } else {
-                  setVisible(window.Win_Examples_file_managerfrm,pop.items.items[0], false);
+                  setVisible(window.Win_Examples_file_managerfrm,getControl(window.Win_Examples_file_managerfrm,"popEditFile"), false);
+                  setVisible(window.Win_Examples_file_managerfrm,getControl(window.Win_Examples_file_managerfrm,"popNewDir"), true);
+                  setVisible(window.Win_Examples_file_managerfrm,getControl(window.Win_Examples_file_managerfrm,"popNewFile"), true);
               }
+
            }
            Examples_file_managerfrm.editFile = function(arguments) {
               if (typeof(Examples_file_managerfrm.SelectFileObject['abspath']) === "undefined"){
@@ -310,6 +323,7 @@
            Examples_file_managerfrm.getAbsPathLeft = function(arguments) {
               let arr = [].slice.call(arguments);
               setCaption(window.Win_Examples_file_managerfrm,"absPathLeft",arr[1].data['abspath']);
+              Examples_file_managerfrm.SelectFileObject = arr[1].data;
               if (arr[1].data['isFile'] === true) {
                  setVar(window.Win_Examples_file_managerfrm,"selectFileLeft",arr[1].data['abspath']);
                  executeAction(window.Win_Examples_file_managerfrm,"GET_FILE_INFO", function(){
@@ -321,6 +335,7 @@
            Examples_file_managerfrm.getAbsPath = function(arguments) {
               let arr = [].slice.call(arguments);
               setCaption(window.Win_Examples_file_managerfrm,"absPath",arr[1].data['abspath']);
+              Examples_file_managerfrm.SelectFileObject = arr[1].data;
               if (arr[1].data['isFile'] === true) {
                  setVar(window.Win_Examples_file_managerfrm,"selectFileLeft",arr[1].data['abspath']);
                  executeAction(window.Win_Examples_file_managerfrm,"GET_FILE_INFO", function(){
@@ -358,6 +373,22 @@
                   })
               }
            }
+
+           Examples_file_managerfrm.CreateNewTextFile = function() {
+               if (Examples_file_managerfrm.SelectFileObject['isFile'] !== true) {
+                    Ext.MessageBox.prompt("Укажите имя файла","Имя файла",function(btn, text) {
+
+                    });
+               }
+           }
+           Examples_file_managerfrm.CreateNewDir = function() {
+               if (Examples_file_managerfrm.SelectFileObject['isFile'] !== true) {
+                    Ext.MessageBox.prompt("Укажите имя каталога","Имя каталога",function(btn, text) {
+
+                    });
+               }
+           }
+
            refreshDataSet(window.Win_Examples_file_managerfrm,"DS_TREE_LEFT");
            refreshDataSet(window.Win_Examples_file_managerfrm,"DS_TREE");
        

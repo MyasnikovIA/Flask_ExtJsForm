@@ -5,20 +5,24 @@
 
     <cmpScript>
        <![CDATA[
-
            Form.SelectFileObject = {};
            // ПКМ
            Form.onPOP = function(arguments) {
               let arr = [].slice.call(arguments);
               let pop = getControl("popUpFile");
-              setVisible(pop.items.items[1], false);
-              setDisable(pop.items.items[1], true);
+              // setVisible(pop.items.items[3], false);
+              // setDisable(pop.items.items[3], true);
+              setVisible(getControl("popDelFile"), false);
               let data = arr[1].data;
               Form.SelectFileObject = data;
               if (data['isFile'] === true) {
-                  setVisible(pop.items.items[0], true);
+                  setVisible(getControl("popEditFile"), true);
+                  setVisible(getControl("popNewDir"), false);
+                  setVisible(getControl("popNewFile"), false);
               } else {
-                  setVisible(pop.items.items[0], false);
+                  setVisible(getControl("popEditFile"), false);
+                  setVisible(getControl("popNewDir"), true);
+                  setVisible(getControl("popNewFile"), true);
               }
            }
            Form.editFile = function(arguments) {
@@ -40,6 +44,7 @@
            Form.getAbsPathLeft = function(arguments) {
               let arr = [].slice.call(arguments);
               setCaption("absPathLeft",arr[1].data['abspath']);
+              Form.SelectFileObject = arr[1].data;
               if (arr[1].data['isFile'] === true) {
                  setVar("selectFileLeft",arr[1].data['abspath']);
                  executeAction("GET_FILE_INFO", function(){
@@ -51,6 +56,7 @@
            Form.getAbsPath = function(arguments) {
               let arr = [].slice.call(arguments);
               setCaption("absPath",arr[1].data['abspath']);
+              Form.SelectFileObject = arr[1].data;
               if (arr[1].data['isFile'] === true) {
                  setVar("selectFileLeft",arr[1].data['abspath']);
                  executeAction("GET_FILE_INFO", function(){
@@ -88,6 +94,22 @@
                   })
               }
            }
+
+           Form.CreateNewTextFile = function() {
+               if (Form.SelectFileObject['isFile'] !== true) {
+                    Ext.MessageBox.prompt("Укажите имя файла","Имя файла",function(btn, text) {
+                       // дописать Action  создания нового файла
+                    });
+               }
+           }
+           Form.CreateNewDir = function() {
+               if (Form.SelectFileObject['isFile'] !== true) {
+                    Ext.MessageBox.prompt("Укажите имя каталога","Имя каталога",function(btn, text) {
+                       // дописать Action  создания нового каталога
+                    });
+               }
+           }
+
            refreshDataSet("DS_TREE_LEFT");
            refreshDataSet("DS_TREE");
        ]]>
@@ -233,13 +255,14 @@
         </cmpTreePanel>
     </cmpPanel>
     <cmpPanel region="south" collapsible="true" height="10%" title="Информация о файле"  split="true">
-           <cmpLabel text="" name="fileinfo"/>
+           <cmpLabel  region="south"  text="" name="fileinfo"/>
     </cmpPanel>
 
     <cmpPopupMenu name="popUpFile"  popupobject="GridMain" onpopup="Form.onPOP(arguments)">
-        <item text="Редактировать" onclick="Form.editFile(arguments);"  />
-        <item text="Удалить" onclick="Form.editFile(arguments);"  />
-        <!--item text="Удалить" onclick="Form.editFile(arguments);"  hidden="true"/-->
+        <item name="popNewFile"  text="Создать новый файл"    onclick="Form.CreateNewTextFile();"  />
+        <item name="popNewDir"   text="Создать новый каталог" onclick="Form.CreateNewDir();"  />
+        <item name="popEditFile" text="Редактировать"         onclick="Form.editFile(arguments);"  />
+        <item name="popDelFile"  text="Удалить"               onclick="Form.editFile(arguments);"  />
     </cmpPopupMenu>
 
 </div>

@@ -25,10 +25,8 @@
         <![CDATA[
            from codecs import open as openFile
            from os import path
-
-           pathForm = editFile
-           if path.exists(pathForm):
-              with openFile(pathForm, 'r', encoding='utf8') as f:
+           if path.exists(editFile):
+              with openFile(editFile, 'r', encoding='utf8') as f:
                 bodyText = f.read()
 
         ]]>
@@ -41,9 +39,8 @@
     <cmpAction name="SET_FILE_TEXT">
         <![CDATA[
            from os import path
-           pathForm = editFile
-           if path.exists(pathForm):
-               with open(pathForm, "wb") as textFile:
+           if path.exists(editFile):
+               with open(editFile, "wb") as textFile:
                    textFile.write(bodyText.encode())
         ]]>
         <items name="bodyText" srctype="ctrl" default=""/>
