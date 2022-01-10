@@ -303,16 +303,56 @@ function getValue(_dom,propName,value){
    return value
 }
 
+function setVisible(_dom, ctrl, isVisible) {
+   if (typeof(ctrl) === "string") {
+      ctrl = getControl(_dom, ctrl);
+   }
+   if (ctrl === null ){
+     console.log("error","контрола нет на форме");
+     return
+   }
+   if (isVisible === true) {
+     ctrl.show();
+   } else {
+     ctrl.hide();
+   }
+   //pop.items.items[0].hide();
+   // pop.items.items[0].show();
+}
+
+function setDisable(_dom, ctrl, isDisabled) {
+   if (typeof(ctrl) === "string") {
+      ctrl = getControl(_dom, ctrl);
+   }
+   if (ctrl === null ){
+     console.log("error","контрола нет на форме");
+     return
+   }
+   ctrl.setDisabled(isDisabled);
+}
+
+
 function getControl(_dom, propName) {
    let ctrlObj = _dom.query('[name='+propName+']');
    if (ctrlObj.length > 0) {
       return ctrlObj[0];
    }
+   for (let key in _dom['mainList']) {
+      if (key === propName ){
+          return _dom['mainList'][key];
+      }
+   }
+   for (let key in _dom['dataSetList']) {
+      if (key === propName ){
+          return _dom['dataSetList'][key];
+      }
+   }
    console.log("error","контрол с именем "+propName+" нет на форме");
+   return null;
 }
 
 function close(_dom,mod) {
-   let ctrlObj = _dom.query('[name='+propName+']');
+   let ctrlObj = _dom
    if (typeof(ctrlObj['parentEvent']) === 'object' ){
        if (typeof(ctrlObj['parentEvent'].onclose) === 'function' ){
           ctrlObj['parentEvent'].onclose(mod);
@@ -595,7 +635,7 @@ function executeAction(){
      if (!isPostQuery) {
          let colbackFunText = "";
          if (typeof(colbackFun) === 'function') {
-             colbackFunText = +"&colbackFun="+colbackFun.toString();
+             colbackFunText = "&colbackFun="+colbackFun.toString();
          }
          loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+colbackFunText).then(function(script){
          },function(error){
@@ -626,7 +666,9 @@ function executeAction(){
                            ctrlObj['vars'][key]=ctrlObj['actionList'][datasetName][key]
                         }
                     }
-                    colbackFun(ctrlObj['actionList'][datasetName]);
+                    if (typeof(colbackFun) === 'function') {
+                        colbackFun(ctrlObj['actionList'][datasetName]);
+                    }
                 }
            }
          };

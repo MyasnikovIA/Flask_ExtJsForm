@@ -411,6 +411,8 @@ def jsonFunFromString(html="",frmObj=""):
     html = html.replace("showPopupMenu(", f"showPopupMenu({thisName},",)
     html = html.replace("refreshDataSet(", f"refreshDataSet({thisName},",)
     html = html.replace("executeAction(", f"executeAction({thisName},",)
+    html = html.replace("setVisible(", f"setVisible({thisName},",)
+    html = html.replace("setDisable(", f"setDisable({thisName},",)
     html = html.replace("close(", f"close({thisName},",)
     html = html.replace("openWindow(", f"openWindow({thisName},",)
     html = html.replace('"Ext.getBody()"', "Ext.getBody()",)
@@ -1173,7 +1175,7 @@ def getActionQuery(request,queryJson, sessionId):
         bin = "[{}]"
     if request.method == 'GET':
         txt = f"""
-        window.Win_{frmObj}['actionList']['{datasetName}'] = {bin[1:-1]}; /**/
+        window.Win_{frmObj}['actionList']['{datasetName}'] = {bin[1:-1]}; 
         for (let key in window.Win_{frmObj}['actionList']['{datasetName}']) {{
             let ctrlObjFild = window.Win_{frmObj}.query('[name='+key+']');
             if ((ctrlObjFild) && (ctrlObjFild.length>0)) {{
@@ -1202,6 +1204,7 @@ def dataSetQuery(queryJson, sessionId):
     dataObj = {}
     if "data" in queryJson:
         if type(queryJson["data"]) == str:
+            print(queryJson["data"])
             dataObj = JSON_parse(queryJson["data"])
         else:
             dataObj = queryJson["data"]

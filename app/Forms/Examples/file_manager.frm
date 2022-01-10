@@ -6,18 +6,57 @@
     <cmpScript>
        <![CDATA[
 
+           Form.SelectFileObject = {};
+           // ПКМ
+           Form.onPOP = function(arguments) {
+              let arr = [].slice.call(arguments);
+              let pop = getControl("popUpFile");
+              setVisible(pop.items.items[1], false);
+              setDisable(pop.items.items[1], true);
+              let data = arr[1].data;
+              Form.SelectFileObject = data;
+              if (data['isFile'] === true) {
+                  setVisible(pop.items.items[0], true);
+              } else {
+                  setVisible(pop.items.items[0], false);
+              }
+           }
+           Form.editFile = function(arguments) {
+              if (typeof(Form.SelectFileObject['abspath']) === "undefined"){
+                return;
+              }
+              let fileName = Form.SelectFileObject['abspath'];
+              setVar("isEdit",true);
+              openForm('Examples/editFile.frm',true,{
+                    width: 800,
+                    height: 600,
+                    vars:{editFile:fileName},
+                    onclose:function(mod){
+                       console.log('OK',mod);
+                    }
+               });
+           }
+
            Form.getAbsPathLeft = function(arguments) {
               let arr = [].slice.call(arguments);
               setCaption("absPathLeft",arr[1].data['abspath']);
               if (arr[1].data['isFile'] === true) {
                  setVar("selectFileLeft",arr[1].data['abspath']);
-                 executeAction("GET_FILE_INFO")
+                 executeAction("GET_FILE_INFO", function(){
+                    setCaption("fileinfo", JSON.stringify(getVar("info")));
+                 })
               }
            }
 
            Form.getAbsPath = function(arguments) {
               let arr = [].slice.call(arguments);
               setCaption("absPath",arr[1].data['abspath']);
+              if (arr[1].data['isFile'] === true) {
+                 setVar("selectFileLeft",arr[1].data['abspath']);
+                 executeAction("GET_FILE_INFO", function(){
+                    setCaption("fileinfo", JSON.stringify(getVar("info")));
+                 })
+              }
            }
 
            Form.getPropertyListLeft = function(arguments) {
@@ -117,6 +156,7 @@
                 info['datetime_change'] = f"{datetime.datetime.fromtimestamp(stats.st_mtime)}"
                 info['datetime_create'] = f"{datetime.datetime.fromtimestamp(stats.st_ctime)}"
                 info['datetime_open'] = f"{datetime.datetime.fromtimestamp(stats.st_atime)}"
+                info['filename'] = filename
         ]]>
         <items name="selectFileLeft" src="selectFileLeft" srctype="var" default=""/>
         <items name="info" srctype="var" />
@@ -178,7 +218,7 @@
            <cmpTextField name="searchItemLeft" value="" onspecialkey="Form.onSearchTreeItemLeft(arguments);"  height="25" width="100%"/>
            <cmpLabel text="_" name="absPathLeft"/>
         </cmpfieldset>
-        <cmpTreePanel name="fileTreeLeft"  rootVisible="false" onitemdblclick=" Form.getPropertyListLeft(arguments);"  onitemclick=" Form.getAbsPathLeft(arguments);"   height="80%"  popupmenu="popupMenuDomTree" dataset="DS_TREE_LEFT" >
+        <cmpTreePanel name="fileTreeLeft"  rootVisible="false" onitemdblclick=" Form.getPropertyListLeft(arguments);"  onitemclick=" Form.getAbsPathLeft(arguments);"   height="80%"  popupmenu="popUpFile" dataset="DS_TREE_LEFT" >
             <colum field='text' caption='Name' />
         </cmpTreePanel>
     </cmpPanel>
@@ -188,8 +228,18 @@
            <cmpTextField name="searchItem" value="" onspecialkey="Form.onSearchTreeItem(arguments);"  height="25" width="100%"/>
            <cmpLabel text="_" name="absPath"/>
         </cmpfieldset>
-        <cmpTreePanel name="domTree"  rootVisible="false" onitemdblclick=" Form.getPropertyList(arguments);"  onitemclick=" Form.getAbsPath(arguments);"   height="80%"  popupmenu="popupMenuDomTree" dataset="DS_TREE" >
+        <cmpTreePanel name="domTree"  rootVisible="false" onitemdblclick=" Form.getPropertyList(arguments);"  onitemclick=" Form.getAbsPath(arguments);"   height="80%"  popupmenu="popUpFile" dataset="DS_TREE" >
             <colum field='text' caption='Name' />
         </cmpTreePanel>
     </cmpPanel>
+    <cmpPanel region="south" collapsible="true" height="10%" title="Информация о файле"  split="true">
+           <cmpLabel text="" name="fileinfo"/>
+    </cmpPanel>
+
+    <cmpPopupMenu name="popUpFile"  popupobject="GridMain" onpopup="Form.onPOP(arguments)">
+        <item text="Редактировать" onclick="Form.editFile(arguments);"  />
+        <item text="Удалить" onclick="Form.editFile(arguments);"  />
+        <!--item text="Удалить" onclick="Form.editFile(arguments);"  hidden="true"/-->
+    </cmpPopupMenu>
+
 </div>
