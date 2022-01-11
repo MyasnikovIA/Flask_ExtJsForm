@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html>
-   <head>
-        <meta charset="utf-8"/>
-        <link href="/lib/ExtJS_6.0.0/theme-classic-all.css" rel="stylesheet" />
-        <script type="text/javascript" src="/lib/ExtJS_6.0.0/ext-all.js"></script>
-        <script type="text/javascript" src="/js/common.js"></script>
-        <script type = "text/javascript">
-             document.addEventListener('contextmenu', event => event.preventDefault());
-             
+
            Ext.onReady(function() {
                 if (typeof(window.Win_mainfrm) === 'undefined') window.Win_mainfrm = "";
                 
@@ -15,6 +6,8 @@
                 var mainfrm_onclose = function(data){ }
                 var mainfrm =  {
     "ServerPathQuery": [
+        "http",
+        "192.168.15.200:5001",
         "main.frm"
     ],
     "actionList": {},
@@ -23,7 +16,7 @@
     "dataSetList": {},
     "dataSetVarList": {},
     "formName": "main.frm",
-    "id": "wina3afb0c98940721f3675708e5b1aa3c2",
+    "id": "wine05a36fbffdfb47c2376a263c4e5143c",
     "items": [
         {
             "items": [
@@ -31,7 +24,7 @@
                     "listeners": {
                         "click": function(){ mainfrm.onClickBtnGet5001(arguments) }
                     },
-                    "mainForm": "wina3afb0c98940721f3675708e5b1aa3c2",
+                    "mainForm": "wine05a36fbffdfb47c2376a263c4e5143c",
                     "mainFormName": "main.frm",
                     "text": "Send 5001",
                     "xtype": "button"
@@ -40,7 +33,7 @@
                     "listeners": {
                         "click": function(){ mainfrm.onClickBtnGet9091(arguments) }
                     },
-                    "mainForm": "wina3afb0c98940721f3675708e5b1aa3c2",
+                    "mainForm": "wine05a36fbffdfb47c2376a263c4e5143c",
                     "mainFormName": "main.frm",
                     "text": "Send 9091",
                     "xtype": "button"
@@ -49,22 +42,23 @@
                     "listeners": {
                         "click": function(){ mainfrm.onClickBtnGet90912(arguments) }
                     },
-                    "mainForm": "wina3afb0c98940721f3675708e5b1aa3c2",
+                    "mainForm": "wine05a36fbffdfb47c2376a263c4e5143c",
                     "mainFormName": "main.frm",
                     "text": "Send onClickBtnGet90912",
                     "xtype": "button"
                 }
             ],
-            "mainForm": "wina3afb0c98940721f3675708e5b1aa3c2",
+            "mainForm": "wine05a36fbffdfb47c2376a263c4e5143c",
             "mainFormName": "main.frm",
             "region": "center"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "wina3afb0c98940721f3675708e5b1aa3c2",
+    "mainForm": "wine05a36fbffdfb47c2376a263c4e5143c",
     "mainFormName": "main.frm",
     "mainList": {},
+    "modal": true,
     "parentEvent": {},
     "renderTo": Ext.getBody(),
     "retuen_object": {},
@@ -80,8 +74,8 @@
                 }
                 if ( typeof(mainfrm['vars']) !=='undefined') mainfrm['vars'] = {};
                 mainfrm["vars"]//=[[%DataVars%]]
-                window.Win_mainfrm = Ext.create('Ext.Viewport',mainfrm);
-                window.Win_mainfrm;
+                window.Win_mainfrm = Ext.create('Ext.window.Window',mainfrm);
+                window.Win_mainfrm.show();
                 
        
            mainfrm.onClickBtnGet5001 = function(arguments) {
@@ -94,14 +88,9 @@
            }
            mainfrm.onClickBtnGet90912 = function(arguments) {
               let arr = [].slice.call(arguments);
-              openForm(window.Win_mainfrm,"http://192.168.15.200:9091/Examples/file_manager.frm")
+              openForm(window.Win_mainfrm,"http://192.168.15.200:5001/Examples/file_manager.frm",true)
            }
        
     
                 
            });
-
-        </script>
-   </head>
-   <body></body>
-</html>

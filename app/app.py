@@ -15,9 +15,6 @@ import jsonForm
 # https://docs.sencha.com/extjs/6.0.0/classic/Ext.tree.Panel.html
 # https://www.techferry.com/articles/ext-js/ext-js-ui-widgets.html
 
-import requests as reqExt
-import urllib.parse
-
 app = Flask(__name__,
             template_folder='www/templates',
             static_folder='www/static'
@@ -63,35 +60,38 @@ def getParam(name, defoultValue=''):
 
 ROOT_DIR = os.path.join(os.path.dirname(__file__))
 
-countQuery = 0
-
-
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def all_files(path):
     # инициализируем сессионный словарь
-    if session.get("ID") == None:
-        global countQuery
-        countQuery += 1
-        session["ID"] = f'{str(uuid.uuid1()).replace("-", "")}{countQuery}{datetime.datetime.now().microsecond}'
-        jsonForm.SESSION_DICT[session["ID"]] = {}
+    jsonForm.initSessionVar(session)
 
     if "dataset.php" in path:
         queryJson = jsonForm.getAttrQuery(request)
-        txt =jsonForm.getDataSetQuery(request,queryJson,session["ID"])
+        txt =jsonForm.getDataSetQuery(request, queryJson, session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
     if "action.php" in path:
         queryJson = jsonForm.getAttrQuery(request)
-        txt = jsonForm.getActionQuery(request,queryJson,session["ID"])
+        txt = jsonForm.getActionQuery(request, queryJson, session["ID"])
+        return txt, 200, {'content-type': "application/x-javascript"}
+
+    # запрос к стороннему стенду
+    if "http:" in path or "https:" in path:
+        txt = jsonForm.getRemouteForm(path, request, session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
     # Поиск запроса в каталоге static
+    queryJson = jsonForm.getAttrQuery(request)
     pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}{path}"
     if os.path.isfile(pathHtmlFromForm):
         bin, mime = jsonForm.sendCostumBin(pathHtmlFromForm)
         return bin, 200, {'content-type': mime}
 
-    queryJson = jsonForm.getAttrQuery(request)
+
+    ServerPathQuery = [path]
+    if 'ServerPathQuery' in queryJson:
+        ServerPathQuery = queryJson['ServerPathQuery']
+
     format = 1
     if "type" in queryJson and queryJson['type'] == "js":
         format = 2
@@ -100,6 +100,7 @@ def all_files(path):
     if isExist:
         if 'data' in queryJson:
             queryJson = json.loads(queryJson['data'])
+        queryJson['ServerPathQuery'] = ServerPathQuery
         bin, mime = jsonForm.getParsedForm(path, queryJson, jsonForm.SESSION_DICT[session["ID"]], format)
         return bin, 200, {'content-type': mime}
 

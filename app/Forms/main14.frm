@@ -12,7 +12,7 @@
            }
            Form.onClickBtnGet90912 = function(arguments) {
               let arr = [].slice.call(arguments);
-              openForm("http://192.168.15.200:9091/Examples/file_manager.frm")
+              openForm("http://192.168.15.200:9091/Examples/file_manager.frm",true)
            }
        ]]>
     </cmpScript>

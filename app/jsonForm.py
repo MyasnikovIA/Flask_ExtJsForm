@@ -8,6 +8,12 @@ from hashlib import md5
 from datetime import datetime
 from app import app
 import ast
+import requests as reqExt
+import urllib.parse
+import uuid
+
+
+
 #from ast import parse as ParsePythonCode
 #from ast import Expression as ExpressionPythonCode
 
@@ -22,6 +28,7 @@ nameElementHeshMap = {}  # список ХЭШ названий элементо
 nameElementMap = {}  # список названий элементов
 DB_DICT = {}  # Список БД по  сессиям
 SESSION_DICT = {}  # Словарь содержащий сессии удаленных серверов
+REMOTE_SESSION_DICT = {}  # Словарь содержащий сессии удаленных серверов
 TEMP_DIR_PATH = path.join(path.dirname(__file__), app.template_folder.replace('/', sep))  # Директория  хронения временных файлов
 
 ROOT_DIR = path.join(path.dirname(__file__))               # Корневая папка
@@ -115,6 +122,7 @@ def getParsedForm(formName, data, session={}, isHtml=0):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
+
     return getSrcSaveTemp(formName, data, session, isHtml)
     # return getSrc(formName, data, session, isHtml)
     getTempCont = True
@@ -429,6 +437,10 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     """
     ext = formName[formName.rfind('.') + 1:].lower()
     frmObj = formName.replace("/","_").replace(".","")
+    ServerPathQuery = [formName]
+    if 'ServerPathQuery' in data:
+        ServerPathQuery = data['ServerPathQuery']
+        del data['ServerPathQuery']
     # ---- получить HTML файл с перенаправлением на JS формой
     rootForm, script, dataset, action, popupMenu, styleBlock = getXMLObject(formName)
     if rootForm.tag == "error":
@@ -444,6 +456,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     jsonDataset,dataSetList, dataSetVarList = parseXMLDataset(dataset, jsonFrm, data, session) # парсим dataSet фрагменты
     actionList = parseXMLAction(rootForm,action, jsonFrm, data, session)  # парсим Action фрагменты
     jsonFrm['formName'] = formName
+    jsonFrm['ServerPathQuery'] = ServerPathQuery
     jsonFrm['retuen_object'] = {}
     if not "listeners" in jsonFrm:
         jsonFrm["listeners"] = {}
@@ -500,6 +513,8 @@ def parseXMLStyle(scriptXml, formName, data, session):
     for elem in scriptXml:
         xmldict = dict(elem.attrib.copy())
         scriptText.append(elem.text)
+    if len(scriptText) == 0:
+        return ""
     cssBody = "\n".join(scriptText)
     return f"""
     var css = `{cssBody}`,
@@ -560,7 +575,7 @@ def parseXMLmain(mainXml, rootForm, data, session):
         xmldict["items"]=mainToTree(elem)
         menuList[xmldict['name']] = f"""(--##--)MENU_{{%frmObj%}}_{xmldict['name']}(--##--)"""
         scriptText.append(f"""var MENU_{{%frmObj%}}_{xmldict['name']}= Ext.create('Ext.menu.Menu',""")
-        scriptText.append(JSON_stringify(xmldict))
+        scriptText.append(JSON_stringify(xmldict, ensure_ascii=False))
         scriptText.append(")")
     return "".join(scriptText) ,menuList
 
@@ -1204,7 +1219,6 @@ def dataSetQuery(queryJson, sessionId):
     dataObj = {}
     if "data" in queryJson:
         if type(queryJson["data"]) == str:
-            print(queryJson["data"])
             dataObj = JSON_parse(queryJson["data"])
         else:
             dataObj = queryJson["data"]
@@ -1266,6 +1280,37 @@ def execBdQuery(datSetXmlObj, dbName, queryJson, sessionId):
     sqlText = datSetXmlObj.text
     return {}
 
+
+
+def getRemouteForm(path,request,sessionId):
+    queryJson = getAttrQuery(request)
+    extSub = path[path.rfind('.') + 1:].lower()
+    if not extSub == 'html' and not extSub == 'frm':
+        path = f"{path}"
+    urlParstmp = urllib.parse.urlsplit(path)
+    if urlParstmp.hostname in REMOTE_SESSION_DICT[sessionId]:
+        remote_session = REMOTE_SESSION_DICT[sessionId][urlParstmp.hostname]
+    else:
+        remote_session = reqExt.Session()
+        REMOTE_SESSION_DICT[sessionId][urlParstmp.hostname] = remote_session
+    remote_headers_query = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    url_tmp = f"{urlParstmp.scheme}://{urlParstmp.netloc}/{urlParstmp.path[1:]}"
+    queryJson["ServerPathQuery"] = [urlParstmp.scheme,urlParstmp.netloc,urlParstmp.path[1:]]
+    result_query = remote_session.post(url_tmp, headers=remote_headers_query, json=queryJson)
+    resultTxt = result_query.text
+    return resultTxt
+
+countQuery = 0
+def initSessionVar(session):
+    """
+        Инициализация сессионных словарей
+    """
+    if session.get("ID") == None:
+        global countQuery
+        countQuery += 1
+        session["ID"] = f'{str(uuid.uuid1()).replace("-", "")}{countQuery}{datetime.now().microsecond}'
+        SESSION_DICT[session["ID"]] = {}
+        REMOTE_SESSION_DICT[session["ID"]] = {}
 
 def existTempPage(name):
     """

@@ -466,9 +466,13 @@ function refreshDataSet(){
         }
      }
      let storeObj = ctrlObj['dataSetList'][datasetName];
+     let url = "dataset.php";
+     if ((typeof(_domParent['ServerPathQuery']) !== 'undefined') && (_domParent['ServerPathQuery'].length>1)) {
+         url = _domParent['ServerPathQuery'][0]+"://"+_domParent['ServerPathQuery'][1]+"/"+url;
+     }
      if (!isPostQuery) {
          startProgress();
-         loadScript("dataset.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
+         loadScript(url+"?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
             if (typeof(colbackFun) ==='function') {
                      let records = storeObj.getData().items;
                      stopProgress();
@@ -495,7 +499,6 @@ function refreshDataSet(){
         */
          // let ctrlObj = Ext.getCmp(_domParent['mainForm'])
          let ctrlObj = _domParent;
-         let url = "dataset.php";
          var request = new XMLHttpRequest(); // CreateRequest();
          //request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
          request.open('POST', url, true);  // `false` makes the request synchronous
@@ -638,19 +641,22 @@ function executeAction(){
             }
         }
      }
+     let url = "action.php";
+     if ((typeof(_domParent['ServerPathQuery']) !== 'undefined') && (_domParent['ServerPathQuery'].length>1)) {
+         url = _domParent['ServerPathQuery'][0]+"://"+_domParent['ServerPathQuery'][1]+"/"+url;
+     }
      if (!isPostQuery) {
          let colbackFunText = "";
          if (typeof(colbackFun) === 'function') {
              colbackFunText = "&colbackFun="+colbackFun.toString();
          }
-         loadScript("action.php?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+colbackFunText).then(function(script){
+         loadScript(url+"?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+colbackFunText).then(function(script){
          },function(error){
              console.log(error);
          });
      }else{
          // let ctrlObj = Ext.getCmp(_domParent['mainForm'])
          let ctrlObj = _domParent;
-         let url = "action.php";
          var request = new XMLHttpRequest(); // CreateRequest();
          //request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
          request.open('POST', url, true);  // `false` makes the request synchronous

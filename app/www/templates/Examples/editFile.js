@@ -47,12 +47,12 @@
     "dataSetVarList": {},
     "formName": "Examples/editFile.frm",
     "fullscreen": true,
-    "id": "win3c5d4784fde6c84998575da457b43a2d",
+    "id": "win8fdf01911af016d209964283cdd71669",
     "items": [
         {
             "height": "100%",
-            "id": "ctrl104b4e41d011d22e980a930260b3e5b1",
-            "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+            "id": "ctrle526c23c3fce70c8c52cacc1c099d08d",
+            "mainForm": "win8fdf01911af016d209964283cdd71669",
             "mainFormName": "Examples/editFile.frm",
             "name": "bodyText",
             "region": "center",
@@ -63,11 +63,11 @@
             "height": 25,
             "items": [
                 {
-                    "id": "ctrl7de0f6b88177d49eedbff9d77c3a6539",
+                    "id": "ctrl0ff70ebcb18a1dcddaf69d0b442bc196",
                     "listeners": {
                         "click": function(){ Examples_editFilefrm.clsForm() }
                     },
-                    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+                    "mainForm": "win8fdf01911af016d209964283cdd71669",
                     "mainFormName": "Examples/editFile.frm",
                     "name": "fileinfo",
                     "region": "west",
@@ -75,11 +75,11 @@
                     "xtype": "button"
                 },
                 {
-                    "id": "ctrl51753eec8558769181d7c6011d197934",
+                    "id": "ctrlf798f8f865eed38332f1b335d2e52ce8",
                     "listeners": {
                         "click": function(){ Examples_editFilefrm.SaveForm() }
                     },
-                    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+                    "mainForm": "win8fdf01911af016d209964283cdd71669",
                     "mainFormName": "Examples/editFile.frm",
                     "name": "fileinfo",
                     "region": "east",
@@ -87,11 +87,11 @@
                     "xtype": "button"
                 },
                 {
-                    "id": "ctrl90858ea0a0170a67e3aef25cd912eff4",
+                    "id": "ctrl6157907841eef2a73e6a3da4baf4dff1",
                     "listeners": {
                         "click": function(){ Examples_editFilefrm.SaveAndCloseForm() }
                     },
-                    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+                    "mainForm": "win8fdf01911af016d209964283cdd71669",
                     "mainFormName": "Examples/editFile.frm",
                     "name": "fileinfo",
                     "region": "east",
@@ -100,7 +100,7 @@
                 }
             ],
             "layout": "border",
-            "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+            "mainForm": "win8fdf01911af016d209964283cdd71669",
             "mainFormName": "Examples/editFile.frm",
             "region": "south",
             "xtype": "panel"
@@ -108,7 +108,7 @@
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win3c5d4784fde6c84998575da457b43a2d",
+    "mainForm": "win8fdf01911af016d209964283cdd71669",
     "mainFormName": "Examples/editFile.frm",
     "mainList": {},
     "modal": true,
@@ -148,15 +148,4 @@
        
     
                 
-    var css = ``,
-    head = document.head || document.getElementsByTagName('head')[0],
-    style = document.createElement('style');
-    head.appendChild(style);
-    style.type = 'text/css';
-    if (style.styleSheet) {
-      style.styleSheet.cssText = css;
-    } else {
-      style.appendChild(document.createTextNode(css));
-    }
-    
            });
