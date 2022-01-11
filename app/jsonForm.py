@@ -11,12 +11,6 @@ import ast
 import requests as reqExt
 import urllib.parse
 import uuid
-
-
-
-#from ast import parse as ParsePythonCode
-#from ast import Expression as ExpressionPythonCode
-
 import sys
 
 try:
@@ -41,7 +35,6 @@ global TMP_PAGE_CAHE
 TMP_PAGE_CAHE = {}
 
 # Шаблон JS файла для динамической загрузки ExtJS формы из JS функции  "openForm"
-
 TEMP_JS_FORM = """
            Ext.onReady(function() {
                 if (typeof(window.Win_mainfrm) === 'undefined') window.Win_mainfrm = "";
@@ -187,7 +180,7 @@ def getSrcSaveTemp(formName, data, session, isHtml=0):
 
 def getTemp(formName, data, session, isHtml=0):
     """
-    Функция получения кэшированной формы (в папке темп HTML)
+       Функция получения кэшированной формы (в папке темп HTML)
     """
     blockName = ""
     if ":" in formName:
@@ -231,7 +224,7 @@ def getTemp(formName, data, session, isHtml=0):
 
 def readFile(pathForm):
     """
-    Чтение исходного текстового файла, и добавление Элементов для дальнейшего преобразование в XML
+       Чтение исходного текстового файла, и добавление Элементов для дальнейшего преобразование в XML
     """
     if not path.exists(pathForm):
         return f'''<error> Form not found </error>'''
@@ -267,7 +260,7 @@ def readFile(pathForm):
 
 def joinDfrm(formName, rootForm):
     """
-    Обработать DFRM и FRM
+       Обработать DFRM и FRM
     """
     USER_FORM_PATH = path.join(path.dirname(__file__), USER_DIR)
     pathUserFormDir = f"{USER_FORM_PATH}{sep}{formName}.d"
@@ -351,7 +344,7 @@ def joinDfrm(formName, rootForm):
 
 def getXMLObject(formName):
     """
-    Получение XML объекта из прочитаного файла (или фрагмента XML)
+       Получение XML объекта из прочитаного файла (или фрагмента XML)
     """
     global TEMP_XML_PAGE
     if formName[0] == "/":
@@ -433,7 +426,7 @@ def jsonFunFromString(html="",frmObj=""):
 
 def getSrc(formName, data={}, session={}, isHtml=0):
     """
-     Функция получения JSON кода из FRM ("XML")
+       Функция получения JSON кода из FRM ("XML")
     """
     ext = formName[formName.rfind('.') + 1:].lower()
     frmObj = formName.replace("/","_").replace(".","")
@@ -496,8 +489,8 @@ def getSrc(formName, data={}, session={}, isHtml=0):
 
 def parseXMLScript(scriptXml, formName, data, session):
     """
-      Распарсить лист XML  объектов cmpScript 
-    """""
+       Распарсить лист XML  объектов cmpScript
+    """
     scriptText = []
     for elem in scriptXml:
         xmldict = dict(elem.attrib.copy())
@@ -507,8 +500,8 @@ def parseXMLScript(scriptXml, formName, data, session):
 
 def parseXMLStyle(scriptXml, formName, data, session):
     """
-      Распарсить лист XML объектов Style 
-    """""
+       Распарсить лист XML объектов Style
+    """
     scriptText = []
     for elem in scriptXml:
         xmldict = dict(elem.attrib.copy())
@@ -532,6 +525,9 @@ def parseXMLStyle(scriptXml, formName, data, session):
 
 
 def mainToTree(root):
+    """
+       Функция геренации EXTJS компонента Grid
+    """
     res=[]
     for el in root:
        obj =  dict(el.attrib.copy())
@@ -550,6 +546,8 @@ def mainToTree(root):
 
 def parseXMLmain(mainXml, rootForm, data, session):
     """
+        Создаем контекстное меню в видестороннего JS объекта
+
              Ext.create('Ext.menu.Menu', {
                 items : [{
                     iconCls : 'star',
@@ -582,7 +580,7 @@ def parseXMLmain(mainXml, rootForm, data, session):
 
 def parseXMLActionOld(datasetXml, jsonFrm, data, session):
     """
-      Распарсить лист XML  объектов cmpAction
+       Распарсить лист XML  объектов cmpAction
     """
     actionList= {}
     scriptText = []
@@ -632,7 +630,7 @@ def parseXMLActionOld(datasetXml, jsonFrm, data, session):
     return " ".join(scriptText),actionList
 def parseXMLAction(rootForm,datasetXml, jsonFrm, data, session):
     """
-      Распарсить лист XML  объектов cmpAction
+       Распарсить лист XML  объектов cmpAction
     """
     actionList= {}
     for elem in datasetXml:
@@ -662,7 +660,7 @@ def parseXMLAction(rootForm,datasetXml, jsonFrm, data, session):
 
 def parseXMLDataset(datasetXml, jsonFrm, data, session):
     """
-      Распарсить лист XML  объектов cmpAction
+       Распарсить лист XML  объектов cmpAction
     """
     dataSetList= {}
     scriptText = []
@@ -736,6 +734,9 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
     return " ".join(scriptText),dataSetList,dataSetVarList
 
 def parseGridElement(rootForm,xmldict,formName, data, session, root, info):
+    """
+       Функция геренации EXTJS компонента Grid
+    """
     if "caption" in xmldict and not "title" in xmldict:
         xmldict['title'] = xmldict['caption']
         del xmldict['caption']
@@ -806,6 +807,9 @@ def parseGridElement(rootForm,xmldict,formName, data, session, root, info):
     return xmldict
 
 def rootToTree(root,tagName='children'):
+    """
+       Функция геренации дерева (проход рекурсионно)
+    """
     res=[]
     for el in root:
        obj =  dict(el.attrib.copy())
@@ -823,6 +827,9 @@ def rootToTree(root,tagName='children'):
     return res
 
 def parsePopupMenuElement(rootForm,xmldict,formName, data, session, root, info):
+    """
+       Функция геренации EXTJS компонента Контекстного меню (объект отрисовывается в отдельной переменной)
+    """
     #obj = dict(root.attrib.copy())
     #obj["items"]=[]
     #for el in root:
@@ -832,6 +839,9 @@ def parsePopupMenuElement(rootForm,xmldict,formName, data, session, root, info):
     return None
 
 def parseTreepanelElement(rootForm,xmldict,formName, data, session, root, info):
+    """
+       Функция геренации EXTJS компонента TreePanel
+    """
     if "caption" in xmldict and not "title" in xmldict:
         xmldict['title'] = xmldict['caption']
         del xmldict['caption']
@@ -910,6 +920,9 @@ def parseTreepanelElement(rootForm,xmldict,formName, data, session, root, info):
 
 
 def parseComboBoxElement(rootForm,xmldict,formName, data, session, root, info):
+    """
+       Функция геренации EXTJS компонента ComboBox
+    """
     storeObj = {}
     if "caption" in xmldict and not "fieldLabel" in xmldict:
         xmldict['fieldLabel'] = xmldict['caption']
@@ -949,6 +962,10 @@ def parseComboBoxElement(rootForm,xmldict,formName, data, session, root, info):
     return xmldict
 
 def initListenerEvent(tagName, eventName, funBody):
+    """
+       Функция добавления в аргумент события за ранее определенный состав переменных ( необходимо дописать выбор из словаря)
+       Сейчас функция не работает и аргументы берутся из переменной arguments (задел на будущее)
+    """
     return f"(--##--)function(){{ {funBody} }}(--##--)"
     """
     if tagName == 'combobox':
@@ -970,7 +987,7 @@ itemsBlock = ['div','item']
 htmlBlock = ['iframe']
 def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"numEl":0}):
     """
-     Конвертировать XML объект формы в ExtJS объект
+       Конвертировать XML объект формы в ExtJS объект
     """
     compName = ""
     if 'cmptype' in root.keys():
@@ -1121,9 +1138,9 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
 
 def stripCode(srcCode=""):
     """
-    Функция очистки пробелов до первого символа (на  пробела), и выравневания остальных строк по этот символ
-    :param srcCode:
-    :return:
+       Функция очистки пробелов до первого символа (на  пробела), и выравневания остальных строк по этот символ
+       :param srcCode:
+       :return:
     """
     codeLines = srcCode.split("\n")
     countlines = 0
@@ -1143,10 +1160,10 @@ def stripCode(srcCode=""):
 
 def exec_then_eval(DB_DICT,vars, code, sessionId):
     """
-    Запуск многострочного текста кода  с кэшированием
-    :param vars:  переменные для входных рагументов скрипта (инициализация) {"var1":111,"var2":333}
-    :param code: текст программы Python для выполнения
-    :return:
+       Запуск многострочного текста кода  с кэшированием
+       :param vars:  переменные для входных рагументов скрипта (инициализация) {"var1":111,"var2":333}
+       :param code: текст программы Python для выполнения
+       :return:
     """
     block = ast.parse(code, mode='exec')
     last = ast.Expression(block.body.pop().value)
@@ -1165,6 +1182,9 @@ def exec_then_eval(DB_DICT,vars, code, sessionId):
 
 
 def getDataSetQuery(request,queryJson, sessionId):
+    """
+       Функция генерации DataSet данных JS или JSON
+    """
     frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
     datasetName = queryJson["dataset"]
     bin = dataSetQuery(queryJson, sessionId)
@@ -1175,6 +1195,9 @@ def getDataSetQuery(request,queryJson, sessionId):
     return txt
 
 def getActionQuery(request,queryJson, sessionId):
+    """
+       Функция выполения Action блока на форме
+    """
     frmObj = queryJson["Form"].replace("/", "_").replace(".", "")
     datasetName = queryJson["dataset"]
     colbackFun = ""
@@ -1210,6 +1233,9 @@ def getActionQuery(request,queryJson, sessionId):
 
 LIST_OUTPUT_TYPE = ["<class 'str'>", "<class 'int'>", "<class 'list'>","<class 'dict'>"]
 def dataSetQuery(queryJson, sessionId):
+    """
+       Функция выполения DataSet блока на форме
+    """
     if not 'Form' in queryJson:
         return '{"error":"Не определена форма на которой расположен запрос"}'
     formName = queryJson['Form']
@@ -1273,7 +1299,9 @@ def dataSetQuery(queryJson, sessionId):
     return JSON_stringify(resObject, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
 
 def execBdQuery(datSetXmlObj, dbName, queryJson, sessionId):
-    # функция выполенние SQL запроса в Базе данных
+    """
+       функция выполенние SQL запроса в Базе данных
+    """
     _DB_DICT = SESSION_DICT[sessionId].get("DB_DICT")
     if not dbName in _DB_DICT:
         return {"error": f"Подключение к  базе данных отсутствует в списке"}
@@ -1283,6 +1311,9 @@ def execBdQuery(datSetXmlObj, dbName, queryJson, sessionId):
 
 
 def getRemouteForm(path,request,sessionId):
+    """
+       Функция получения контента  из внешнего источника
+    """
     queryJson = getAttrQuery(request)
     extSub = path[path.rfind('.') + 1:].lower()
     if not extSub == 'html' and not extSub == 'frm':
@@ -1304,7 +1335,7 @@ def getRemouteForm(path,request,sessionId):
 countQuery = 0
 def initSessionVar(session):
     """
-        Инициализация сессионных словарей
+       Инициализация сессионных словарей
     """
     if session.get("ID") == None:
         global countQuery
@@ -1315,7 +1346,7 @@ def initSessionVar(session):
 
 def existTempPage(name):
     """
-    Проверка наличия  сохраненой копии преобразованной страницы
+       Проверка наличия  сохраненой копии преобразованной страницы
     """
     global TMP_PAGE_CAHE
     if TMP_PAGE_CAHE == None:
@@ -1327,9 +1358,9 @@ def existTempPage(name):
 
 def getTempPage(name, defoultValue=''):
     """
-    Получить текст страницы, к которой уже обращались ранее после перезагрузки
-    необходимо для ускорения работы, страница персится один раз, и сохраняется ,
-    При повтороном обращении  вытаскивается сохраненая копия
+       Получить текст страницы, к которой уже обращались ранее после перезагрузки
+       необходимо для ускорения работы, страница персится один раз, и сохраняется ,
+       При повтороном обращении  вытаскивается сохраненая копия
     """
     global TMP_PAGE_CAHE
     if TMP_PAGE_CAHE.get(name) == None:
@@ -1340,7 +1371,7 @@ def getTempPage(name, defoultValue=''):
 
 def setTempPage(name, html='', mime='application/plain'):
     """
-    Сохранение  преобразованной страницы во временное хронилище (Словарь)
+       Сохранение  преобразованной страницы во временное хронилище (Словарь)
     """
     global TMP_PAGE_CAHE
     if TMP_PAGE_CAHE == None:
@@ -1350,9 +1381,9 @@ def setTempPage(name, html='', mime='application/plain'):
 
 def getAttrQuery(request):
     """
-    Преобразовать  входящие агрументы в словарь
-    :param request:
-    :return:
+       Преобразовать  входящие агрументы в словарь
+       :param request:
+       :return:
     """
     if request.method == 'POST':
         data = JSON_parse(request.data)
@@ -1364,7 +1395,7 @@ def getAttrQuery(request):
 
 def sendCostumBin(pathFile):
     """
-    Получить содержимое файлв с MIME типом
+       Получить содержимое файлв с MIME типом
     """
     txt = ""
     mime = mimeType(pathFile)
@@ -1383,7 +1414,7 @@ def sendCostumBin(pathFile):
 
 def mimeType(pathFile):
     """
-    Получение типа HTML контента, по  расширению  запрациваемой страницы
+       Получение типа HTML контента, по  расширению  запрациваемой страницы
     """
     extList = {"py": "text/html", "psp": "text/html", "css": "text/css", "js": "application/x-javascript",
                "xml": "text/xml", "dtd": "text/xml", "txt": "text/plain", "inf": "text/plain",
@@ -1428,71 +1459,3 @@ def mimeType(pathFile):
         return extList[ext]
     else:
         return "text/plain"
-
-
-
-
-
-class XmlListConfig(list):
-    def __init__(self, aList):
-        for element in aList:
-            if element:
-                # treat like dict
-                if len(element) == 1 or element[0].tag != element[1].tag:
-                    self.append(XmlDictConfig(element))
-                # treat like list
-                elif element[0].tag == element[1].tag:
-                    self.append(XmlListConfig(element))
-            elif element.text:
-                text = element.text.strip()
-                if text:
-                    self.append(text)
-
-
-class XmlDictConfig(dict):
-    '''
-    Example usage:
-
-    >>> tree = ET.parse('your_file.xml')
-    >>> root = tree.getroot()
-    >>> xmldict = XmlDictConfig(root)
-
-    Or, if you want to use an XML string:
-
-    >>> root = ET.XML(xml_string)
-    >>> xmldict = XmlDictConfig(root)
-
-    And then use xmldict for what it is... a dict.
-    '''
-
-    def __init__(self, parent_element):
-        if parent_element.items():
-            self.update(dict(parent_element.items()))
-        for element in parent_element:
-            if element:
-                # treat like dict - we assume that if the first two tags
-                # in a series are different, then they are all different.
-                if len(element) == 1 or element[0].tag != element[1].tag:
-                    aDict = XmlDictConfig(element)
-                # treat like list - we assume that if the first two tags
-                # in a series are the same, then the rest are the same.
-                else:
-                    # here, we put the list in dictionary; the key is the
-                    # tag name the list elements all share in common, and
-                    # the value is the list itself
-                    aDict = {element[0].tag: XmlListConfig(element)}
-                # if the tag has attributes, add those to the dict
-                if element.items():
-                    aDict.update(dict(element.items()))
-                self.update({element.tag: aDict})
-            # this assumes that if you've got an attribute in a tag,
-            # you won't be having any text. This may or may not be a
-            # good idea -- time will tell. It works for the way we are
-            # currently doing XML configuration files...
-            elif element.items():
-                self.update({element.tag: dict(element.items())})
-            # finally, if there are no child tags and no attributes, extract
-            # the text
-            else:
-                self.update({element.tag: element.text})
-
