@@ -6,7 +6,7 @@
     "listeners": {
         "beforeload": function(store, operation, options){  this.getProxy().setExtraParam('searchItemLeft',getValue(window.Win_Examples_file_managerfrm,'searchItemLeft','')); this.getProxy().setExtraParam('selectFileLeft',getVar(window.Win_Examples_file_managerfrm,'selectFileLeft','')); } 
     },
-    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
     "mainFormName": "Examples/file_manager.frm",
     "proxy": {
         "reader": {
@@ -22,7 +22,7 @@
     "listeners": {
         "beforeload": function(store, operation, options){  this.getProxy().setExtraParam('searchItem',getValue(window.Win_Examples_file_managerfrm,'searchItem','')); this.getProxy().setExtraParam('selectFile',getVar(window.Win_Examples_file_managerfrm,'selectFile','')); } 
     },
-    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
     "mainFormName": "Examples/file_manager.frm",
     "proxy": {
         "reader": {
@@ -100,10 +100,10 @@
     },
     "formName": "Examples/file_manager.frm",
     "fullscreen": true,
-    "id": "winb640bb41461342e7bc18ab7462244d2c",
+    "id": "wine0bec75ee45b2df7e8b1076004c0869b",
     "items": [
         {
-            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
             "mainFormName": "Examples/file_manager.frm"
         },
         {
@@ -114,11 +114,11 @@
                     "items": [
                         {
                             "height": 25,
-                            "id": "ctrl239822407ec9afc0c56cfabe227332bb",
+                            "id": "ctrle3f865b46de4940744182b2722eb5fce",
                             "listeners": {
                                 "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItemLeft(arguments); }
                             },
-                            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "searchItemLeft",
                             "value": "",
@@ -126,15 +126,15 @@
                             "xtype": "textfield"
                         },
                         {
-                            "id": "ctrl6c51d8f71a03f1c5a5da243d64b002d8",
-                            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                            "id": "ctrl4477acc3d265bb34e52c8393f60420ed",
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "absPathLeft",
                             "text": "_",
                             "xtype": "label"
                         }
                     ],
-                    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                     "mainFormName": "Examples/file_manager.frm",
                     "region": "north",
                     "title": "Search",
@@ -143,13 +143,13 @@
                 {
                     "dataset": "DS_TREE_LEFT",
                     "height": "80%",
-                    "id": "ctrl88e620db6c93bf0b6c9c8883b6466b2a",
+                    "id": "ctrl354e1b36164ac0505c8fb9fb400c1a9c",
                     "listeners": {
                         "itemclick": function(){  Examples_file_managerfrm.getAbsPathLeft(arguments); },
                         "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent(); Examples_file_managerfrm.onPOP(arguments); showPopupMenu(window.Win_Examples_file_managerfrm,'popUpFile',arr[4].getX(),arr[4].getY()); return false; },
                         "itemdblclick": function(){  Examples_file_managerfrm.getPropertyListLeft(arguments); }
                     },
-                    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "fileTreeLeft",
                     "region": "center",
@@ -159,7 +159,7 @@
                 }
             ],
             "layout": "border",
-            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
             "mainFormName": "Examples/file_manager.frm",
             "minSize": 100,
             "region": "west",
@@ -170,17 +170,17 @@
         {
             "autoScroll": true,
             "height": "40%",
-            "id": "ctrlf00d443060b7c7e6529e4c21b582c9fd",
+            "id": "ctrlce332b4f3aa1fe7c87b2522246a6792b",
             "items": [
                 {
                     "items": [
                         {
                             "height": 25,
-                            "id": "ctrlb8ad74256824c8f100919c8c0d99d989",
+                            "id": "ctrl5b23fb643ba279735779fadcb60e9116",
                             "listeners": {
                                 "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItem(arguments); }
                             },
-                            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "searchItem",
                             "value": "",
@@ -188,15 +188,15 @@
                             "xtype": "textfield"
                         },
                         {
-                            "id": "ctrlae27c453560efc67791c5105b0f4a7e8",
-                            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                            "id": "ctrld1c7e628bd353d66bfc7e0fa482301b4",
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "absPath",
                             "text": "_",
                             "xtype": "label"
                         }
                     ],
-                    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                     "mainFormName": "Examples/file_manager.frm",
                     "region": "north",
                     "title": "Search",
@@ -205,13 +205,13 @@
                 {
                     "dataset": "DS_TREE",
                     "height": "80%",
-                    "id": "ctrl851bf1bdc0610975de61a6bdaff55cf4",
+                    "id": "ctrl23255cce1c1ba91fdc98221006e22cef",
                     "listeners": {
                         "itemclick": function(){  Examples_file_managerfrm.getAbsPath(arguments); },
                         "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent(); Examples_file_managerfrm.onPOP(arguments); showPopupMenu(window.Win_Examples_file_managerfrm,'popUpFile',arr[4].getX(),arr[4].getY()); return false; },
                         "itemdblclick": function(){  Examples_file_managerfrm.getPropertyList(arguments); }
                     },
-                    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "domTree",
                     "region": "center",
@@ -221,7 +221,7 @@
                 }
             ],
             "layout": "border",
-            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
             "mainFormName": "Examples/file_manager.frm",
             "minSize": 100,
             "name": "demoBody",
@@ -235,8 +235,8 @@
             "height": "10%",
             "items": [
                 {
-                    "id": "ctrl38bc32c7ba629f35d140aef39ee0f452",
-                    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+                    "id": "ctrl7695637bdd167c52f6b0f5ec4bcf8acb",
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "fileinfo",
                     "region": "south",
@@ -244,7 +244,7 @@
                     "xtype": "label"
                 }
             ],
-            "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
             "mainFormName": "Examples/file_manager.frm",
             "region": "south",
             "split": true,
@@ -254,7 +254,7 @@
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "winb640bb41461342e7bc18ab7462244d2c",
+    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
     "mainFormName": "Examples/file_manager.frm",
     "mainList": {
         "popUpFile": MENU_Examples_file_managerfrm_popUpFile

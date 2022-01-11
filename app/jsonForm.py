@@ -1293,11 +1293,12 @@ def getRemouteForm(path,request,sessionId):
     else:
         remote_session = reqExt.Session()
         REMOTE_SESSION_DICT[sessionId][urlParstmp.hostname] = remote_session
-    remote_headers_query = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    remote_headers_query = {'Content-type': 'application/json; charset=utf-8', 'Accept': 'text/plain'}
     url_tmp = f"{urlParstmp.scheme}://{urlParstmp.netloc}/{urlParstmp.path[1:]}"
     queryJson["ServerPathQuery"] = [urlParstmp.scheme,urlParstmp.netloc,urlParstmp.path[1:]]
     result_query = remote_session.post(url_tmp, headers=remote_headers_query, json=queryJson)
-    resultTxt = result_query.text
+    result_query.encoding = 'utf-8'
+    resultTxt = result_query.text.encode('utf-8')
     return resultTxt
 
 countQuery = 0

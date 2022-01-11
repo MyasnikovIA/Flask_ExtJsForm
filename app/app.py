@@ -88,9 +88,6 @@ def all_files(path):
         return bin, 200, {'content-type': mime}
 
 
-    ServerPathQuery = [path]
-    if 'ServerPathQuery' in queryJson:
-        ServerPathQuery = queryJson['ServerPathQuery']
 
     format = 1
     if "type" in queryJson and queryJson['type'] == "js":
@@ -98,6 +95,10 @@ def all_files(path):
     # Поиск запроса в каталоге Forms и templates
     isExist, pathHtmlFromForm = jsonForm.existContentExtJs(path, format)
     if isExist:
+        ServerPathQuery = [path]
+        if 'ServerPathQuery' in queryJson:
+            ServerPathQuery = queryJson['ServerPathQuery']
+            del queryJson['ServerPathQuery']
         if 'data' in queryJson:
             queryJson = json.loads(queryJson['data'])
         queryJson['ServerPathQuery'] = ServerPathQuery
