@@ -18,6 +18,24 @@
     <script type="text/javascript">
         // https://metanit.com/web/extjs/6.7.php
 Ext.onReady(function() {
+
+Ext.define('Student',
+{
+    name : 'unnamed',
+    getName : function(){
+        return "Student name is" + this.name;
+    }
+}, function(){
+    alert('Student object created');
+});
+
+var myComputer = Ext.create('Student', {
+     hardware:'MacBook Pro',
+     os:'Mac OS X',
+     price:1800
+});
+
+/*
     new Ext.panel.Panel({
         renderTo: document.body,
         title: 'A Panel',
@@ -41,7 +59,7 @@ Ext.onReady(function() {
             }
         }]
     });
-
+*/
 });
     </script>
 </head>

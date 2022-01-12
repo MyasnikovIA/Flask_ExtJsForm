@@ -1,4 +1,6 @@
- Ext.define('MyWidget', {
+// https://studentaid.psu.edu/real-scripts/ajax/ext/source/widgets/
+
+Ext.define('MyWidget', {
      extend: 'Ext.Widget',
 
      // The element template passed to Ext.Element.create()

@@ -23,46 +23,18 @@
     "dataSetList": {},
     "dataSetVarList": {},
     "formName": "main.frm",
-    "id": "win55fac4cc48ed8f7256a812a711f77921",
+    "id": "wine74f8a7dc8c5aab3b56ceeaffd7f615f",
     "items": [
         {
-            "items": [
-                {
-                    "listeners": {
-                        "click": function(){ mainfrm.onClickBtnGet5001(arguments) }
-                    },
-                    "mainForm": "win55fac4cc48ed8f7256a812a711f77921",
-                    "mainFormName": "main.frm",
-                    "text": "Send 5001",
-                    "xtype": "button"
-                },
-                {
-                    "listeners": {
-                        "click": function(){ mainfrm.onClickBtnGet9091(arguments) }
-                    },
-                    "mainForm": "win55fac4cc48ed8f7256a812a711f77921",
-                    "mainFormName": "main.frm",
-                    "text": "Send 9091",
-                    "xtype": "button"
-                },
-                {
-                    "listeners": {
-                        "click": function(){ mainfrm.onClickBtnGet90912(arguments) }
-                    },
-                    "mainForm": "win55fac4cc48ed8f7256a812a711f77921",
-                    "mainFormName": "main.frm",
-                    "text": "Send onClickBtnGet90912",
-                    "xtype": "button"
-                }
-            ],
-            "mainForm": "win55fac4cc48ed8f7256a812a711f77921",
+            "mainForm": "wine74f8a7dc8c5aab3b56ceeaffd7f615f",
             "mainFormName": "main.frm",
-            "region": "center"
+            "text": 11111,
+            "xtype": "button1"
         }
     ],
     "layout": "border",
     "listeners": {},
-    "mainForm": "win55fac4cc48ed8f7256a812a711f77921",
+    "mainForm": "wine74f8a7dc8c5aab3b56ceeaffd7f615f",
     "mainFormName": "main.frm",
     "mainList": {},
     "parentEvent": {},
@@ -84,18 +56,7 @@
                 window.Win_mainfrm;
                 
        
-           mainfrm.onClickBtnGet5001 = function(arguments) {
-              let arr = [].slice.call(arguments);
-              openForm(window.Win_mainfrm,"http://192.168.15.200:5001/main.frm",true)
-           }
-           mainfrm.onClickBtnGet9091 = function(arguments) {
-              let arr = [].slice.call(arguments);
-              openForm(window.Win_mainfrm,"http://192.168.15.200:5001/main.frm",true)
-           }
-           mainfrm.onClickBtnGet90912 = function(arguments) {
-              let arr = [].slice.call(arguments);
-              openForm(window.Win_mainfrm,"http://192.168.15.200:9091/Examples/file_manager.frm")
-           }
+
        
     
                 

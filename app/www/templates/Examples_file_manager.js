@@ -6,7 +6,11 @@
     "listeners": {
         "beforeload": function(store, operation, options){  this.getProxy().setExtraParam('searchItemLeft',getValue(window.Win_Examples_file_managerfrm,'searchItemLeft','')); this.getProxy().setExtraParam('selectFileLeft',getVar(window.Win_Examples_file_managerfrm,'selectFileLeft','')); } 
     },
+<<<<<<< HEAD
     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
     "mainFormName": "Examples/file_manager.frm",
     "proxy": {
         "reader": {
@@ -22,7 +26,11 @@
     "listeners": {
         "beforeload": function(store, operation, options){  this.getProxy().setExtraParam('searchItem',getValue(window.Win_Examples_file_managerfrm,'searchItem','')); this.getProxy().setExtraParam('selectFile',getVar(window.Win_Examples_file_managerfrm,'selectFile','')); } 
     },
+<<<<<<< HEAD
     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
     "mainFormName": "Examples/file_manager.frm",
     "proxy": {
         "reader": {
@@ -100,10 +108,17 @@
     },
     "formName": "Examples/file_manager.frm",
     "fullscreen": true,
+<<<<<<< HEAD
     "id": "wina002e01d077d785d6b18af3f293009e1",
     "items": [
         {
             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+    "id": "wine0bec75ee45b2df7e8b1076004c0869b",
+    "items": [
+        {
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
             "mainFormName": "Examples/file_manager.frm"
         },
         {
@@ -114,11 +129,19 @@
                     "items": [
                         {
                             "height": 25,
+<<<<<<< HEAD
                             "id": "ctrl44e4e7f7338c714b2d864091f84e3fb9",
                             "listeners": {
                                 "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItemLeft(arguments); }
                             },
                             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                            "id": "ctrle3f865b46de4940744182b2722eb5fce",
+                            "listeners": {
+                                "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItemLeft(arguments); }
+                            },
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "searchItemLeft",
                             "value": "",
@@ -126,15 +149,24 @@
                             "xtype": "textfield"
                         },
                         {
+<<<<<<< HEAD
                             "id": "ctrlce450bed4efd61ba9519fa4964245a5e",
                             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                            "id": "ctrl4477acc3d265bb34e52c8393f60420ed",
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "absPathLeft",
                             "text": "_",
                             "xtype": "label"
                         }
                     ],
+<<<<<<< HEAD
                     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                     "mainFormName": "Examples/file_manager.frm",
                     "region": "north",
                     "title": "Search",
@@ -143,13 +175,21 @@
                 {
                     "dataset": "DS_TREE_LEFT",
                     "height": "80%",
+<<<<<<< HEAD
                     "id": "ctrl26f9c4a5f169b90dba11813a1014a25e",
+=======
+                    "id": "ctrl354e1b36164ac0505c8fb9fb400c1a9c",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                     "listeners": {
                         "itemclick": function(){  Examples_file_managerfrm.getAbsPathLeft(arguments); },
                         "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent(); Examples_file_managerfrm.onPOP(arguments); showPopupMenu(window.Win_Examples_file_managerfrm,'popUpFile',arr[4].getX(),arr[4].getY()); return false; },
                         "itemdblclick": function(){  Examples_file_managerfrm.getPropertyListLeft(arguments); }
                     },
+<<<<<<< HEAD
                     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "fileTreeLeft",
                     "region": "center",
@@ -159,7 +199,11 @@
                 }
             ],
             "layout": "border",
+<<<<<<< HEAD
             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
             "mainFormName": "Examples/file_manager.frm",
             "minSize": 100,
             "region": "west",
@@ -170,17 +214,29 @@
         {
             "autoScroll": true,
             "height": "40%",
+<<<<<<< HEAD
             "id": "ctrl2513940896e3a558c480543e9a4c59ea",
+=======
+            "id": "ctrlce332b4f3aa1fe7c87b2522246a6792b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
             "items": [
                 {
                     "items": [
                         {
                             "height": 25,
+<<<<<<< HEAD
                             "id": "ctrl8f361f31329f3ab09b1cff9f995b10e3",
                             "listeners": {
                                 "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItem(arguments); }
                             },
                             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                            "id": "ctrl5b23fb643ba279735779fadcb60e9116",
+                            "listeners": {
+                                "specialkey": function(){ Examples_file_managerfrm.onSearchTreeItem(arguments); }
+                            },
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "searchItem",
                             "value": "",
@@ -188,15 +244,24 @@
                             "xtype": "textfield"
                         },
                         {
+<<<<<<< HEAD
                             "id": "ctrle7f72b7a10357bf3373f33915a5ed3f4",
                             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                            "id": "ctrld1c7e628bd353d66bfc7e0fa482301b4",
+                            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                             "mainFormName": "Examples/file_manager.frm",
                             "name": "absPath",
                             "text": "_",
                             "xtype": "label"
                         }
                     ],
+<<<<<<< HEAD
                     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                     "mainFormName": "Examples/file_manager.frm",
                     "region": "north",
                     "title": "Search",
@@ -205,13 +270,21 @@
                 {
                     "dataset": "DS_TREE",
                     "height": "80%",
+<<<<<<< HEAD
                     "id": "ctrl1e8c42ab0454435b03588bb3746c2f06",
+=======
+                    "id": "ctrl23255cce1c1ba91fdc98221006e22cef",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                     "listeners": {
                         "itemclick": function(){  Examples_file_managerfrm.getAbsPath(arguments); },
                         "itemcontextmenu": function(){ let arr = [].slice.call(arguments); arr[4].stopEvent(); Examples_file_managerfrm.onPOP(arguments); showPopupMenu(window.Win_Examples_file_managerfrm,'popUpFile',arr[4].getX(),arr[4].getY()); return false; },
                         "itemdblclick": function(){  Examples_file_managerfrm.getPropertyList(arguments); }
                     },
+<<<<<<< HEAD
                     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "domTree",
                     "region": "center",
@@ -221,7 +294,11 @@
                 }
             ],
             "layout": "border",
+<<<<<<< HEAD
             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
             "mainFormName": "Examples/file_manager.frm",
             "minSize": 100,
             "name": "demoBody",
@@ -235,8 +312,13 @@
             "height": "10%",
             "items": [
                 {
+<<<<<<< HEAD
                     "id": "ctrl85eda0bfacceaf73c994afc7af078b6c",
                     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+                    "id": "ctrl7695637bdd167c52f6b0f5ec4bcf8acb",
+                    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
                     "mainFormName": "Examples/file_manager.frm",
                     "name": "fileinfo",
                     "region": "south",
@@ -244,7 +326,11 @@
                     "xtype": "label"
                 }
             ],
+<<<<<<< HEAD
             "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+            "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
             "mainFormName": "Examples/file_manager.frm",
             "region": "south",
             "split": true,
@@ -254,7 +340,11 @@
     ],
     "layout": "border",
     "listeners": {},
+<<<<<<< HEAD
     "mainForm": "wina002e01d077d785d6b18af3f293009e1",
+=======
+    "mainForm": "wine0bec75ee45b2df7e8b1076004c0869b",
+>>>>>>> a6e3421... Добавил кодирование UTF-8 при получении контента с другого стенда
     "mainFormName": "Examples/file_manager.frm",
     "mainList": {
         "popUpFile": MENU_Examples_file_managerfrm_popUpFile
