@@ -6,6 +6,7 @@
        ]]>
     </cmpScript>
 
-    <cmpButton1 text="11111" />
+    <cmpOsm html="11111" />
+    <!--cmpEditor1 html="11111" /-->
 
 </div>
