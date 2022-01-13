@@ -1,3 +1,6 @@
+# https://metanit.com/web/extjs/15.7.php
+# http://extjs-sencha.blogspot.com/2012/08/extjs-layout.html
+
 from pathlib import Path
 from json import loads as JSON_parse
 from json import dumps as JSON_stringify
