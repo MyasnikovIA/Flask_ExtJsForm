@@ -1,7 +1,7 @@
 Ext.define('Student', {
     name : 'unnamed',
     extend: 'Ext.panel.Panel',
-    alias: 'widget.pressmebutton',
+    alias: 'widget.student',
     text: 'Press Me',
     xtype: 'student',
     getName : function(){
@@ -10,13 +10,23 @@ Ext.define('Student', {
     config: {
         // ...
     },
-    constructor: function(config) {
-        this.initConfig(config);
-        return this;
+    constructor : function(studentName){
+        if(studentName)
+            this.name = studentName;
     },
+    // constructor: function(config) {
+    //     this.initConfig(config);
+    //     return this;
+    // },
     initComponent:  function() {
 
-    }
+    },
+    init:function() { },
 }, function(){
-    alert('Student object created');
+    console.log('Student object created');
+});
+
+
+Ext.create('widget.student', {
+    /* ... */
 });

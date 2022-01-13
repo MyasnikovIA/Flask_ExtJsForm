@@ -6,7 +6,7 @@
        ]]>
     </cmpScript>
 
-    <cmpOsm html="11111" />
+    <cmpMyWidget html="11111" />
     <!--cmpEditor1 html="11111" /-->
 
 </div>

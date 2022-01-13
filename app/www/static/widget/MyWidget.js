@@ -1,9 +1,38 @@
 // https://studentaid.psu.edu/real-scripts/ajax/ext/source/widgets/
 
+/*
+
+Ext.mywidget = function(field, config){
+    if(field.field){
+        this.field = Ext.create(field.field, 'textfield');
+        config = Ext.apply({}, field); // copy so we don't disturb original config
+        delete config.field;
+    }else{
+        this.field = field;
+    }
+    Ext.MyWidget.superclass.constructor.call(this, config);
+};
+
+// Ext.reg('mywidget', Ext.MyWidget);
+*/
+
+Ext.mywidget = function(field, config){
+    if(field.field){
+        this.field = Ext.create(field.field, 'textfield');
+        config = Ext.apply({}, field); // copy so we don't disturb original config
+        delete config.field;
+    }else{
+        this.field = field;
+    }
+    Ext.MyWidget.superclass.constructor.call(this, config);
+};
+
+
 Ext.define('MyWidget', {
      extend: 'Ext.Widget',
-
-     // The element template passed to Ext.Element.create()
+     xtype:'panel',
+     xclass:Ext.mywidget,
+     alias:'widget.mywidget', // DO USE this
      element: {
          reference: 'element',
          listeners: {
@@ -17,26 +46,20 @@ Ext.define('MyWidget', {
          }]
      },
 
-     constructor: function(config) {
-         // It is important to remember to call the Widget superclass constructor
-         // when overriding the constructor in a derived class. This ensures that
-         // the element is initialized from the template, and that initConfig() is
-         // is called.
-         this.callParent([config]);
+     create : function(config, defaultType){
+         return new types[config.xtype || defaultType](config);
+     },
 
-         // After calling the superclass constructor, the Element is available and
-         // can safely be manipulated. Reference Elements are instances of
-         // Ext.Element, and are cached on each Widget instance by reference name.
+     constructor: function(config) {
+         this.callParent([config]);
          Ext.getBody().appendChild(this.element);
      },
 
      onClick: function() {
-         // listeners use this Widget instance as their scope
          console.log('element clicked', this);
      },
 
      onInnerClick: function() {
-         // access the innerElement reference by name
          console.log('inner element clicked', this.innerElement);
      }
  });

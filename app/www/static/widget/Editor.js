@@ -394,4 +394,4 @@ Ext.extend(Ext.Editor, Ext.Component, {
         delete this.boundEl;
     }
 });
-Ext.reg('editor', Ext.Editor);
+Ext.reg('editor1', Ext.Editor);
