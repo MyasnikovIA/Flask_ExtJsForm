@@ -24,6 +24,11 @@ app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.permanent_session_lifetime = datetime.timedelta(days=10)  # период хронений сессии составляет 10 дней
 
+if not os.path.exists(app.static_folder.replace('/', os.sep)):
+    os.makedirs(app.static_folder.replace('/', os.sep)) # принудительно создаем
+
+
+
 
 @app.before_request
 def before_request():
