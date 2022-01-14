@@ -1,0 +1,332 @@
+<!doctype html>
+<html>
+<head>
+    <title>angular test</title>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.js"></script>
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+
+    <script>
+        var path = {
+            "status": 200,
+            "hint_data": {
+                "locations": ["QafpBESn6QQAAAAASwAAAIAAAAAaAAAAAAAAABJiLwQTYi8E5rYAAKbhRgNs2fIEAQABAQ", "-XWeD_52ng8AAAAAUAAAAI4AAAAAAAAAYQAAAG4azQjhGc0I5rYAAO_IRgMJDvMEAAABAQ"],
+                "checksum": 133313292
+},
+            "route_name": ["Большевистская улица (Р-256)", "Бердское шоссе (Р-256)"],
+            "found_alternative": false,
+            "route_summary": {"total_distance": 1661, "total_time": 140, "end_point": "", "start_point": ""},
+            "route_instructions": [["10", "", 186, 0, 37, "186m", "E", 95, 1, "W", 275], ["3", "", 120, 3, 13, "119m", "E", 102, 1, "W", 282], ["1", "Большевистская улица (Р-256)", 354, 9, 19, "354m", "E", 101, 1, "W", 281], ["1", "Бердское шоссе (Р-256)", 798, 15, 48, "798m", "SE", 144, 1, "NW", 324], ["3", "", 202, 32, 22, "202m", "SW", 236, 1, "NE", 56], ["15", "", 0, 35, 0, "0m", "N", 0, 1, "N", 0]],
+            "via_points": [[54.976934, 83.024236], [54.970607, 83.037705]],
+            "via_indices": [0, 35],
+            "status_message": "Found route between points",
+            "route_geometry": [[54.976934, 83.024236], [54.976868, 83.025516], [54.976861, 83.026877], [54.976966, 83.027079], [54.976935, 83.027325], [54.97754, 83.027463], [54.977594, 83.027523], [54.977662, 83.027641], [54.977697, 83.027734], [54.977731, 83.02789], [54.977555, 83.029433], [54.977405, 83.030148], [54.977194, 83.030825], [54.976967, 83.031414], [54.976596, 83.032108], [54.976247, 83.032611], [54.975087, 83.034096], [54.97436, 83.034987], [54.974164, 83.03523], [54.974099, 83.035311], [54.973465, 83.03607], [54.973284, 83.036301], [54.973061, 83.036594], [54.972912, 83.036785], [54.97249, 83.037345], [54.972183, 83.037792], [54.971699, 83.0384], [54.971637, 83.038474], [54.971371, 83.038807], [54.971208, 83.039019], [54.971101, 83.039157], [54.971055, 83.039217], [54.970455, 83.039994], [54.970211, 83.039354], [54.969931, 83.038513], [54.970607, 83.037705]]
+        };
+
+
+    </script>
+
+
+    <script>
+        // Создаем модуль ангуляр
+var app = angular.module('MyApp', []);
+
+        // Создаем контроллер для модели
+app.controller('MyCtrl', function ($scope, $http) {
+            $scope.Myhtml = '';
+            $scope.lat = 54.97525;
+            $scope.lon = 83.03330;
+            $scope.onDrag = function (event) {
+                //     console.log("X ->",$event.originalEvent.pageX,"Y ->",$event.originalEvent.pageY)
+alert("X ->" + event.pageX + "Y ->" + event.pageY);
+            }
+        });
+
+
+        // Определение директивы
+app.directive('osmMap', function ($compile) {
+            var direct = {};
+            direct.priority = 20;
+            direct.restrict = 'A'; // необходимый параметр
+direct.terminal = true; // необходимый параметр
+            // Обьявляем входные параметры как внутренние переменные директивы
+direct.scope = {name: '=', id: '='};
+            // Определяем контроллер для содержимого ТЭГа
+direct.controller = function ($scope, $http) {
+                $scope.lat = 54.97525;
+                $scope.lon = 83.03330;
+                $scope.AddressList = [];
+                $scope.PointsList = [];
+                $scope.PointsPathList = [];    //  массив точек маршрута
+$scope.OsmPathList = [];    //  массив точек маршрута
+$scope.OsmPointList = [];    //  массив точек маршрута
+$scope.PointsPathMetaInfo = []; //  суммарная информация (дистанция и время)
+$scope.PointsPathInstruct = []; //  инструкция по ходу маршрута
+
+
+                // Если изменить состав списка точек саршрута, тогда перерисовать весть маршрут
+$scope.$watch('PointsPathList', ViewGeoPathLine, true);
+                // Функция срабатывает при изменении значения переменной
+function ViewGeoPathLine(newValue, oldValue) {
+                    if ($scope.isUpdate == true) {
+                        $scope.isUpdate = false;
+                    }
+                }
+
+                var fromProjection = new OpenLayers.Projection('EPSG:4326');  // Transform from WGS 1984
+var toProjection = new OpenLayers.Projection('EPSG:900913');  // to Spherical Mercator Projection
+var position;
+                var map;
+                var vectorLayer;
+                var Label_layer;
+
+                /// Процедура инициализации карты вариант 2
+$scope.initMap = function (MapId) {
+                    OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
+                        defaultHandlerOptions: {
+                            'single': true,
+                            'double': false,
+                            'pixelTolerance': 0,
+                            'stopSingle': false,
+                            'stopDouble': false
+},
+                        initialize: function (options) {
+                            this.handlerOptions = OpenLayers.Util.extend({}, this.defaultHandlerOptions);
+                            OpenLayers.Control.prototype.initialize.apply(this, arguments);
+                            this.handler = new OpenLayers.Handler.Click(this, {'click': this.trigger}, this.handlerOptions);
+                        },
+                        trigger: function (e) {
+                            var lonlat = map.getLonLatFromViewPortPx(e.xy)
+                            lonlat.transform(toProjection, fromProjection);
+                            var locatObjUrl = "http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lonlat.lat + "&lon=" + lonlat.lon + "&zoom=18&addressdetails=1";
+                            $scope.isUpdate = false;
+                            $scope.html = '';
+                            $http.get(locatObjUrl).then(function (response) {
+                                var textLabel='';
+                                var address = '{';
+                                address += '"lat":' + response.data.lat + ' ';
+                                address += ',"lon":' + response.data.lon + ' ';
+                                address += ',"osm_id":' + response.data.osm_id + ' ';
+                                if (response.data.address.postcode != undefined) {
+                                    address += ',"postcode":' + response.data.address.postcode + ' ';
+                                }
+                                address += ',"address":"';
+                                if (response.data.address.city != undefined) {
+                                    address += response.data.address.city + ','
+}
+                                if (response.data.address.city_district != undefined) {
+                                    address += response.data.address.city_district
+                                }
+                                if (response.data.address.road != undefined) {
+                                    address += ',' + response.data.address.road
+                                    textLabel+= response.data.address.road;
+                                }
+                                if (response.data.address.house_number != undefined) {
+                                    address += ',' + response.data.address.house_number
+                                    textLabel+=' '+  response.data.address.house_number;
+                                }
+                                address += '"';
+                                address += '}';
+                                var geoPoint = JSON.parse(address);
+                                var features = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat).transform(fromProjection, toProjection),
+                                        {
+                                            tooltip: map.layers.length, label:textLabel,
+                                            img: 'http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/48x48/pin_sq_down.png'
+}
+                                );
+                                Label_layer.addFeatures(features);
+                                $scope.OsmPointList.push(features);
+
+                                //
+                                // если список точек больше 0, тогда строим маршрут
+if ($scope.AddressList.length > 0) {
+                                    var lastPoint = $scope.AddressList.pop();
+                                    $scope.AddressList.push(lastPoint);
+                                    var urlPointList = 'http://router.project-osrm.org/viaroute?instructions=true&compression=false&geometry=true' + '&loc=' + lastPoint.lat + "," + lastPoint.lon + '&loc=' + geoPoint.lat + "," + geoPoint.lon;
+                                    $http.get(urlPointList).then(function (response) {
+                                        var points = [];
+                                        for (var i in response.data.route_geometry) {
+                                            points.push(new OpenLayers.Geometry.Point(response.data.route_geometry[i][1], response.data.route_geometry[i][0]).transform(fromProjection, toProjection));
+                                        }
+                                        var feature = new OpenLayers.Feature.Vector(
+                                                new OpenLayers.Geometry.LineString(points)
+                                        );
+                                        $scope.OsmPathList.push(feature);
+                                        vectorLayer.addFeatures(feature);
+
+                                        // добавляем фрагмент маршрута
+$scope.PointsPathList.push(response.data.route_geometry);
+                                        // добавляем информацию о маршруте
+$scope.PointsPathMetaInfo.push({
+                                            'total_distance': response.data.route_summary.total_distance,
+                                            'total_time': response.data.route_summary.total_time
+                                        });
+                                        // добавляем инструкцию проходжения маршрута
+$scope.PointsPathInstruct.push(response.data.route_instructions);
+                                        $scope.htmlPath = $scope.PointsPathList;
+                                        $scope.isUpdate = true;
+                                    }, function myError(response) {
+                                        $scope.html = JSON.stringify(response);
+                                    });
+                                }
+                                $scope.AddressList.push(geoPoint);
+                                $scope.html = $scope.AddressList;
+
+                            }, function myError(response) {
+                                $scope.html = JSON.stringify(response);
+                            });
+                        }
+                    });
+
+
+                    var markers = new OpenLayers.Layer.Markers("Markers");        // слой маркеров
+map = new OpenLayers.Map(MapId);
+                    map.addLayer(markers);
+                    var mapnik = new OpenLayers.Layer.OSM();
+                    position = new OpenLayers.LonLat($scope.lon, $scope.lat).transform(fromProjection, toProjection);
+                    var zoom = 15;
+                    map.addLayer(mapnik);
+                    map.setCenter(position, zoom);
+                    var click = new OpenLayers.Control.Click();
+                    map.addControl(click);
+                    click.activate();
+
+                    //
+                    // При нажатии правой кнопкой на карту, тогда удаляется последняя точка из массива и точки пути к ней
+map.div.oncontextmenu = function noContextMenu(e) {
+                        if (OpenLayers.Event.isRightClick(e)) {
+                            var popped = $scope.AddressList.pop();
+                            var poppedPoint = $scope.PointsPathList.pop();
+                            $scope.PointsPathMetaInfo.pop();
+                            $scope.PointsPathInstruct.pop();
+                            //  удаление последнего маршрута
+vectorLayer.removeFeatures($scope.OsmPathList.pop());
+                            Label_layer.removeFeatures($scope.OsmPointList.pop());
+                            $scope.isUpdate = true;
+                        }
+                        return false;
+                    };
+
+
+                    var vlayer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+                    vlayer_style.fillOpacity = 0.6;
+                    vlayer_style.fillColor = "green";
+                    vlayer_style.strokeWidth = 3;
+                    vlayer_style.strokeColor = "blue";
+                    vlayer_style.strokeOpacity = 1;
+                    var vStyleMap = new OpenLayers.StyleMap({
+                        "default": vlayer_style
+});
+                    vectorLayer = new OpenLayers.Layer.Vector("Overlay", {styleMap: vStyleMap});
+                    map.addLayer(vectorLayer);
+
+                    var label_style = new OpenLayers.Style(
+                            {
+                                // externalGraphic: 'http://cdn1.iconfinder.com/data/icons/super-mono-reflection/green/balloon_green.png',
+                                // externalGraphic: "http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/48x48/pin_sq_down.png",
+                                // externalGraphic: 'img/avto.png',
+externalGraphic: '${img}',
+                                graphicWidth: 10,
+                                graphicHeight: 10,
+                                graphicYOffset: 10,
+                                labelYOffset: 0,
+                                labelOutlineWidth: 1,
+                                title: '${tooltip}',
+                                label: '${label}'
+});
+                    Label_layer = new OpenLayers.Layer.Vector("Points", {styleMap: new OpenLayers.StyleMap(label_style)});
+                    map.addLayer(Label_layer);
+                }
+                ///  процедура поиска Гео.Объекта по слову
+$scope.FoundGeoObject = function () {
+                    var urlLoad = 'http://nominatim.openstreetmap.org/?format=json&addressdetails=1&q=' + encodeURIComponent($scope.FoundObjectText);
+                    $http.get(urlLoad).then(function (response) {
+                        $scope.html = response.data;
+                        position = new OpenLayers.LonLat(response.data[0].lon, response.data[0].lat).transform(fromProjection, toProjection);
+                        map.setCenter(position);
+                    }, function myError(response) {
+                        $scope.html = JSON.stringify(response);
+                    });
+                }
+
+                /**
+                 * Получит координаты по имени объекта
+                 */
+$scope.getLonLatGeoObject = function (NameGeoObject) {
+                    var urlLoad = 'http://nominatim.openstreetmap.org/?format=json&addressdetails=1&q=' + encodeURIComponent(NameGeoObject);
+                    $http.get(urlLoad).then(function (response) {
+                        $scope.html = {'lat': response.data[0].lat, 'lon': response.data[0].lon};
+                    }, function myError(response) {
+                        $scope.html = {'lat': undefined, 'lon': undefined};
+                    });
+                }
+
+                /**
+                 *  Получить список точек для прорисовки маршрута.
+                 *  [{'lat': 54.97525 , 'lon': 83.03330},{'lat': 55.1762343, 'lon': 82.9572601}]
+                 */
+$scope.getPathGeoObject = function (ListGeoPoint) {
+                    var PiontArrayList = '';   // два вспомагательных
+var ind = 0;
+                    for (var i in ListGeoPoint) {
+                        if (ind != ListGeoPoint.length) {
+                            PiontArrayList += '&loc=' + ListGeoPoint[i].lat + "," + ListGeoPoint[i].lon;
+                        } else {
+                            PiontArrayList += '&loc=' + ListGeoPoint[i].lat + "," + ListGeoPoint[i].lon;
+                            var urlPointList = 'http://router.project-osrm.org/viaroute?instructions=true&compression=false&geometry=true' + PiontArrayList;
+                            $http.get(urlPointList).then(function (response) {
+                                $scope.html = response.data;
+                            }, function myError(response) {
+                                $scope.html = {'lat': undefined, 'lon': undefined};
+                            });
+                        }
+                    }
+                }
+            };
+            // Функция срабатывает при загрузке страницы
+direct.link = function ($scope, element, attrs) {
+                // ------ Получаем переменные из блока OSM -----
+var MapId = 'basicMap'
+if ((attrs.name != undefined) && (attrs.name.length > 0)) {
+                    MapId = attrs.name;
+                }
+                if (($scope.name != undefined) && ($scope.name.length > 0)) {
+                    MapId = $scope.name;
+                }
+                if ((attrs.id != undefined) && (attrs.id.length > 0)) {
+                    MapId = attrs.id;
+                }
+                if (($scope.id != undefined) && ($scope.id.length > 0)) {
+                    MapId = $scope.id;
+                }
+                //------------------------------------
+                //  Рисуем форму на Вэб странице
+var html =
+                        "  <button ng-click='getLonLatGeoObject(\"Новосибирск\")'>---</button>" +
+                        "  <input type='text' ng-model='FoundObjectText'  ng-keypress='($event.charCode==13)?FoundGeoObject():return'  >" +
+                        "  <div id='" + MapId + "' style='height: 480px;width: 640px; background-color: #7D9029'></div>" +
+                        "  <br> {{FoundObjectText}}" +
+                        "  <br> {{html}}" +
+                        "  <br> <br> {{htmlPath}}";
+                element.html(html);
+                $compile(element.contents())($scope);
+                //------------------------------------
+                // запускаем инициализацию карты
+$scope.initMap(MapId);
+            };
+            return direct;
+        });
+    </script>
+</head>
+<body>
+<div ng-app="MyApp">
+    <div ng-controller="MyCtrl">
+        {{lon}} {{lat}}
+        <div name='myosm' osm-Map>
+        </div>
+    </div>
+
+
+</div>
+</body>
+</html>

@@ -80,6 +80,12 @@ def all_files(path):
         txt = jsonForm.getRemouteForm(path, request, session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
+    # Загрузка изображения карты
+    if "openstreetmap/" in path:
+        txt = jsonForm.getOSMimage(path,app.static_folder)
+        return txt, 200, {'content-type': "application/x-javascript"}
+
+
     # поиск компонентов ExtJS в каталоге app/www/static/widget
     if "widget/" in path:
         begFrag, endFrag = path.split("widget/")

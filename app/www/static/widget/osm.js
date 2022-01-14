@@ -14,16 +14,17 @@ Ext.define('widget.osm', {
                      alert('No Leaflet library');
                  } else {
                      var map = L.map(panelId);
-                     var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                     //  var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                     var osmUrl = '/openstreetmap/{s}/{z}/{x}/{y}.png';
                      var osmAttrib = '';
                      var osm = new L.TileLayer(osmUrl, {
                          minZoom: 0,
                          maxZoom: 18,
                          attribution: osmAttrib
                      });
-                     map.setView(new L.LatLng(38.7775, -95.1875), 12, { reset: true });
+                     map.setView(new L.LatLng(53.3594112 , 83.6796416), 12, { reset: true });
                      map.addLayer(osm);
-                     var marker = L.marker([38.7775, -95.1875], {
+                     var marker = L.marker([53.3594112, 83.6796416], {
                          icon: L.icon({
                              iconUrl: '/images/geo_point.png',
                              iconSize: [41, 41],
@@ -36,6 +37,10 @@ Ext.define('widget.osm', {
                      for (let ind = 0; ind < controls.length; ++ind) {
                          controls[ind].style['display'] = 'none';
                      }
+                     function onMapClick(e) {
+                        alert("You clicked the map at " + e.latlng);
+                     }
+                     map.on('click', onMapClick);
                  }
              },function(error){
                  console.log(error);

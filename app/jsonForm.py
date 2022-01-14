@@ -4,7 +4,7 @@
 from pathlib import Path
 from json import loads as JSON_parse
 from json import dumps as JSON_stringify
-from os import path, sep,makedirs,listdir
+from os import path, sep,makedirs,listdir,mkdir
 from codecs import open as openFile
 from uuid import uuid1
 from hashlib import md5
@@ -1311,6 +1311,31 @@ def execBdQuery(datSetXmlObj, dbName, queryJson, sessionId):
     sqlText = datSetXmlObj.text
     return {}
 
+
+def getOSMimage(pathStr,static_folder):
+    """
+        Функция загрузки картинок карты OpenStreetMap
+    """
+    begFrag, endFrag = pathStr.split("openstreetmap/")
+    pathHtmlFromForm = f"{static_folder.replace('/', sep)}{sep}lib{sep}OpenStreetMap{sep}map_img{sep}{endFrag}".replace("/", sep)
+    bin = b""
+    if not path.isfile(pathHtmlFromForm):
+        dirName = pathHtmlFromForm[:pathHtmlFromForm.rfind(sep)]
+        try:
+            if not path.exists(dirName):
+                makedirs(dirName)
+        except:
+            pass
+        elArr = endFrag[:endFrag.rfind(".")].split("/")
+        url_tmp = f"https://{elArr[0]}.tile.openstreetmap.org/{elArr[1]}/{elArr[2]}/{elArr[3]}.png"
+        r = reqExt.get(url_tmp, stream=True)
+        with open(pathHtmlFromForm, 'wb') as f:
+            for chunk in r.iter_content():
+                f.write(chunk)
+                bin+=chunk
+    else:
+        bin, mime = sendCostumBin(pathHtmlFromForm)
+    return bin
 
 
 def getRemouteForm(path,request,sessionId):
