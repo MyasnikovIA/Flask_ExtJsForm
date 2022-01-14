@@ -4,18 +4,16 @@ Ext.define('widget.osm', {
      constructor: function(config) {
          this.callParent([config]);
          Ext.getBody().appendChild(this.element);
-         let panelId = this.element['dom']['id'];
-         console.log("this.element['dom']",this.element['dom'])
-         console.log("this.element",this.element)
-         console.log("config",config)
+         let localConfig = config;
+         let localElement = this.element;
          loadCSS("/lib/OpenStreetMap/Leaflet.css").then(function(){
              loadScript("/lib/OpenStreetMap/Leaflet.js").then(function(){
                  if (!window.L) {
                      alert('No Leaflet library');
                  } else {
-                     var map = L.map(panelId);
+                     var map = L.map(localElement['dom']['id']);
                      //  var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                     var osmUrl = '/openstreetmap/{s}/{z}/{x}/{y}.png';
+                     var osmUrl = '/openstreetmap/{s}/{z}/{x}/{y}.png'; // адрес кэширования загруженой карты
                      var osmAttrib = '';
                      var osm = new L.TileLayer(osmUrl, {
                          minZoom: 0,
@@ -35,12 +33,15 @@ Ext.define('widget.osm', {
                      marker.bindPopup('<b>Baldwin City, KS</b><br>').openPopup();
                      let controls = document.querySelectorAll(".leaflet-control-attribution");
                      for (let ind = 0; ind < controls.length; ++ind) {
-                         controls[ind].style['display'] = 'none';
+                        controls[ind].style['display'] = 'none';
                      }
                      function onMapClick(e) {
                         alert("You clicked the map at " + e.latlng);
                      }
                      map.on('click', onMapClick);
+                     console.log("localConfig",localConfig)
+                     console.log("localElement",localElement)
+                     // дописать инициализацию компонента
                  }
              },function(error){
                  console.log(error);

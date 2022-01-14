@@ -27,9 +27,6 @@ app.permanent_session_lifetime = datetime.timedelta(days=10)  # период х�
 if not os.path.exists(app.static_folder.replace('/', os.sep)):
     os.makedirs(app.static_folder.replace('/', os.sep)) # принудительно создаем
 
-
-
-
 @app.before_request
 def before_request():
     """
@@ -89,7 +86,6 @@ def all_files(path):
     if "openstreetmap/" in path:
         txt = jsonForm.getOSMimage(path,app.static_folder)
         return txt, 200, {'content-type': "application/x-javascript"}
-
 
     # поиск компонентов ExtJS в каталоге app/www/static/widget
     if "widget/" in path:
