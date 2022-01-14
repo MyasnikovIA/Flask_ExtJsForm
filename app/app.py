@@ -80,14 +80,20 @@ def all_files(path):
         txt = jsonForm.getRemouteForm(path, request, session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
+    # поиск компонентов ExtJS в каталоге app/www/static/widget
+    if "widget/" in path:
+        begFrag, endFrag = path.split("widget/")
+        pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}widget{os.sep}{endFrag}"
+        if os.path.isfile(pathHtmlFromForm):
+            bin, mime = jsonForm.sendCostumBin(pathHtmlFromForm)
+            return bin, 200, {'content-type': mime}
+
     # Поиск запроса в каталоге static
     queryJson = jsonForm.getAttrQuery(request)
     pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}{path}"
     if os.path.isfile(pathHtmlFromForm):
         bin, mime = jsonForm.sendCostumBin(pathHtmlFromForm)
         return bin, 200, {'content-type': mime}
-
-
 
     format = 1
     if "type" in queryJson and queryJson['type'] == "js":

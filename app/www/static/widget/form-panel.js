@@ -1,13 +1,10 @@
-       Ext.define('My.form.Panel',{
+       Ext.define('widget.form-panel',{
                extend: 'Ext.panel.Panel',
                xtype: 'form-panel',
-
                title: 'form-panel',
                width: 400,
                height: 300,
-
                defaultType: 'textfield',
-
                items: [{
                    allowBlank: false,
                    fieldLabel: 'Name:',
@@ -46,7 +43,6 @@
                    me.callParent();
 
                },
-
                beforeRender: function(){
                    Ext.Msg.alert('beforRender','beforerender!');
                    this.callParent();

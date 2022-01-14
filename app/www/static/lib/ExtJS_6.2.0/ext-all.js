@@ -11248,7 +11248,6 @@ Ext.Factory.define = function (g, d) {
         b.references = {};
         b.onAvailableCallbacks = {}
     }, create: function (a, b) {
-        console.log("create: function (a, b)",a, b)
         if (typeof a === "string") {
             return Ext.widget(a)
         }

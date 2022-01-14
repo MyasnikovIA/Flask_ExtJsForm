@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <!--link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-classic/resources/theme-classic-all.css" rel="stylesheet" /-->
+    <!--  https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-classic/resources/images/menu/default-menu-parent.gif -->
+    <link href="lib/ExtJS_6.2.0/theme-classic-all.css" rel="stylesheet" />
+    <!--
+    <script src="lib/beautify/beautify.js"></script>
+    <script src="lib/beautify/beautify-css.js"></script>
+    <script src="lib/beautify/beautify-html.js"></script>
+    -->
+    <!--link href="component/builder.css" rel="stylesheet" /-->
+    <script type="text/javascript" src="lib/ExtJS_6.2.0/ext-all.js"></script>
+    <!--script type="text/javascript" src="lib/system.js"></script-->
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="/widget/StepForm.js"></script>
+    <script type="text/javascript">
+        // https://metanit.com/web/extjs/6.7.php
+        Ext.onReady(function(){
+            /*
+            var stepForm = new StepForm({
+                        width:500,
+                        height:300,
+                        navWidth:130,
+                        number:true,
+                        activeTab:3,
+                        ltitle:'步骤',
+                        rtitle:'用户信息',
+                        items:[
+                                {
+                                    title:'基本信息',
+                                    items:[{
+                                        xtype:'form',
+                                        bodyStyle:'padding:20px',
+                                        items:[
+                                            {xtype:'textfield',fieldLabel:'姓名'},
+                                            {xtype:'textfield',fieldLabel:'电子邮件'},
+                                            {xtype:'textfield',fieldLabel:'电话'}
+                                        ]
+                                    }]
+                                },
+                                {
+                                    title:'详细信息',
+                                    items:[{
+                                        xtype:'form',
+                                        bodyStyle:'padding:20px',
+                                        items:[
+                                            {xtype:'textfield',fieldLabel:'牛逼'},
+                                            {xtype:'textfield',fieldLabel:'牛逼'},
+                                            {xtype:'textfield',fieldLabel:'牛逼'}
+                                        ]
+                                    }]
+                                }
+                        ]
+                    });
+*/
+            var win = new Ext.Window({
+                title:'用户添加',
+                width:500,
+                height:300,
+                items:[
+                       {
+                        xtype:'StepForm',
+                        width:500,
+                        height:300,
+                        navWidth:130,
+                        number:true,
+                        activeTab:3,
+                        ltitle:'步骤',
+                        rtitle:'用户信息',
+                      }
+                ]
+            });
+            win.show(Ext.getBody());
+            stepForm.register();
+        });
+    </script>
+</head>
+<body></body>
+</html>
