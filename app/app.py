@@ -90,7 +90,7 @@ def all_files(path):
     # поиск компонентов ExtJS в каталоге app/www/static/widget
     if "widget/" in path:
         begFrag, endFrag = path.split("widget/")
-        pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}widget{os.sep}{endFrag}"
+        pathHtmlFromForm = f"{jsonForm.ROOT_DIR.replace('/', os.sep)}{os.sep}Components{os.sep}{endFrag}"
         if os.path.isfile(pathHtmlFromForm):
             bin, mime = jsonForm.sendCostumBin(pathHtmlFromForm)
             return bin, 200, {'content-type': mime}
