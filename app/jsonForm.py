@@ -546,6 +546,12 @@ def mainToTree(root):
        res.append(obj)
     return res
 
+def setFunctionContextMenu(node,xmldict,onPopUpFun):
+    if getCompName(node) == 'osm':
+        node.attrib["onitemcontextmenu"] = f""" {onPopUpFun}  showPopupMenu('{xmldict['name']}', arguments[0].containerPoint['x']+100 ,arguments[0].containerPoint['y']+30);"""
+        return
+    node.attrib["onitemcontextmenu"] = f"""console.log('arguments',arguments);   let arr = [].slice.call(arguments); arr[4].stopEvent(); {onPopUpFun} showPopupMenu('{xmldict['name']}',arr[4].getX(),arr[4].getY()); return false;"""
+
 
 def parseXMLmain(mainXml, rootForm, data, session):
     """
@@ -572,7 +578,7 @@ def parseXMLmain(mainXml, rootForm, data, session):
         if "popupobject" in xmldict:
             nodes = rootForm.findall(f'*[@name="{xmldict["popupobject"]}"]')
             for node in nodes:
-                node.attrib["onitemcontextmenu"]= f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); {onPopUpFun} showPopupMenu('{xmldict['name']}',arr[4].getX(),arr[4].getY()); return false;"""
+                setFunctionContextMenu(node,xmldict,onPopUpFun)
         xmldict["items"]=mainToTree(elem)
         menuList[xmldict['name']] = f"""(--##--)MENU_{{%frmObj%}}_{xmldict['name']}(--##--)"""
         scriptText.append(f"""var MENU_{{%frmObj%}}_{xmldict['name']}= Ext.create('Ext.menu.Menu',""")
@@ -985,6 +991,18 @@ def initListenerEvent(tagName, eventName, funBody):
     """
 
 
+def getCompName(root):
+    """
+        Функция получения имени компонента
+    """
+    compName=""# root.tag
+    if 'cmptype' in root.keys():
+        compName = root.attrib['cmptype'].lower()
+    else:
+        if root.tag[:3] == 'cmp':
+            compName = root.tag[3:].lower()
+    return compName
+
 itemsThiwObject = ["buttons"]
 itemsBlock = ['div','item']
 htmlBlock = ['iframe']
@@ -992,12 +1010,7 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
     """
        Конвертировать XML объект формы в ExtJS объект
     """
-    compName = ""
-    if 'cmptype' in root.keys():
-        compName = root.attrib['cmptype'].lower()
-    else:
-        if root.tag[:3] == 'cmp':
-            compName = root.tag[3:].lower()
+    compName = getCompName(root)
     if compName == "script" or compName == "dataset" or compName == "action":
         return None
     info['numEl']+=1;
