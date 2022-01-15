@@ -2,32 +2,60 @@
 
     <cmpScript>
        <![CDATA[
+           Form.activeMap = null;
            Form.onPOP = function(arguments) {
-              let map = getControl('MyOsm').element
-              console.log("getControl('MyOsm')",getControl('MyOsm'));
-              console.log("map.clickPoint",map.clickPoint);
-              console.log("map",map);
-              //console.log("onPOP",arguments);
+              Form.activeMap = getControl('MyOsm').element;
+              let jsonInfo = Form.activeMap.getInfo();
+              setCaption('objectInfo', JSON.stringify(jsonInfo,null, 4))
            }
+
+           // Установить  метку на карте
+           Form.onSetLabel = function(){
+              let map = getControl('MyOsm').element;
+              map.appLabel("<br/><h3>текст метки</h3>","подсказка",function(){
+
+              });
+           };
+           Form.onDeleteLabel = function() {
+              getControl('MyOsm').element.delLabel();
+           }
+           Form.onClrLabel = function() {
+              getControl('MyOsm').element.delLabels();
+           }
+
+
+           //  получить информацию об выбранном гео-объекте
+           Form.onGetInfo = function() {
+                let map = getControl('MyOsm').element;
+                let jsonInfo = map.getInfo()
+                setCaption('objectInfo', JSON.stringify(jsonInfo,null, 4))
+           }
+           Form.onFoundObjectText = function() {
+                let map = getControl('MyOsm').element;
+                let jsonResult = map.foundObject(getValue('foundObjectText'))
+                for (let ind = 0; ind < jsonResult.length; ++ind) {
+                    let tmpObj = {'lat':jsonResult[ind]['lat'],'lng':jsonResult[ind]['lon']};
+                    map.appLabel( tmpObj, jsonResult[ind]['display_name']);
+                    console.log(  'tmpObj',tmpObj );
+                    console.log( ' jsonResult[ind]', jsonResult[ind] );
+                }
+           }
+
        ]]>
     </cmpScript>
-
-    <item region="north" collapsible="true" width="150" ><h1 class="x-panel-header" split="true">Page Title</h1></item>
-    <item region="west" collapsible="true" width="150" title="Панель слева" split="true"></item>
-    <item region="south" collapsible="true" width="150" title="Снизу"  split="true"></item>
-    <item region="east" collapsible="true" width="150" title="Справа"  split="true"></item>
-
-    <cmpOSM region="center" name="MyOsm" onclick="console.log('OpenStreetMap1.frm',arguments)"   split="true" >
+    <item region="west" collapsible="true" width="350" title="Панель слева" split="true">
+        <cmpTextField name="foundObjectText" value="барнаул"  region="north" onspecialkey="Form.onFoundObjectText();"  height="25" width="100%"/>
+        <cmpLabel region="center" name="objectInfo"  text="---"/>
+    </item>
+    <cmpOSM region="center" name="MyOsm" onclick="Form.onGetInfo()"   split="true" >
 
     </cmpOSM>
 
-
     <cmpPopupMenu name="myMain"  popupobject="MyOsm" onpopup="Form.onPOP(arguments)">
-        <item text="dddddddd" onclick="console.log('menu clicked');" />
-        <item text="print" >
-            <item text="22222" onclick="console.log('menu clicked');" />
-            <item text="333333" onclick=" console.log('menu clicked');"  />
-        </item>
+        <item name="addLabel" text="Установить метку" onclick="Form.onSetLabel();" />
+        <item name="delLabel" text="Удалить метку" onclick="Form.onDeleteLabel();" />
+        <item name="clrAllLabel" text="Очистить все метки" onclick="Form.onClrLabel();" />
+        <item name="getInfo" text="Получить информацию об объекте" onclick="Form.onGetInfo();" />
     </cmpPopupMenu>
 
 </div>

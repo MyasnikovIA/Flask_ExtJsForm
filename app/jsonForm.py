@@ -548,7 +548,8 @@ def mainToTree(root):
 
 def setFunctionContextMenu(node,xmldict,onPopUpFun):
     if getCompName(node) == 'osm':
-        node.attrib["onitemcontextmenu"] = f""" {onPopUpFun}  showPopupMenu('{xmldict['name']}', arguments[0].containerPoint['x']+100 ,arguments[0].containerPoint['y']+30);"""
+        # node.attrib["onitemcontextmenu"] = f""" console.log('onitemcontextmenu',arguments); {onPopUpFun}  showPopupMenu('{xmldict['name']}', arguments[0].containerPoint['x']+300 ,arguments[0].containerPoint['y']+30);"""
+        node.attrib["onitemcontextmenu"] = f""" console.log('onitemcontextmenu',arguments); {onPopUpFun}  showPopupMenu('{xmldict['name']}', arguments[0].originalEvent['clientX'] ,arguments[0].originalEvent['clientY']);"""
         return
     node.attrib["onitemcontextmenu"] = f"""console.log('arguments',arguments);   let arr = [].slice.call(arguments); arr[4].stopEvent(); {onPopUpFun} showPopupMenu('{xmldict['name']}',arr[4].getX(),arr[4].getY()); return false;"""
 
