@@ -4,34 +4,33 @@
        <![CDATA[
            Form.activeMap = null;
            Form.onPOP = function(arguments) {
-              Form.activeMap = getControl('MyOsm').element;
+              Form.activeMap = getControl('MyOsm');
               let jsonInfo = Form.activeMap.getInfo();
               setCaption('objectInfo', JSON.stringify(jsonInfo,null, 4))
            }
 
            // Установить  метку на карте
            Form.onSetLabel = function(){
-              let map = getControl('MyOsm').element;
+              let map = getControl('MyOsm');
               map.appLabel("<br/><h3>текст метки</h3>","подсказка",function(){
 
               });
            };
            Form.onDeleteLabel = function() {
-              getControl('MyOsm').element.delLabel();
+              getControl('MyOsm').delLabel();
            }
            Form.onClrLabel = function() {
-              getControl('MyOsm').element.delLabels();
+              getControl('MyOsm').delLabels();
            }
 
 
            //  получить информацию об выбранном гео-объекте
            Form.onGetInfo = function() {
-                let map = getControl('MyOsm').element;
-                let jsonInfo = map.getInfo()
+                let jsonInfo = getControl('MyOsm').getInfo()
                 setCaption('objectInfo', JSON.stringify(jsonInfo,null, 4))
            }
            Form.onFoundObjectText = function() {
-                let map = getControl('MyOsm').element;
+                let map = getControl('MyOsm');
                 let jsonResult = map.foundObject(getValue('foundObjectText'))
                 for (let ind = 0; ind < jsonResult.length; ++ind) {
                     let tmpObj = {'lat':jsonResult[ind]['lat'],'lng':jsonResult[ind]['lon']};

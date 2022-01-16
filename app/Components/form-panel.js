@@ -1,9 +1,6 @@
        Ext.define('widget.form-panel',{
                extend: 'Ext.panel.Panel',
-               xtype: 'form-panel',
-               title: 'form-panel',
-               width: 400,
-               height: 300,
+               //xtype: 'form-panel',
                defaultType: 'textfield',
                items: [{
                    allowBlank: false,
@@ -25,26 +22,9 @@
                },{
                    text: 'Cancel'
                }],
-
                constructor: function(){
                    this.renderTo = Ext.getBody();
                    this.callParent(arguments);
-                   Ext.Msg.alert('constructor','Constructor!');
-               },
-
-               initComponent: function(){
-                   Ext.Msg.alert('InitComponent','InitComponent!');
-                   var me = this;
-                   me.defaults = {
-                       anchor: '100%',
-                       labelWidth: 100
-
-                   };
-                   me.callParent();
-
-               },
-               beforeRender: function(){
-                   Ext.Msg.alert('beforRender','beforerender!');
-                   this.callParent();
+                   // Ext.Msg.alert('constructor','Constructor!');
                }
            })
