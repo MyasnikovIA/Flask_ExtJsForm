@@ -1,13 +1,15 @@
        Ext.define('widget.form-panel',{
                extend: 'Ext.panel.Panel',
-               //xtype: 'form-panel',
-               defaultType: 'textfield',
+               // xtype: 'form-panel',
+               // defaultType: 'textfield',
                items: [{
+                   xtype: 'textfield',
                    allowBlank: false,
                    fieldLabel: 'Name:',
                    name: 'name',
                    emptyText: 'Name ID'
                },{
+                   xtype: 'textfield',
                    allowBlank: false,
                    fieldLabel: 'Password:',
                    name: 'password',

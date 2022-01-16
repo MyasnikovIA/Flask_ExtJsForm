@@ -4,7 +4,7 @@
 from pathlib import Path
 from json import loads as JSON_parse
 from json import dumps as JSON_stringify
-from os import path, sep,makedirs,listdir,mkdir
+from os import path, sep, makedirs, listdir, stat
 from codecs import open as openFile
 from uuid import uuid1
 from hashlib import md5
@@ -77,13 +77,27 @@ TEMP_HTML_FORM = """<!DOCTYPE html>
    <body></body>
 </html>
 """
-
+TEMP_JS_WIDGET = """
+      {%style%}
+      {%cmpDataset%}
+      {%cmpPopupMenu%}
+      Ext.define('widget.{%widgetName%}',
+               {%},
+               constructor: function(){
+                   this.renderTo = Ext.getBody();
+                   this.callParent(arguments);
+                   {%cmpScript%}
+               }
+           })
+"""
 
 def existContentExtJs(formName,isHtml=0):
     """
     Функция проверки наличия файлов в  каталоге исходников "Form" и временных файлах
     """
-    pathHtmlFromForm = f"{ROOT_DIR}{sep}{FORM_DIR}{sep}{formName}"
+    pathHtmlFromForm = f"{ROOT_DIR}{sep}{FORM_DIR}{sep}{formName.replace('/',sep)}"
+    if "widget/" in formName:
+        pathHtmlFromForm = f"{pathHtmlFromForm[:pathHtmlFromForm.rfind('.')]}.frm"
     if path.isfile(pathHtmlFromForm):
         return True, pathHtmlFromForm
     resBool,pathHtmlFromForm = existContentExtJsTemp(formName,isHtml)
@@ -118,16 +132,14 @@ def getParsedForm(formName, data, session={}, isHtml=0):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
-
     return getSrcSaveTemp(formName, data, session, isHtml)
-    # return getSrc(formName, data, session, isHtml)
-    getTempCont = True
-    if "debug" in data and int(data["debug"]) > 0:
-        getTempCont = False
-    if getTempCont:
-        return getTemp(formName, data, session,isHtml)
-    else:
-        return getSrc(formName, data, session,isHtml)
+    #getTempCont = True
+    #if "debug" in data and int(data["debug"]) > 0:
+    #    getTempCont = False
+    #if getTempCont:
+    #    return getTemp(formName, data, session,isHtml)
+    #else:
+    #    return getSrc(formName, data, session,isHtml)
 
 
 def replaceTempData(ext,txt, data):
@@ -168,13 +180,26 @@ def getSrcSaveTemp(formName, data, session, isHtml=0):
     if isHtml == 2:
         ext = "js"
     cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_')}{blockName}.{ext}").replace("/", sep)
+    cmpFilesrc = path.join(FORM_PATH, formName).replace("/", sep)
     mime = mimeType(ext)
     if not path.exists(cmpDirSrc):
         makedirs(cmpDirSrc)
     if not path.exists(path.dirname(cmpFiletmp)):
         makedirs(path.dirname(cmpFiletmp))
+    if "widget/" in formName and ext == "js": # если в пути есть "widget/" и расширение ресурса "js", тогда обрабатываем как компонент из формы (меняем расширение )
+        cmpFilesrc = f"{cmpFilesrc[:cmpFilesrc.rfind('.')]}.frm"
+    if path.exists(cmpFiletmp) and path.exists(cmpFilesrc):
+        statsSrc = stat(cmpFilesrc)
+        statsTmp = stat(cmpFiletmp)
+        if not statsSrc.st_mtime > statsTmp.st_mtime: # Если файл исходника не изменен, тогда вычитываем ранее созданный файл
+            with openFile(cmpFiletmp, 'r', encoding='utf8') as f:
+                txt = f.read()
+                setTempPage(cmpFiletmp, txt)
+                txt = replaceTempData(ext, txt, data)
+            return txt, mime
+    # иначе создаем файл из исходников
+    txt, mime = getSrc(formName, data, session, isHtml)
     with open(cmpFiletmp, "wb") as d3_css:
-      txt, mime = getSrc(formName, data, session, isHtml)
       d3_css.write(txt.encode())
       setTempPage(cmpFiletmp, txt)
       txt = replaceTempData(ext, txt, data)
@@ -430,8 +455,15 @@ def jsonFunFromString(html="",frmObj=""):
 def getSrc(formName, data={}, session={}, isHtml=0):
     """
        Функция получения JSON кода из FRM ("XML")
+       isHtml = 0 - создается JS файл; 1 - создается HTML файл; 2 - создается ExtJS компонент  widget
     """
     ext = formName[formName.rfind('.') + 1:].lower()
+    widgetName=""
+    if "widget/" in formName:
+        formName = f"{formName[:formName.rfind('.')]}.frm"
+        widgetName = f"{formName[:formName.rfind('.')]}".split("widget/")[1].lower()
+        ext = "js"
+        isHtml = 2
     frmObj = formName.replace("/","_").replace(".","")
     ServerPathQuery = [formName]
     if 'ServerPathQuery' in data:
@@ -463,32 +495,48 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     jsonFrm["dataSetVarList"] = dataSetVarList
     jsonFrm["actionList"] = {}
     jsonFrm["mainList"] = popupMenuList
-    # ---- получить JS файл с формой
-    extClass = "Ext.Viewport"
-    showWin = ""
-    if "isModal" in data:
-        jsonFrm['modal'] = True
-        extClass = "Ext.window.Window"
-        showWin=".show()"
-    jsonFrm['layout'] = 'border'
-    if not 'renderTo' in jsonFrm:
-        jsonFrm['renderTo'] = 'Ext.getBody()';
-    jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
-    jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} """
-    html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
-        .replace("{%cmpDataset%}",jsonDataset)\
-        .replace("{%cmpPopupMenu%}",jsonPopupMenu)\
-        .replace("{%frmObj%}",frmObj)\
-        .replace("{%formName%}",formName)\
-        .replace("{%cmpScript%}",jsonScript)\
-        .replace("{%style%}",jsonStyle)\
-        .replace("{%showWin%}",showWin)
-    html = jsonFunFromString(html,frmObj)
-    if isHtml == 1:
-        html = TEMP_HTML_FORM.replace("{%}", html)
-        return  html,  mimeType(ext)
-    return html, mimeType(ext)
+    if isHtml == 1 or isHtml == 0: # создаем HTML или JS файл формы
+        # ---- получить JS файл с формой
+        extClass = "Ext.Viewport"
+        showWin = ""
+        if "isModal" in data:
+            jsonFrm['modal'] = True
+            extClass = "Ext.window.Window"
+            showWin=".show()"
+        jsonFrm['layout'] = 'border'
+        if not 'renderTo' in jsonFrm:
+            jsonFrm['renderTo'] = 'Ext.getBody()';
+        jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
+        jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} """
+        html = TEMP_JS_FORM.replace("{%}", jsonFrmTxt).replace("{%ExtClass%}",extClass)\
+            .replace("{%cmpDataset%}",jsonDataset)\
+            .replace("{%cmpPopupMenu%}",jsonPopupMenu)\
+            .replace("{%frmObj%}",frmObj)\
+            .replace("{%formName%}",formName)\
+            .replace("{%cmpScript%}",jsonScript)\
+            .replace("{%style%}",jsonStyle)\
+            .replace("{%showWin%}",showWin)
+        html = jsonFunFromString(html,frmObj)
+        if isHtml == 1:
+            html = TEMP_HTML_FORM.replace("{%}", html)
+            return  html,  mimeType(ext)
+        return html, mimeType(ext)
 
+    if isHtml == 2: # создаем JS файл widget
+        if not "extend" in jsonFrm:
+            jsonFrm['extend'] = 'Ext.panel.Panel';
+        jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
+        jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n  """
+        html = TEMP_JS_WIDGET.replace("{%}", jsonFrmTxt)\
+            .replace("{%widgetName%}",widgetName)\
+            .replace("{%cmpDataset%}",jsonDataset)\
+            .replace("{%cmpPopupMenu%}",jsonPopupMenu)\
+            .replace("{%frmObj%}",frmObj)\
+            .replace("{%formName%}",formName)\
+            .replace("{%cmpScript%}",jsonScript)\
+            .replace("{%style%}",jsonStyle)
+        html = jsonFunFromString(html,frmObj)
+        return html, mimeType(ext)
 
 def parseXMLScript(scriptXml, formName, data, session):
     """
