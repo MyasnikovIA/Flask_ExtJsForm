@@ -78,17 +78,17 @@ TEMP_HTML_FORM = """<!DOCTYPE html>
 </html>
 """
 TEMP_JS_WIDGET = """
-      {%style%}
-      {%cmpDataset%}
-      {%cmpPopupMenu%}
-      Ext.define('widget.{%widgetName%}',
-               {%},
-               constructor: function(){
-                   this.renderTo = Ext.getBody();
-                   this.callParent(arguments);
-                   {%cmpScript%}
-               }
-           })
+Ext.define('widget.{%widgetName%}',
+         {%},
+         constructor: function(){
+             this.renderTo = Ext.getBody();
+             this.callParent(arguments);
+             {%cmpScript%}
+         }
+})
+{%style%}
+{%cmpDataset%}
+{%cmpPopupMenu%}
 """
 
 def existContentExtJs(formName,isHtml=0):
@@ -97,7 +97,8 @@ def existContentExtJs(formName,isHtml=0):
     """
     pathHtmlFromForm = f"{ROOT_DIR}{sep}{FORM_DIR}{sep}{formName.replace('/',sep)}"
     if "widget/" in formName:
-        pathHtmlFromForm = f"{pathHtmlFromForm[:pathHtmlFromForm.rfind('.')]}.frm"
+        widgetName = f"{formName[:formName.rfind('.')]}".split("widget/")[1].lower()
+        pathHtmlFromForm = f"{ROOT_DIR}{sep}{FORM_DIR}{sep}widget{sep}{widgetName}.frm"
     if path.isfile(pathHtmlFromForm):
         return True, pathHtmlFromForm
     resBool,pathHtmlFromForm = existContentExtJsTemp(formName,isHtml)
@@ -122,7 +123,7 @@ def existContentExtJsTemp(formName,isHtml=0):
         formNameBody = formName[:((len(ext))*-1)-1]
     if isHtml==2:
         ext = "js"
-    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_')}{blockName}.{ext}").replace("/",sep)
+    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_').replace('-','_')}{blockName}.{ext}").replace("/",sep)
     if existTempPage(cmpFiletmp):
         return True,cmpFiletmp
     return False,None
@@ -179,7 +180,7 @@ def getSrcSaveTemp(formName, data, session, isHtml=0):
         formNameBody = formName[:((len(ext)) * -1) - 1]
     if isHtml == 2:
         ext = "js"
-    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_')}{blockName}.{ext}").replace("/", sep)
+    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_').replace('-','_')}{blockName}.{ext}").replace("/", sep)
     cmpFilesrc = path.join(FORM_PATH, formName).replace("/", sep)
     mime = mimeType(ext)
     if not path.exists(cmpDirSrc):
@@ -222,7 +223,7 @@ def getTemp(formName, data, session, isHtml=0):
         formNameBody = formName[:((len(ext))*-1)-1]
     if isHtml==2:
         ext = "js"
-    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_')}{blockName}.{ext}").replace("/",sep)
+    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_').replace('-','_')}{blockName}.{ext}").replace("/",sep)
     mime = mimeType(ext)
     if not path.exists(cmpDirSrc):
         makedirs(cmpDirSrc)
@@ -460,11 +461,11 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     ext = formName[formName.rfind('.') + 1:].lower()
     widgetName=""
     if "widget/" in formName:
-        formName = f"{formName[:formName.rfind('.')]}.frm"
+        formName = f"widget/{formName[:formName.rfind('.')].split('widget/')[1]}.frm"
         widgetName = f"{formName[:formName.rfind('.')]}".split("widget/")[1].lower()
         ext = "js"
         isHtml = 2
-    frmObj = formName.replace("/","_").replace(".","")
+    frmObj = formName.replace('/', '_').replace('.', '').replace('-', '_')
     ServerPathQuery = [formName]
     if 'ServerPathQuery' in data:
         ServerPathQuery = data['ServerPathQuery']
