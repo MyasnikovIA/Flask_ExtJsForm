@@ -78,17 +78,19 @@ TEMP_HTML_FORM = """<!DOCTYPE html>
 </html>
 """
 TEMP_JS_WIDGET = """
-Ext.define('widget.{%widgetName%}',
-         {%},
-         constructor: function(){
-             this.renderTo = Ext.getBody();
-             this.callParent(arguments);
-             {%cmpScript%}
-         }
-})
-{%style%}
 {%cmpDataset%}
 {%cmpPopupMenu%}
+window.Win_{%frmObj%} = {%}; 
+window.Win_{%frmObj%}['constructor'] = function() {
+   this.renderTo = Ext.getBody();
+   this.callParent(arguments);
+   window.Win_{%frmObj%} = this;
+   window.Win_{%frmObj%}.config = arguments[0];
+   {%cmpScript%}
+}  
+Ext.define('widget.{%widgetName%}',window.Win_{%frmObj%});
+
+{%style%}
 """
 
 def existContentExtJs(formName,isHtml=0):
@@ -446,7 +448,7 @@ def jsonFunFromString(html="",frmObj=""):
     html = html.replace("close(", f"close({thisName},",)
     html = html.replace("openWindow(", f"openWindow({thisName},",)
     html = html.replace('"Ext.getBody()"', "Ext.getBody()",)
-    html = html.replace("Form.", f"{frmObj}.")
+    html = html.replace("Form.", f"window.Win_{frmObj}.")
     html = html.replace('(--##--)\"', '')
     html = html.replace('\"(--##--)', '')
     html = html.replace('\"(--##--)', '')
@@ -526,8 +528,9 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     if isHtml == 2: # создаем JS файл widget
         if not "extend" in jsonFrm:
             jsonFrm['extend'] = 'Ext.panel.Panel';
+        # mainFormName
         jsonFrmTxt = JSON_stringify(jsonFrm, ensure_ascii=False, sort_keys=True,indent=4, separators=(',', ': '))
-        jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n  """
+        jsonFrmTxt = f""" {jsonFrmTxt[:-1]}\r\n//[[%INPETDATA%]] \r\n }} """
         html = TEMP_JS_WIDGET.replace("{%}", jsonFrmTxt)\
             .replace("{%widgetName%}",widgetName)\
             .replace("{%cmpDataset%}",jsonDataset)\
@@ -1040,6 +1043,25 @@ def initListenerEvent(tagName, eventName, funBody):
     return f"(--##--)function(view){{ {funBody} }}(--##--)"
     """
 
+def recursObjFunction(obj):
+    """
+       Функция преобразования строки из атрибута тэга в JSON объект
+       Рекурсионный обход объекта поиск функций (Убираем кавычки)
+    """
+    if str(type(obj)) == "<class 'list'>":
+        for ind in range(len(obj)):
+            obj[ind] = recursObjFunction(obj[ind])
+        return obj
+    if str(type(obj)) == "<class 'dict'>":
+        for key in obj:
+            if str(type(obj[key])) == "<class 'str'>":
+                if obj[key].strip()[:len("function(")] == "function(":
+                    obj[key] = f'(--##--){obj[key]}(--##--)'
+                if obj[key].strip()[:len("Form.")] == "Form.":
+                    obj[key] = f'(--##--)function(){{ {obj[key]} }}(--##--)'
+            obj[key] = obj[key]
+        return obj
+    return obj
 
 def getCompName(root):
     """
@@ -1099,8 +1121,9 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
             xmldict[k] = f'(--##--){v}(--##--)'
         elif v.strip()[:4] == "Ext.":
             xmldict[k] = f'(--##--){v}(--##--)'
-        elif v.strip()[-1:] == "}" or v.strip()[:1] == "{" or v.strip()[-1:] == "]" or v.strip()[:1] == "[":
-            xmldict[k] = f'(--##--){v}(--##--)'
+        elif v.strip()[-1:] == "]" or v.strip()[:1] == "[" or v.strip()[-1:] == "}" or v.strip()[:1] == "{":
+            v = v.replace("true", "True").replace("false", "False")
+            xmldict[k] = recursObjFunction(eval(v))
 
     if parentRoot==None:
         xmldict["vars_return"] = {}

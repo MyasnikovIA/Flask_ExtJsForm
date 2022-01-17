@@ -87,14 +87,6 @@ def all_files(path):
         txt = jsonForm.getOSMimage(path,app.static_folder)
         return txt, 200, {'content-type': "application/x-javascript"}
 
-    # поиск компонентов ExtJS в каталоге app/www/static/widget
-    #if "widget/" in path:
-    #    begFrag, endFrag = path.split("widget/")
-    #    pathHtmlFromForm = f"{jsonForm.ROOT_DIR.replace('/', os.sep)}{os.sep}Components{os.sep}{endFrag}"
-    #    if os.path.isfile(pathHtmlFromForm):
-    #        bin, mime = jsonForm.sendCostumBin(pathHtmlFromForm)
-    #        return bin, 200, {'content-type': mime}
-
     # Поиск запроса в каталоге static
     queryJson = jsonForm.getAttrQuery(request)
     pathHtmlFromForm = f"{app.static_folder.replace('/', os.sep)}{os.sep}{path}"

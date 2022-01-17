@@ -291,23 +291,21 @@ function setCaption(_dom,propName,value){
     console.log("error","контрол с именем "+propName+" нет на форме");
 }
 
-function getValue(_dom,propName,value){
-   if (typeof(value) === 'undefined') {
-      value = null;
-   }
+function getValue(_dom,propName){
    let ctrlObj = _dom.query('[name='+propName+']');
-   if (ctrlObj) {
+   if (ctrlObj.length > 0) {
       return ctrlObj[0].getValue();
    }
-   console.log("error","контрол с именем "+propName+" нет на форме");
-   return value
+   return undefined
+   // console.log("error","контрол с именем "+propName+" нет на форме");
+   // return value
 }
 
 function setVisible(_dom, ctrl, isVisible) {
    if (typeof(ctrl) === "string") {
       ctrl = getControl(_dom, ctrl);
    }
-   if (ctrl === null ){
+   if (ctrl === null ) {
      console.log("error","контрола нет на форме");
      return
    }
@@ -324,7 +322,7 @@ function setDisable(_dom, ctrl, isDisabled) {
    if (typeof(ctrl) === "string") {
       ctrl = getControl(_dom, ctrl);
    }
-   if (ctrl === null ){
+   if (ctrl === null ) {
      console.log("error","контрола нет на форме");
      return
    }
@@ -332,13 +330,39 @@ function setDisable(_dom, ctrl, isDisabled) {
 }
 
 
+function foundItemsName(_dom, propName) {
+   if (typeof(_dom["name"]) !== 'undefined') {
+      if (_dom["name"] === propName){
+         return _dom;
+      }
+   }
+   if (typeof(_dom["items"]) !== 'undefined') {
+        if (Array.isArray(_dom["items"]) == true) {
+           for (let i = 0; i < _dom["items"].length; i++) {
+             console.log('_dom["items"][i]',i , _dom["items"][i])
+             let subDom =  foundItemsName( _dom["items"][i], propName)
+             if (subDom !== null){
+                return subDom
+             }
+           }
+        } else if (typeof(_dom["items"]) === 'object') {
+            let subDom = foundItemsName( _dom["items"], propName)
+             if (subDom !== null){
+                return subDom
+             }
+        }
+   }
+   return null;
+}
+
 function getControl(_dom, propName) {
+   let mainObject = _dom;
    let ctrlObj = _dom.query('[name='+propName+']');
    if (ctrlObj.length > 0) {
       return ctrlObj[0];
    }
    for (let key in _dom['mainList']) {
-      if (key === propName ){
+      if (key === propName ) {
           return _dom['mainList'][key];
       }
       let ctrlSubObj = _dom['mainList'][key].query('[name='+propName+']');
@@ -347,24 +371,26 @@ function getControl(_dom, propName) {
       }
    }
    for (let key in _dom['dataSetList']) {
-      if (key === propName ){
+      if (key === propName ) {
           return _dom['dataSetList'][key];
       }
    }
-
-
+   let retObj = foundItemsName(_dom, propName);
+   if (retObj !== null) {
+      return null;
+   }
    console.log("error","контрол с именем "+propName+" нет на форме");
    return null;
 }
 
 function close(_dom,mod) {
    let ctrlObj = _dom
-   if (typeof(ctrlObj['parentEvent']) === 'object' ){
-       if (typeof(ctrlObj['parentEvent'].onclose) === 'function' ){
+   if (typeof(ctrlObj['parentEvent']) === 'object' ) {
+       if (typeof(ctrlObj['parentEvent'].onclose) === 'function' ) {
           ctrlObj['parentEvent'].onclose(mod);
        }
    }
-   if (typeof(ctrlObj.close) === 'function'){
+   if (typeof(ctrlObj.close) === 'function') {
       ctrlObj.close();
    } else {
       ctrlObj.destroy()
@@ -435,50 +461,60 @@ function refreshDataSet(){
         isPostQuery = arr.splice(0, 1)[0];
      }
      if(datasetName.length === 0) {
-        console.log("error","Не указано имя dataset")
+        console.log("error", "Не указано имя dataset")
         return;
      }
      if (_domParent == null)  {
-        consople.log("error","Не определен контекст вызова")
+        consople.log("error", "Не определен контекст вызова")
         return;
      }
      let parentFrom = null;
-     formName = _domParent["mainFormName"];
-     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
-     if (typeof(ctrlObj['dataSetList']) === 'undefined')  {
+     formName = _domParent["formName"];
+     if (typeof(_domParent['dataSetList']) === 'undefined')  {
         consople.log("error","Не определен списко dataset на форме")
         return;
      } ;
-     if (typeof(ctrlObj['dataSetList'][datasetName]) === 'undefined') {
-        console.log("error","dataset с именем "+datasetName+" отсутствует на форме")
+     if (typeof(_domParent['dataSetList'][datasetName]) === 'undefined') {
+        console.log("error", "dataset с именем "+datasetName+" отсутствует на форме")
         return;
      }
+     let mainObject = Ext.getCmp(_domParent['mainForm']);
      if ((typeof(_domParent['dataSetVarList'])!=="undefined") && (typeof(_domParent['dataSetVarList'][datasetName])!=="undefined") ) {
         for (let key in _domParent['dataSetVarList'][datasetName]) {
             let srcName = _domParent['dataSetVarList'][datasetName][key]['src']
             let defaultValue = _domParent['dataSetVarList'][datasetName][key]['default']
             if (_domParent['dataSetVarList'][datasetName][key]['srctype'] == "ctrl") {
-                objectQuery[key] = getValue(_domParent,srcName,defaultValue)
+                objectQuery[key] = getValue(_domParent,srcName)
+                if (typeof(objectQuery[key]) === 'undefined') {
+                    if (formName !== _domParent['mainForm']){
+                        objectQuery[key] = getValue(mainObject,srcName);
+                    }else{
+                       objectQuery[key] = defaultValue
+                    }
+                }
             }
             if (_domParent['dataSetVarList'][datasetName][key]['srctype'] == "var") {
-                objectQuery[key] = getVar(_domParent,srcName,defaultValue)
+                objectQuery[key] = getVar(_domParent,srcName)
+                if (objectQuery[key] == null){
+                    objectQuery[key] = getVar(mainObject,srcName,defaultValue)
+                }
             }
         }
      }
-     let storeObj = ctrlObj['dataSetList'][datasetName];
+     let storeObj = _domParent['dataSetList'][datasetName];
      let url = "dataset.php";
      if ((typeof(_domParent['ServerPathQuery']) !== 'undefined') && (_domParent['ServerPathQuery'].length>1)) {
          url = _domParent['ServerPathQuery'][0]+"://"+_domParent['ServerPathQuery'][1]+"/"+url;
      }
      if (!isPostQuery) {
          startProgress();
-         loadScript(url+"?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script){
+         loadScript(url+"?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)).then(function(script) {
             if (typeof(colbackFun) ==='function') {
                      let records = storeObj.getData().items;
                      stopProgress();
                      colbackFun(records);
             }
-         },function(error){
+         },function(error) {
             console.log(error);
          });
      } else {
@@ -548,14 +584,15 @@ function setData() {
         console.log("error","Не указано имя dataset")
         return;
      }
-     if (_domParent == null)  {
+     if (_domParent == null) {
         consople.log("error","Не определен контекст вызова")
         return;
      }
      let parentFrom = null;
-     formName = _domParent["mainFormName"];
-     let ctrlObj = Ext.getCmp(_domParent['mainForm'])
-     if (typeof(ctrlObj['dataSetList']) === 'undefined')  {
+     formName = _domParent["formName"];
+     // let ctrlObj = Ext.getCmp(_domParent['mainFormName'])
+     let ctrlObj = _domParent;
+     if (typeof(ctrlObj['dataSetList']) === 'undefined') {
         consople.log("error","Не определен списко dataset на форме")
         return;
      } ;
@@ -628,16 +665,28 @@ function executeAction(){
      if(datasetName.length === 0) return;
      if (_domParent == null)  return;
      let parentFrom = null;
-     formName = _domParent["mainFormName"];
+     formName = _domParent["formName"];
+     let mainObject = Ext.getCmp(_domParent['mainForm']);
      if ((typeof(_domParent['actionVarList'])!=="undefined") && (typeof(_domParent['actionVarList'][datasetName])!=="undefined") ) {
         for (let key in _domParent['actionVarList'][datasetName]) {
             let srcName = _domParent['actionVarList'][datasetName][key]['src']
             let defaultValue = _domParent['actionVarList'][datasetName][key]['default']
             if (_domParent['actionVarList'][datasetName][key]['srctype'] == "ctrl") {
-                objectQuery[key] = getValue(_domParent,srcName,defaultValue)
+                let varVol = getValue(_domParent,srcName);
+                if (typeof(varVol) === 'undefined') {
+                    if (formName !== _domParent['mainForm']) {
+                       varVol = getValue(mainObject,srcName);
+                    }else{
+                       varVol = defaultValue;
+                    }
+                }
+                objectQuery[key] = varVol;
             }
             if (_domParent['actionVarList'][datasetName][key]['srctype'] == "var") {
-                objectQuery[key] = getVar(_domParent,srcName,defaultValue)
+                objectQuery[key] = getVar(_domParent,srcName)
+                if (objectQuery[key] == null){
+                    objectQuery[key] = getVar(mainObject,srcName,defaultValue)
+                }
             }
         }
      }
@@ -650,8 +699,8 @@ function executeAction(){
          if (typeof(colbackFun) === 'function') {
              colbackFunText = "&colbackFun="+colbackFun.toString();
          }
-         loadScript(url+"?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+colbackFunText).then(function(script){
-         },function(error){
+         loadScript(url+"?Form="+formName+"&dataset="+datasetName+"&data="+JSON.stringify(objectQuery)+colbackFunText).then(function(script) {
+         },function(error) {
              console.log(error);
          });
      }else{
@@ -667,7 +716,6 @@ function executeAction(){
                 countQuery++;
                 if (countQuery == 2) {
                     ctrlObj['actionList'][datasetName] = JSON.parse(request.responseText);
-                    console.log("ctrlObj",ctrlObj)
                     for (let key in ctrlObj['actionList'][datasetName]) {
                         let ctrlObjFild = ctrlObj.query('[name='+key+']');
                         if ((ctrlObjFild) && (ctrlObjFild.length>0)) {
@@ -723,7 +771,7 @@ function openForm() {
      }
      if(formName.length === 0) return;
      var objectOnEvent = {};
-     for (let key in objectQuery){
+     for (let key in objectQuery) {
         if (typeof(objectQuery[key]) === 'function') {
            if (key.substr(0, 2) === 'on' ) {
               objectOnEvent[key] = objectQuery[key];
@@ -766,9 +814,8 @@ function getRandomString(length) {
 function makeid() {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (var i = 0; i < 5; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-
+  for (var i = 0; i < 5; i++) {
+     text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
   return text;
 }
