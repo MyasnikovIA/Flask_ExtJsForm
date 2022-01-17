@@ -1,15 +1,20 @@
-<div extend="Ext.window.Window" modal="true" buttons="[{'text':'OK','handler':'Form.testFun()' ,'test':true},{'text':'getTime','handler':'Form.getTimeFun()' ,'test':true}]">
+<div extend="Ext.window.Window"
+     closable="true"
+     closeAction="hide"
+     modal="true"
+     buttons="[{'text':'Ок','handler':'Form.testFun()' ,'test':true},{'text':'Отмена','handler':'Form.onCansel()' ,'test':true}]">
+
     <cmpScript>
        <![CDATA[
           //this.show();
           Form.testFun = function() {
-             alert("ok");
-          }
-          Form.getTimeFun = function() {
              executeAction("myAction");
              refreshDataSet('DS_COMBO',function(){ alert('ok'); });
+             this.close();
           }
-
+          Form.onCansel = function() {
+             this.close();
+          }
        ]]>
     </cmpScript>
     <cmpTextField  allowBlank="false" fieldLabel="Name:" name="MyTime" emptyText="Name ID" />
