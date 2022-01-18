@@ -170,6 +170,8 @@ def getSrcSaveTemp(formName, data, session, isHtml=0):
     """
         Функция получения кэшированной формы (в папке темп HTML)
     """
+    if not path.exists(TEMP_DIR_PATH):
+        makedirs(TEMP_DIR_PATH)
     blockName = ""
     if ":" in formName:
         blockName, formName = formName.split(":")
@@ -182,15 +184,15 @@ def getSrcSaveTemp(formName, data, session, isHtml=0):
         formNameBody = formName[:((len(ext)) * -1) - 1]
     if isHtml == 2:
         ext = "js"
-    cmpFiletmp = path.join(cmpDirSrc, f"{formNameBody.replace(sep, '_').replace('-','_')}{blockName}.{ext}").replace("/", sep)
+    cmpFiletmp = path.join(TEMP_DIR_PATH, f"{formNameBody.replace(sep, '_').replace('-','_')}{blockName}.{ext}").replace("/", sep)
     cmpFilesrc = path.join(FORM_PATH, formName).replace("/", sep)
     mime = mimeType(ext)
-    if not path.exists(cmpDirSrc):
-        makedirs(cmpDirSrc)
-    if not path.exists(path.dirname(cmpFiletmp)):
-        makedirs(path.dirname(cmpFiletmp))
     if "widget/" in formName and ext == "js": # если в пути есть "widget/" и расширение ресурса "js", тогда обрабатываем как компонент из формы (меняем расширение )
         cmpFilesrc = f"{cmpFilesrc[:cmpFilesrc.rfind('.')]}.frm"
+        formNameBody = formNameBody.split("widget/")[1]
+        cmpFiletmp = path.join(TEMP_DIR_PATH,"widget", f"{formNameBody.replace(sep, '_').replace('-','_')}{blockName}.{ext}").replace("/", sep)
+    if not path.exists(path.dirname(cmpFiletmp)):
+        makedirs(path.dirname(cmpFiletmp))
     if path.exists(cmpFiletmp) and path.exists(cmpFilesrc):
         statsSrc = stat(cmpFilesrc)
         statsTmp = stat(cmpFiletmp)
