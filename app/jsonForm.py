@@ -31,7 +31,7 @@ TEMP_DIR_PATH = path.join(path.dirname(__file__), app.template_folder.replace('/
 ROOT_DIR = path.join(path.dirname(__file__))               # Корневая папка
 FORM_DIR = "Forms"                                         # Каталог расположения форм
 USER_DIR = "UserForms"                                     # Каталог фрагментами для переопределения форм
-FORM_PATH = path.join(path.dirname(__file__), FORM_DIR )       # Директория  где хронятся формы
+
 
 
 global TMP_PAGE_CAHE
@@ -185,7 +185,7 @@ def getSrcSaveTemp(formName, data, session, isHtml=0):
     if isHtml == 2:
         ext = "js"
     cmpFiletmp = path.join(TEMP_DIR_PATH, f"{formNameBody.replace(sep, '_').replace('-','_')}{blockName}.{ext}").replace("/", sep)
-    cmpFilesrc = path.join(FORM_PATH, formName).replace("/", sep)
+    cmpFilesrc = path.join(FORM_DIR, formName).replace("/", sep)
     mime = mimeType(ext)
     if "widget/" in formName and ext == "js": # если в пути есть "widget/" и расширение ресурса "js", тогда обрабатываем как компонент из формы (меняем расширение )
         cmpFilesrc = f"{cmpFilesrc[:cmpFilesrc.rfind('.')]}.frm"
@@ -392,10 +392,10 @@ def getXMLObject(formName):
     USER_FORM_PATH = path.join(path.dirname(__file__), USER_DIR)
 
     if ext == "html" or ext == "frm":
-        pathForm = f"{FORM_PATH}{sep}{formName}"
+        pathForm = f"{FORM_DIR}{sep}{formName}"
         pathUserForm = f"{USER_FORM_PATH}{sep}{formName}"
     else:
-        pathForm = f"{FORM_PATH}{sep}{formName}.frm"
+        pathForm = f"{FORM_DIR}{sep}{formName}.frm"
         pathUserForm = f"{USER_FORM_PATH}{sep}{formName}.frm"
     if path.exists(pathUserForm):
         pathForm = pathUserForm
