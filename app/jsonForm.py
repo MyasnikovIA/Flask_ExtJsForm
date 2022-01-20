@@ -1094,7 +1094,6 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
        nodes = rootForm.findall(f'*[@name="{root.attrib.get("popupmenu")}"]')
        if len(nodes)>0:
            xmldicttmp = dict(nodes[0].attrib.copy())
-           print(xmldicttmp)
            if "onpopup" in xmldicttmp:
                 onPopUpFun = f"{xmldicttmp['onpopup']};"
        root.attrib["onitemcontextmenu"] = f"""let arr = [].slice.call(arguments); arr[4].stopEvent(); {onPopUpFun} showPopupMenu('{root.attrib.get('popupmenu')}',arr[4].getX(),arr[4].getY()); return false;"""
