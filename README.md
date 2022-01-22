@@ -13,6 +13,11 @@
 После того, как платформа переработает XML файл, резултат выгрузится в HTML файл в каталоге ***"app\www\templates"***
 
 **Примеры применения компонентов распологаются в каталоге "app\Forms\Tutorial"**
+Создание форм
+
+Создание форм:  https://youtu.be/Y-wlEw2RqPM
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Y-wlEw2RqPM/0.jpg)](https://www.youtube.com/watch?v=Y-wlEw2RqPM)
+<br>
 
 **Пример:**
 ```xml
