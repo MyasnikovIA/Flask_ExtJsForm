@@ -15,8 +15,8 @@
 **Примеры применения компонентов распологаются в каталоге "app\Forms\Tutorial"**
 Создание форм
 
-Создание форм:  https://youtu.be/Y-wlEw2RqPM
-<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Y-wlEw2RqPM/0.jpg)](https://www.youtube.com/watch?v=Y-wlEw2RqPM)
+Пример создание форм:  https://youtu.be/7zxrvjW0za8
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/7zxrvjW0za8/0.jpg)](https://www.youtube.com/watch?v=7zxrvjW0za8)
 <br>
 
 **Пример:**
