@@ -9,7 +9,8 @@
 Разработка была сделана для управщения создания приложений на базе фрэймворка ExtJS.
 
 Работа платформы основана на преобразовании XML формата формы в HTML страницу.  
-Все атрибуты XML тэга перемещаются в атрибуты объекта. Все вложенные объекты перемещаются в блок children 
+Все атрибуты XML тэга перемещаются в атрибуты объекта. Все вложенные объекты перемещаются в блок children.
+После того, как платформа переработает XML файл, резултат выгрузится в HTML файл в каталоге ***"app\www\templates"***
 
 **Примеры применения компонентов распологаются в каталоге "app\Forms\Tutorial"**
 
@@ -268,12 +269,8 @@ pip install -r requirements.txt
 android\Flask_D3_client\app\build\outputs\apk\debug\app-debug.apk - браузер клинт D3 под андроид
 
 Если в JS коде присутствует объект  с именем Android значит в качестве браузера выступает **"D3extClient"** 
-
 <img src="https://github.com/MyasnikovIA/Flask_D3_v2/blob/main/img/scr.png?raw=true"/>
-
-
 <img src="https://github.com/MyasnikovIA/Flask_D3_v2/blob/main/img/scrAndroid.png?raw=true"/>
-
 Команды для работы с докером
 ```
 docker save -o F:\DockerProject\Flask_Python_3.8\Flask_001(13.10.2020).tar python3.6_flask:flask_001     - выгразить контейнер в файл 
