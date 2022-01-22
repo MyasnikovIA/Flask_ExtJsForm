@@ -43,16 +43,19 @@
             <items  text="55555" onclick="Form.mylert2()"></items>
         </cmpButton>
 
-
         <cmpCombo fieldLabel ="Параметры в атрибутах" width="320" queryMode="local" name='division' autoSelect="true" forceSelection="true" store="[10,20,30]" />
 
+        <cmpCombo fieldLabel ="Параметры в атрибутах" width="320" queryMode="local" name='division' autoSelect="true" forceSelection="true" store="{'key':'','value':''}" />
         <cmpCombo fieldLabel ="Параметры в теле" width="320" queryMode="local" name='division' autoSelect="true" forceSelection="true" displayField='text' valueField='value' >
-            <![CDATA[ [10 ,20,30, 40 ]  ]]>
+            <![CDATA[ [10 ,20,30, 400 ]  ]]>
         </cmpCombo>
 
+        <cmpCombo fieldLabel ="Параметры в теле" width="320" queryMode="local" name='division' autoSelect="true" forceSelection="true" displayField='text' valueField='value' >
+            <![CDATA[ [{"text":'поле 1','value':'1111'},{"text":'поле 2','value':'2222'}]  ]]>
+        </cmpCombo>
 
         <cmpCombobox fieldLabel="Параметры в теле"  width="420" valueField='value' displayField='text'   queryMode='local'>
-            <![CDATA[ [ {value:10,text:"зелен1" },{value:20,text:"зелен2" },{value:30,text:"зелен3" } ]  ]]>
+            <![CDATA[ [ {'value':10,'text':"зелен1" },{'value':20,'text':"зелен2" },{'value':30,'text':"зелен3" } ]  ]]>
         </cmpCombobox>
 
         <cmpCombobox fieldLabel="Параметры в теле JS функци" width="420"  valueField='value' displayField='text'   queryMode='local'>
@@ -60,18 +63,16 @@
         </cmpCombobox>
 
         <cmpCombobox fieldLabel="Выберите язык" width="420" valueField='value' displayField='text' queryMode='local'>
-            <store value="10" text="зелен"/>
-            <store value="20" text="РОс"/>
-            <store value="30" text="------ыафва"/>
+            <cmpItem value="10" text="зелен"/>
+            <cmpItem value="20" text="РОс"/>
+            <cmpItem value="30" text="-ыафва"/>
         </cmpCombobox>
 
-        <cmpCombobox fieldLabel="Выберите язык" width="420" valueField='value' displayField='text' queryMode='local'>
-            <store value="10" text="зелен"/>
-            <store value="20" text="РОс"/>
-            <store value="30" text="------ыафва"/>
+       <cmpCombobox fieldLabel="Выберите язык" width="420" valueField='value' displayField='text' >
+            <store value="10" text="зелен1111"/>
+            <store value="20" text="РОс222"/>
+            <store value="30" text="-ыафва333"/>
         </cmpCombobox>
         <cmpCombobox fieldLabel="Использование URL " width="420" valueField='value' displayField='text' queryMode='local' url="json/tutorialdata.json"/>
-        <cmpCombobox fieldLabel="Использование URL " width="420" valueField='value' displayField='text' queryMode='local' proxy="json/tutorialdata.json"/>
-
     </cmpPanel>
 </div>

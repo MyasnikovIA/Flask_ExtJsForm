@@ -42,10 +42,10 @@
 
        ]]>
     </cmpScript>
-    <item region="west" collapsible="true" width="350" title="Панель слева" split="true">
+    <cmpPanel region="west" collapsible="true" width="350" title="Панель слева" split="true">
         <cmpTextField name="foundObjectText" value="барнаул"  region="north" onspecialkey="Form.onFoundObjectText();"  height="25" width="100%"/>
         <cmpLabel region="center" name="objectInfo"  text="---"/>
-    </item>
+    </cmpPanel>
     <cmpOSM region="center" name="MyOsm" onclick="Form.onGetInfo()"   split="true" >
 
     </cmpOSM>

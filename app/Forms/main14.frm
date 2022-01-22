@@ -17,11 +17,11 @@
        ]]>
     </cmpScript>
 
-    <item region="center"   >
+    <cmpPanel region="center"   >
         <cmpButton text="Send 5001" onclick="Form.onClickBtnGet5001(arguments)"/>
         <cmpButton text="Send 9091" onclick="Form.onClickBtnGet9091(arguments)"/>
         <cmpButton text="Send onClickBtnGet90912" onclick="Form.onClickBtnGet90912(arguments)"/>
-    </item>
+    </cmpPanel>
 
 
 </div>

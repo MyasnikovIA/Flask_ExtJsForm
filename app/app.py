@@ -77,12 +77,12 @@ def all_files(path):
         txt = jsonForm.getActionQuery(request, queryJson, session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
-    # запрос к стороннему стенду
+    # запрос к стороннему стенду (реализация микросервисной архитектуры)
     if "http:" in path or "https:" in path:
         txt = jsonForm.getRemouteForm(path, request, session["ID"])
         return txt, 200, {'content-type': "application/x-javascript"}
 
-    # Загрузка изображения карты
+    # Загрузка изображения карты (компонент cmpOSM)
     if "openstreetmap/" in path:
         txt = jsonForm.getOSMimage(path,app.static_folder)
         return txt, 200, {'content-type': "application/x-javascript"}
@@ -94,9 +94,11 @@ def all_files(path):
         bin, mime = jsonForm.sendCostumBin(pathHtmlFromForm)
         return bin, 200, {'content-type': mime}
 
-    format = 1
-    if "type" in queryJson and queryJson['type'] == "js":
+    format = 0
+    if "widget/" in path:
         format = 2
+    elif "type" in queryJson and queryJson['type'] == "js":
+        format = 1
     # Поиск запроса в каталоге Forms и templates
     isExist, pathHtmlFromForm = jsonForm.existContentExtJs(path, format)
     if isExist:

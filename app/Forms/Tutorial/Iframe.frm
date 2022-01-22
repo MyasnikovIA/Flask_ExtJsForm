@@ -6,10 +6,6 @@
 
     <cmpScript>
        <![CDATA[
-           Form.listeners["afterrender"] = function(){
-               Form.loadEmploePage('temp.html');
-           }
-
            var ContentEditorDocumeIframe;
            Form.loadEmploePage = function(pathPage) {
                 ContentEditorDocumeIframe = document.getElementById('TabBodyEdit');
@@ -84,7 +80,7 @@
              html: 'Ext JS is here!'
          })
 
-
+         Form.loadEmploePage('temp.html');
        ]]>
     </cmpScript>
 

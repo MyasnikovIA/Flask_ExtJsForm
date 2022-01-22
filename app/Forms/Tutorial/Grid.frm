@@ -44,7 +44,7 @@
         </cmpDataSet>
 
 
-         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true" onitemclick=" console.log(arguments);  " >
+         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ 'forceFit': true, 'scrollOffset': 0 }" autoHeight="true" onitemclick=" console.log(arguments);  " >
               <![CDATA[
                    [ {id:1,name:"11111111"}
                      ,{id:2,name:"2222222222222"}
@@ -55,7 +55,7 @@
              <colum dataIndex='name' width="670" header='Name' />
          </cmpGrid>
 
-         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ forceFit: true, scrollOffset: 0 }" autoHeight="true"  url="/json/tutorialdata.json">
+         <cmpGrid title="Пользователи" height="150" width="500" viewConfig="{ 'forceFit': true, 'scrollOffset': 0 }" autoHeight="true"  url="/json/tutorialdata.json">
              <colum field='value'  caption='поле 1'  width="330"/>
              <colum field='text'   caption='поле 2'  width="670"/>
          </cmpGrid>

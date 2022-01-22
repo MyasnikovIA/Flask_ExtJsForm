@@ -464,7 +464,9 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     """
     ext = formName[formName.rfind('.') + 1:].lower()
     widgetName=""
-    if "widget/" in formName:
+    if "isModal" in data and data['isModal'] == True:
+        isHtml = 1
+    elif "widget/" in formName:
         formName = f"widget/{formName[:formName.rfind('.')].split('widget/')[1]}.frm"
         widgetName = f"{formName[:formName.rfind('.')]}".split("widget/")[1].lower()
         ext = "js"
@@ -477,7 +479,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
     # ---- получить HTML файл с перенаправлением на JS формой
     rootForm, script, dataset, action, popupMenu, styleBlock = getXMLObject(formName)
     if rootForm.tag == "error":
-        if isHtml == 1:
+        if isHtml == 0:
             return f'<h1>error: {rootForm.text} </h1>', "text/html"
         else:
             return f'{{"error":"{rootForm.text}"}}', "application/x-javascript"
@@ -522,7 +524,7 @@ def getSrc(formName, data={}, session={}, isHtml=0):
             .replace("{%style%}",jsonStyle)\
             .replace("{%showWin%}",showWin)
         html = jsonFunFromString(html,frmObj)
-        if isHtml == 1:
+        if isHtml == 0:
             html = TEMP_HTML_FORM.replace("{%}", html)
             return  html,  mimeType(ext)
         return html, mimeType(ext)
@@ -749,7 +751,8 @@ def parseXMLDataset(datasetXml, jsonFrm, data, session):
         extDataStore['mainForm'] = jsonFrm["mainForm"]
         extDataStore['mainFormName'] = jsonFrm["mainFormName"]
         # extDataStore['proxy'] = {"type":"ajax", "url":f"dataset.php?Form={jsonFrm['mainFormName']}&dataset={xmldict['name']}", "reader":{'type': 'json', 'root': 'data'}}
-        extDataStore['proxy'] = {"type":"ajax","reader":{'type': 'json', 'root': 'data'}}
+        # extDataStore['proxy'] = {"type":"ajax","reader":{'type': 'json', 'root': 'data'}}
+        extDataStore['proxy'] = {"type":"ajax"}
         # JSON.stringify(objectQuery)
         extDataStore["listeners"]={}
         extDataStore["records"]=[]
@@ -992,7 +995,14 @@ def parseComboBoxElement(rootForm,xmldict,formName, data, session, root, info):
         xmldict['fieldLabel'] = xmldict['caption']
         del xmldict['caption']
     if "store" in xmldict:
-        xmldict["store"] = f'''{xmldict["store"].replace('"', "'")}'''
+        print("store", xmldict["store"])
+        if str(type(xmldict["store"])) == "<class 'list'>":
+            return xmldict
+        if str(type(xmldict["store"])) == "<class 'dict'>":
+            data = xmldict["store"]
+            xmldict["store"] = f"""(--##--)Ext.create('Ext.data.Store', {{ fields:{[*data.keys()]},data : {data} }})(--##--)"""
+            return xmldict
+        #xmldict["store"] = f'''{xmldict["store"].replace('"', "'")}'''
         return xmldict
     if "dataset" in xmldict:
         xmldict["store"] = f'''(--##--)DATA_SET_{{%frmObj%}}_{xmldict['dataset']}(--##--)'''
@@ -1004,24 +1014,37 @@ def parseComboBoxElement(rootForm,xmldict,formName, data, session, root, info):
         storeObj["fields"] = xmldict["fields"].split(",")
         del xmldict["fields"]
     if "data" in xmldict:
-        storeObj["data"] = f'''(--##--){xmldict["data"].replace('"', "'")}(--##--)'''
+        storeObj["data"] = xmldict["data"]
         del xmldict["data"]
     if len(root) == 0 and not root.text == None and not root.tail == None:
         txtval = root.text.replace("\r", "").replace("\n", "").replace('"', "'")
         if len(txtval) > 0:
-            storeObj["data"] = f'(--##--){txtval}(--##--)'
+            if txtval.strip()[-1:] == "]" or txtval.strip()[:1] == "[" or txtval.strip()[-1:] == "}" or txtval.strip()[:1] == "{":
+                txtval = txtval.replace("true", "True").replace("false", "False")
+                val = recursObjFunction(eval(txtval))
+                if str(type(val)) == "<class 'list'>":
+                    if len(val)>0:
+                        if str(type(val[0])) == "<class 'dict'>":
+                            xmldict["store"] = f"""(--##--)Ext.create('Ext.data.Store', {{ fields:{[*val[0].keys()]},data : {val} }})(--##--)"""
+                        else: xmldict["store"] = val
+                return xmldict
+            else:
+                storeObj["data"] = f'(--##--){txtval}(--##--)'
     elif len(root) > 0:
+        subObject={}
         for elem in root:
-            subObject = parseXMLFrm(elem, formName, data, session, root, info)
-            if "mainForm" in subObject:
-                del subObject['mainForm']
-            if "mainFormName" in subObject:
-                del subObject['mainFormName']
+            subObject = dict(elem.attrib.copy())
             dataItem.append(subObject)
-        storeObj["data"] = dataItem
+        xmldict["store"] = f"""(--##--)Ext.create('Ext.data.Store', {{ fields:{[*subObject.keys()]},data : {dataItem} }})(--##--)"""
+        return xmldict
     elif "url" in xmldict:
-        storeObj["data"] = f'''(--##--)getJsonUrl('{xmldict['url']}')(--##--)'''
+        fields = []
+        if "fields" in storeObj:
+            fields = storeObj["fields"]
+        xmldict["store"] = f"""(--##--)Ext.create('Ext.data.Store', {{ fields:{fields},data : getJsonUrl('{xmldict['url']}') }})(--##--)"""
+        # storeObj["data"] = f'''(--##--)getJsonUrl('{xmldict['url']}')(--##--)'''
         del xmldict['url']
+        return xmldict
     xmldict["store"] = storeObj
     return xmldict
 
@@ -1070,6 +1093,10 @@ def getCompName(root):
         Функция получения имени компонента
     """
     compName=""# root.tag
+    if str(type(root)) == "<class 'str'>":
+        if root[:3] == 'cmp':
+            compName = root[3:].lower()
+        return compName
     if 'cmptype' in root.keys():
         compName = root.attrib['cmptype'].lower()
     else:
@@ -1078,12 +1105,14 @@ def getCompName(root):
     return compName
 
 itemsThiwObject = ["buttons"]
-itemsBlock = ['div','item']
+itemsBlock = ['div','item','br']
 htmlBlock = ['iframe']
 def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"numEl":0}):
     """
        Конвертировать XML объект формы в ExtJS объект
     """
+    if str(type(root)) == "<class 'str'>":
+        return root
     compName = getCompName(root)
     if compName == "script" or compName == "dataset" or compName == "action":
         return None
@@ -1141,7 +1170,7 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
     if not "id" in xmldict and "name" in xmldict:
         xmldict["id"] = "ctrl"+md5(f'{str(uuid1()).replace("-", "")}{info["numEl"]}{xmldict}{datetime.now().microsecond}'.encode()).hexdigest()
 
-    if root.tag.lower() in htmlBlock:
+    if not parentRoot == None and (len(compName) == 0 or root.tag.lower() in htmlBlock):
         xmldict["html"] = (ET.tostring(root)).decode('UTF-8')
         return xmldict
 
@@ -1348,7 +1377,9 @@ def dataSetQuery(queryJson, sessionId):
             xmldictSub = dict(el.attrib.copy())
             nameVar = xmldictSub['name']
             sessionVar.append(nameVar)
-            defaultValue = xmldictSub['default']
+            defaultValue = ""
+            if "default" in xmldictSub:
+                defaultValue = xmldictSub['default']
             dataObj[nameVar] = defaultValue
             if nameVar in SESSION_DICT[sessionId]:
                 dataObj[nameVar] = SESSION_DICT[sessionId][nameVar]

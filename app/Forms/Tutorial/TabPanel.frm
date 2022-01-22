@@ -1,5 +1,13 @@
 <div caption="Примеры использования контролов" >
-   <cmptabpanel region="center" activeTab="0" margin="3 0 15 0" width="100%"  >
+
+        <cmpScript>
+        <![CDATA[
+           Form.onTypeChange = function(arguments) {
+              console.log("arguments",arguments);
+           }
+       ]]>
+    </cmpScript>
+   <cmptabpanel region="center" activeTab="0" margin="3 0 15 0" width="100%"  onTabchange="Form.onTypeChange(arguments);">
         <item title="tab1" bodyPadding="10" html='A simple tab'>
             fasdfsadfsa
             asdfasdf

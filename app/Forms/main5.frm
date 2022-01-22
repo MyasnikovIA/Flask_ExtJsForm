@@ -9,11 +9,11 @@
 
         </cmpButton>
 
-        <Buttons>
+        <cmpButton text="menu">
             <item text="New User Register" scale="medium" handler="function(){ alert( getValue('MyEdit') ); }"/>
             <item text="New User Register111" scale="medium" handler="function(){  setValue('MyEdit',111);  }"></item>
             <item text="open openWindow" scale="medium" handler="function(){  openForm('main3',false);  }"></item>
             <item text="--!!!!!!!!open openForm modal!!!" scale="medium" handler="function(){  openForm('main3',true,{width: 800,height: 600,vars:{aaa:111,bbb:222,ccc:333},onclose:function(mod){console.log('OK',mod);}}); }" ></item>
-        </Buttons>
+        </cmpButton>
     </cmpPanel>
 </div>

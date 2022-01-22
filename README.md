@@ -1,36 +1,127 @@
-# Flask_D3Ext_v2
-Трансляция фреймворка D3 от компании Bars-груп с PHP на Python3.8(вариант2)
+# Flask_ExtJsForm
+Конвертор XML форм в HTML страницы с использованием фрэймворка ExtJS  
+<h1>Проект находится в стадии поиска оптимальной архитектуры</h1>
 
-<H1>Тупиковая ветсвь развития, (оставить пример как писать не надо)</H1>
 <br> **Установка**r:  https://youtu.be/eUePsfeHuwg
 <br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/eUePsfeHuwg/0.jpg)](https://www.youtube.com/watch?v=eUePsfeHuwg)
 
 
-
 **Для чего эта разработка**
-Разработка была сделана для расширения стандартной HTML компонентной базы.
-<br/>Поведение пользовательских компонентов , которые будут использоватся в проекте описано 
-<br/>в каталоке "app\Components"
-<br/>При использовании компонентов название начинается со слова "cmp"
-<br/>На пример, необходимо подключить компонент в HTML странице, описанный в каталоге "app\Components\Button"
-<br/> тэг будет выглядить так ```<cmpButton caption="push my" onclick="alert('click')"/>```
-<br/>__Html страница будет такой:__
+Разработка была сделана для управщения создания приложений на базе фрэймворка ExtJS.
+
+Работа платформы основана на преобразовании XML формата формы в HTML страницу.  
+Все атрибуты XML тэга перемещаются в атрибуты объекта. Все вложенные объекты перемещаются в блок children 
+**Пример:**
+```xml
+Исходный файл формы: 
+<div caption="Примеры использования контролов" >
+    <cmpPanel text="Expander component"  title='Центральная панель' region="center" margin='5 5 5 5'>
+        <cmpButton text="menu">
+            <div text='New User Register' scale="medium" handler="alert(444);"/>
+            <div text='Login' scale="medium" handler="alert(555);"/>
+        </cmpButton>
+    </cmpPanel>
+</div>
+```
 ```html
-<html lang="en">
-	<head>
-		<link rel="stylesheet" type="text/css" href="./~d3theme"/>
-		<script src="./~d3main"></script>
-	</head>
-	<body>
-		<div>
-			<cmpButton caption="push my" onclick="alert('click')"/>
-		</div>
-	</body>
+// результат переработки платформой
+<!DOCTYPE html>
+<html>
+   <head>
+        <meta charset="utf-8"/>
+        <link href="/lib/ExtJS_6.2.0/classic/theme-classic/resources/theme-classic-all.css" rel="stylesheet" />
+        <script type="text/javascript" src="/lib/ExtJS_6.2.0/ext-all.js"></script>
+        <script type="text/javascript" src="/js/common.js"></script>
+        <script type = "text/javascript">
+             document.addEventListener('contextmenu', event => event.preventDefault());
+             
+           Ext.onReady(function() {
+                if (typeof(window.Win_mainfrm) === 'undefined') window.Win_mainfrm = "";
+                
+                
+                var main17frm_onclose = function(data){ }
+                var main17frm =  {
+    "ServerPathQuery": [
+        "main17.frm"
+    ],
+    "actionList": {},
+    "actionVarList": {},
+    "caption": "Примеры использования контролов",
+    "dataSetList": {},
+    "dataSetVarList": {},
+    "formName": "main17.frm",
+    "id": "win4ab3ae037b609d31efa8d86177c497ba",
+    "items": [
+        {
+            "items": [
+                {
+                    "mainForm": "win4ab3ae037b609d31efa8d86177c497ba",
+                    "mainFormName": "main17.frm",
+                    "menu": [
+                        {
+                            "handler": "alert(444);",
+                            "mainForm": "win4ab3ae037b609d31efa8d86177c497ba",
+                            "mainFormName": "main17.frm",
+                            "scale": "medium",
+                            "text": "New User Register"
+                        },
+                        {
+                            "handler": "alert(555);",
+                            "mainForm": "win4ab3ae037b609d31efa8d86177c497ba",
+                            "mainFormName": "main17.frm",
+                            "scale": "medium",
+                            "text": "Login"
+                        }
+                    ],
+                    "text": "menu",
+                    "xtype": "button"
+                }
+            ],
+            "mainForm": "win4ab3ae037b609d31efa8d86177c497ba",
+            "mainFormName": "main17.frm",
+            "margin": "5 5 5 5",
+            "region": "center",
+            "text": "Expander component",
+            "title": "Центральная панель",
+            "xtype": "panel"
+        }
+    ],
+    "layout": "border",
+    "listeners": {},
+    "mainForm": "win4ab3ae037b609d31efa8d86177c497ba",
+    "mainFormName": "main17.frm",
+    "mainList": {},
+    "parentEvent": {},
+    "renderTo": Ext.getBody(),
+    "retuen_object": {},
+    "vars_return": {}
+
+,"ServerPathQuery": ["main17.frm"] 
+ } ;
+                if ( typeof(window.ExtObj["FormsObject"]) !=='undefined'){
+                    if (typeof(window.ExtObj["FormsObject"]['main17.frm']) !== 'function') {
+                       main17frm['parentEvent'] = window.ExtObj["FormsObject"]['main17.frm'];
+                       delete window.ExtObj["FormsObject"]['main17.frm'];
+                    }
+                }
+                if ( typeof(main17frm['vars']) !=='undefined') main17frm['vars'] = {};
+                main17frm["vars"]//=[[%DataVars%]]
+                window.Win_main17frm = Ext.create('Ext.Viewport',main17frm);
+                window.Win_main17frm;
+                
+                
+           });
+
+        </script>
+   </head>
+   <body></body>
 </html>
 ```
+<br/> На формах XML можно распологать SQL запросы для получения давнных из БД. 
 
+
+<!--
 **Примеры применения компонентов распологаются в каталоге "app\Forms\Tutorial"**
-
 
 **Запуск платформы в Docker контейнере**
 ```
@@ -124,3 +215,4 @@ docker images
 docker commit d02a9d321c4b python3.8_flask:flask_001
 -------------------------------------------------------------
 ```
+-->

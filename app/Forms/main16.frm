@@ -21,6 +21,7 @@ Ext.create('Ext.window.Window', {
         xtype:'mygrid'
     }]
 }).show();
+
        ]]>
     </cmpScript>
 

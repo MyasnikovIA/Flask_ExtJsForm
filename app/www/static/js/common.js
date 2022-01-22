@@ -465,13 +465,13 @@ function refreshDataSet(){
         return;
      }
      if (_domParent == null)  {
-        consople.log("error", "Не определен контекст вызова")
+        console.log("error", "Не определен контекст вызова")
         return;
      }
      let parentFrom = null;
      formName = _domParent["formName"];
      if (typeof(_domParent['dataSetList']) === 'undefined')  {
-        consople.log("error","Не определен списко dataset на форме")
+        console.log("error","Не определен списко dataset на форме")
         return;
      } ;
      if (typeof(_domParent['dataSetList'][datasetName]) === 'undefined') {
@@ -585,7 +585,7 @@ function setData() {
         return;
      }
      if (_domParent == null) {
-        consople.log("error","Не определен контекст вызова")
+        console.log("error","Не определен контекст вызова")
         return;
      }
      let parentFrom = null;
@@ -593,11 +593,11 @@ function setData() {
      // let ctrlObj = Ext.getCmp(_domParent['mainFormName'])
      let ctrlObj = _domParent;
      if (typeof(ctrlObj['dataSetList']) === 'undefined') {
-        consople.log("error","Не определен списко dataset на форме")
+        console.log("error","Не определен списко dataset на форме")
         return;
      } ;
      if (typeof(ctrlObj['dataSetList'][datasetName]) === 'undefined') {
-        consople.log("error","dataset с именем "+datasetName+" отсутствует на форме")
+        console.log("error","dataset с именем "+datasetName+" отсутствует на форме")
         return;
      }
      let storeObj = ctrlObj['dataSetList'][datasetName];
@@ -627,7 +627,7 @@ function showPopupMenu(){
      let ctrlObj = _domParent;
      if (typeof(ctrlObj['mainList']) === 'undefined')  return;
      if (typeof(ctrlObj['mainList'][menuName]) === 'undefined') {
-        consople.log("error","меню с именем "+menuName+" отсутствует на форме")
+        console.log("error","меню с именем "+menuName+" отсутствует на форме")
         return;
      }
      let storeObj = ctrlObj['mainList'][menuName];
