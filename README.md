@@ -1,8 +1,28 @@
 # Flask_ExtJsForm
 Конвертор XML форм в HTML страницы с использованием фрэймворка ExtJS  
 
-<br> **Установка**r:  https://youtu.be/eUePsfeHuwg
-<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/eUePsfeHuwg/0.jpg)](https://www.youtube.com/watch?v=eUePsfeHuwg)
+<br> **Установка**:  https://youtu.be/7c3x6jsWJws
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/7c3x6jsWJws/0.jpg)](https://www.youtube.com/watch?v=7c3x6jsWJws)
+```
+1) Скачать репозиторий локально;
+2) Запустить Docker (авторизоватся);
+3) Запустить скрипт для сборки Docker контейнера "build.bat"(подождать окончания сборки);
+4) Запустите контейнер через скрипт "run.bat". Полсе запуска через 10 секунд откроется браузер 
+   или перейти по адресу   http://127.0.0.1:9091/
+```
+
+**Запуск платформы локально**
+```
+1) Скачать репозиторий локально;
+2) Перейти в директорию платформы "\Flask_ExtJsForm\app"
+3) В командной строке установить виртуальное окружение cmd:virtualenv env
+                                                       cmd:python -m venv env
+4) Активировать виртуальное окружение cmd:env\Scripts\activate.bat
+5) Установить зависимости проекта cmd:pip install -r requirements.txt
+6) Запустить сервер cmd:python app.py 5001
+    5001 - порт на котором запустился сервер
+	Запустить браузер и перейти по адресу http://127.0.0.1:5001/
+``` 
 
 
 **Для чего эта разработка**
@@ -200,47 +220,14 @@
 **Назначение файлов и директорий в проекте**
 ```
 app\app.py - Скрипт сервера Flask (точка запуска проекта)
-app\getform.py - Парсер Frm в HTML
-app\Components - Содержит описание компонентов, стилей и библиотек для работы с этими компонентами
+app\jsonForm.py - Парсер Frm в HTML
 app\Forms      - Содержит формы для преобразования парсером
-app\UserForms  - Содержит фрагменты XML для переопределения основных форм
 app\requirements.txt - содержит список подключаемых модулей, которые необходимо инсталлировать
 build.bat - скрипт для сборки Docker контейнера с проектом
 run.bat - скрипт для запуска собранного Docker контейнера с проектом
 save_images.bat - скрипт для выгрузки архива Docker контейнера
 commit_images.bat - скрипт для фиксации состояния работающего  Docker контейнера
 ```
-**Запуск платформы в Docker контейнере**
-```
-1) Скачать репозиторий локально;
-2) Запустить Docker (авторизоватся);
-3) Запустить скрипт для сборки Docker контейнера "build.bat"(подождать окончания сборки);
-4) Запустите контейнер через скрипт "run.bat". Полсе запуска через 10 секунд откроется браузер 
-   или перейти по адресу   http://127.0.0.1:9091/
-```
-Развертывание  платформы в Docker:  https://youtu.be/IsNmCKiFTuY
-<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/IsNmCKiFTuY/0.jpg)](https://www.youtube.com/watch?v=IsNmCKiFTuY)
-<br>
-<br>
-
-
-**Запуск платформы локально**
-```
-1) Скачать репозиторий локально;
-2) Перейти в директорию платформы "\Flask_D3_v2\app"
-3) В командной строке установить виртуальное окружение cmd:virtualenv env
-                                                       cmd:python -m venv env
-4) Активировать виртуальное окружение cmd:env\Scripts\activate.bat
-5) Установить зависимости проекта cmd:pip install -r requirements.txt
-6) Запустить сервер cmd:python app.py 5001
-    5001 - порт на котором запустился сервер
-	Запустить браузер и перейти по адресу http://127.0.0.1:5001/
-``` 
-
-Запуск платформы локально:  https://youtu.be/LV5cnsGonZU
-<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/LV5cnsGonZU/0.jpg)](https://www.youtube.com/watch?v=LV5cnsGonZU)
-<br>
-<br>
 
 
 
