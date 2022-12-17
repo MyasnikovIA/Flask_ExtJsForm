@@ -1207,8 +1207,9 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
             xmldict['html'] = htmlText
 
         # =========== Рекурсионый обход дерева ============================
-        if hasattr(root, 'getchildren'):
-            for elem in root.getchildren():
+        if root.__len__() > 0:  # ---- дочерние элементы
+            for indElem in range(root.__len__()):
+                elem = root[indElem]
                 subObject = parseXMLFrm(rootForm,elem, formName, data, session, root, info)
                 if subObject == None:
                     continue
@@ -1238,9 +1239,10 @@ def parseXMLFrm(rootForm,root, formName, data, session, parentRoot=None,info={"n
     # Поместить объект как атрибуты родительского объекта (Объединить свойства двух объектов)
     if root.tag.lower() in itemsThiwObject:
         tag = root.tag.lower()
-        if hasattr(root, 'getchildren'):
+        if root.__len__() > 0:  # ---- дочерние элементы
             xmldict[tag] = []
-            for elem in root.getchildren():
+            for indElem in range(root.__len__()):
+                elem = root[indElem]
                 subObject = parseXMLFrm(rootForm, elem, formName, data, session, root)
                 xmldict[tag].append(subObject)
         elif len(root) > 0:
